@@ -1,0 +1,86 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.chatter</groupId>
+    <artifactId>chatter-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <!-- Общие свойства -->
+    <properties>
+        <java.version>21</java.version>
+        <spring.boot.version>3.2.4</spring.boot.version>
+        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
+        <checkstyle.version>3.3.0</checkstyle.version>
+        <spotbugs.version>4.7.3.0</spotbugs.version>
+    </properties>
+
+    <!-- Модули микросервисов -->
+    <modules>
+        <module>services/auth-service</module>
+        <module>services/messaging-service</module>
+        <module>services/chat-service</module>
+        <module>services/notification-service</module>
+    </modules>
+
+    <!-- Общие зависимости -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Общие плагины -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Компиляция кода -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+
+                <!-- Checkstyle для линтинга -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- SpotBugs для статического анализа -->
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
