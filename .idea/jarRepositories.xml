@@ -7,6 +7,11 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="github" />
+      <option name="url" value="https://maven.pkg.github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />
@@ -20,6 +25,11 @@
       <option name="id" value="snapshots" />
       <option name="name" value="snapshots" />
       <option name="url" value="https://oss.sonatype.org/content/repositories/snapshots/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="github" />
+      <option name="url" value="https://maven.pkg.github.com/maxim58r/shared-library" />
     </remote-repository>
   </component>
 </project>
