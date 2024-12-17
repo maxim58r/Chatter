@@ -52,5 +52,16 @@ jobs:
           fi
 
       - name: Deploy to Kubernetes
+        run: kubectl apply -f k8s/
+
+      - name: Verify Rollout Status
         run: |
-          kubectl apply -f k8s/
+          kubectl rollout status deployment/auth-service
+          kubectl rollout status deployment/chat-service
+          kubectl rollout status deployment/messaging-service
+          kubectl rollout status deployment/notification-service
+
+      - name: Health Check
+        run: |
+          curl --fail http://your-service-url/actuator/health || exit 1
+

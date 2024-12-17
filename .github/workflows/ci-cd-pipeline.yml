@@ -68,7 +68,15 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy to Kubernetes
-        run: |
-          echo "Deploying to Kubernetes..."
-          kubectl apply -f k8s/
+#      - name: Deploy to Kubernetes
+#        run: |
+#          echo "Deploying to Kubernetes..."
+#          kubectl apply -f k8s/
+
+      - name: Deploy to Staging
+        if: github.ref == 'refs/heads/develop'
+        run: kubectl apply -f k8s/staging/
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
+        run: kubectl apply -f k8s/production/
