@@ -8,16 +8,7 @@
 /dataSources.local.xml
 # IntelliJ IDEA папка .idea
 .idea/
-# Исключить только индивидуальные файлы настроек
-!.idea/codeStyles
-!.idea/inspectionProfiles
-!.idea/modules.xml
-!.idea/vcs.xml
-!.idea/libraries
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/shelf/
-.idea/usage.statistics.xml
+
 
 # Исключить .iml файлы
 *.iml
@@ -27,3 +18,4 @@
 
 # Исключить лог-файлы
 *.log
+/compiler.xml

@@ -1,0 +1,15 @@
+[submodule "services/auth-service"]
+    path = services/auth-service
+    url = https://github.com/maxim58r/auth-service.git
+
+[submodule "services/chat-service"]
+    path = services/chat-service
+    url = https://github.com/maxim58r/chat-service.git
+
+[submodule "services/messaging-service"]
+    path = services/messaging-service
+    url = https://github.com/maxim58r/messaging-service.git
+
+[submodule "services/notification-service"]
+    path = services/notification-service
+    url = https://github.com/maxim58r/notification-service.git
