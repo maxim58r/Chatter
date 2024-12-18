@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_USER = credentials('docker-hub-username')  // ID Docker Hub Credentials
         DOCKER_HUB_PASS = credentials('docker-hub-password')
+        GITHUB_USER = credentials('github-credentials')  // ID для GitHub Credentials
     }
 
     stages {
