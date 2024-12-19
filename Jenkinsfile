@@ -77,9 +77,10 @@ pipeline {
                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
                     services.each { service ->
                         sh """
-                        echo "Building Docker image for ${service}..."
                         docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
+                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
                         docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
                         """
                     }
                 }
