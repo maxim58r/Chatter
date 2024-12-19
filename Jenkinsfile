@@ -2,8 +2,7 @@ pipeline {
     agent { label 'chatter' }  // Использование узла Jenkins
 
     environment {
-        DOCKER_HUB_USER = credentials('docker-hub-username')  // ID Docker Hub Credentials
-        DOCKER_HUB_PASS = credentials('docker-hub-password')
+        DOCKER_HUB_CREDS = credentials('docker-hub')  // ID Docker Hub Credentials
         GITHUB_USER = credentials('github-credentials')  // ID для GitHub Credentials
     }
 
@@ -62,6 +61,16 @@ pipeline {
             }
         }
 
+
+    stages {
+        stage('Login to Docker Hub') {
+            steps {
+                sh '''
+                echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin
+                '''
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 script {
@@ -69,8 +78,8 @@ pipeline {
                     services.each { service ->
                         sh """
                         echo "Building Docker image for ${service}..."
-                        docker build -t ${DOCKER_HUB_USER}/${service}:${env.BUILD_NUMBER} ./services/${service}
-                        docker tag ${DOCKER_HUB_USER}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_USER}/${service}:latest
+                        docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
+                        docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
                         """
                     }
                 }
@@ -80,13 +89,13 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    sh "echo ${DOCKER_HUB_PASS} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
+                    sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
                     services.each { service ->
                         sh """
                         echo "Pushing Docker image for ${service}..."
-                        docker push ${DOCKER_HUB_USER}/${service}:${env.BUILD_NUMBER}
-                        docker push ${DOCKER_HUB_USER}/${service}:latest
+                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
+                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
                         """
                     }
                 }
