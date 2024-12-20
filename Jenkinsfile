@@ -31,11 +31,8 @@ pipeline {
         stage('Run Tests and Build') {
             steps {
                 sh '''
-                echo "Running Maven Tests"
-                mvn clean test
-
-                echo "Building Maven Artifacts"
-                mvn clean package
+                echo "Running Maven Tests and Building Artifacts"
+                mvn -s /home/jenkins-agent/.m2/settings.xml clean install
                 '''
             }
         }
