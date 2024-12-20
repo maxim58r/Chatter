@@ -10,6 +10,10 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
+                sh '''
+                git submodule init
+                git submodule update
+                '''
             }
         }
 
