@@ -2,7 +2,7 @@ pipeline {
     agent { label 'chatter' }  // Использование узла Jenkins
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker-hub')  // ID Docker Hub Credentials
+        DOCKER_HUB_CREDS = credentials('docker_hub')  // ID Docker Hub Credentials
         GITHUB_USER = credentials('github-credentials')  // ID для GitHub Credentials
     }
 
