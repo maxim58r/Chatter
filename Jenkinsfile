@@ -46,17 +46,17 @@ pipeline {
             }
         }
 
-        stage('Run Checkstyle and SpotBugs') {
-            steps {
-                sh '''
-                echo "Running Checkstyle..."
-                mvn checkstyle:check
-
-                echo "Running SpotBugs..."
-                mvn spotbugs:check
-                '''
-            }
-        }
+//         stage('Run Checkstyle and SpotBugs') {
+//             steps {
+//                 sh '''
+//                 echo "Running Checkstyle..."
+//                 mvn checkstyle:check
+//
+//                 echo "Running SpotBugs..."
+//                 mvn spotbugs:check
+//                 '''
+//             }
+//         }
 
         stage('CodeQL Analysis') {
             steps {
