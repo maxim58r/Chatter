@@ -8,6 +8,7 @@
 
     <!-- Общие свойства -->
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
         <spring.boot.version>3.2.4</spring.boot.version>
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
