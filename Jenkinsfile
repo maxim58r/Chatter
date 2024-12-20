@@ -28,11 +28,20 @@ pipeline {
             }
         }
 
-        stage('Run Tests and Build') {
+        stage('Run Tests') {
             steps {
                 sh '''
-                echo "Running Maven Tests and Building Artifacts"
-                mvn -s /home/jenkins-agent/.m2/settings.xml clean install
+                echo "Running Maven Tests"
+                mvn -s /home/jenkins-agent/.m2/settings.xml test
+                '''
+            }
+        }
+
+        stage('Build Artifacts') {
+            steps {
+                sh '''
+                echo "Building Maven Artifacts"
+                mvn -s /home/jenkins-agent/.m2/settings.xml package
                 '''
             }
         }
