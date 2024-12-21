@@ -37,6 +37,21 @@ pipeline {
             }
         }
 
+         stage('Build Maven Project') {
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'github-cred',
+                                                         usernameVariable: 'GITHUB_USER',
+                                                         passwordVariable: 'GITHUB_TOKEN')]) {
+                            sh '''
+                                mvn clean package \
+                                    -Dgithub.user=$GITHUB_USER \
+                                    -Dgithub.token=$GITHUB_TOKEN
+                            '''
+                        }
+                    }
+                }
+         }
+
         stage('Build Artifacts') {
             steps {
                 sh '''
