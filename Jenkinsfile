@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')  // ID Docker Hub Credentials
-        GITHUB_USER = credentials('github-credentials')  // ID для GitHub Credentials
+        GITHUB_USER = credentials('github-cred')  // ID для GitHub Credentials
     }
 
     stages {
@@ -37,19 +37,19 @@ pipeline {
             }
         }
 
-         stage('Build Maven Project') {
-                    steps {
-                        withCredentials([usernamePassword(credentialsId: 'github-cred',
-                                                         usernameVariable: 'GITHUB_USER',
-                                                         passwordVariable: 'GITHUB_TOKEN')]) {
-                            sh '''
-                                mvn clean package \
-                                    -Dgithub.user=$GITHUB_USER \
-                                    -Dgithub.token=$GITHUB_TOKEN
-                            '''
-                        }
-                    }
-         }
+//          stage('Build Maven Project') {
+//                     steps {
+//                         withCredentials([usernamePassword(credentialsId: 'github-cred',
+//                                                          usernameVariable: 'GITHUB_USER',
+//                                                          passwordVariable: 'GITHUB_TOKEN')]) {
+//                             sh '''
+//                                 mvn clean package \
+//                                     -Dgithub.user=$GITHUB_USER \
+//                                     -Dgithub.token=$GITHUB_TOKEN
+//                             '''
+//                         }
+//                     }
+//          }
 
         stage('Build Artifacts') {
             steps {
