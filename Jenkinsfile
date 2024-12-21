@@ -58,6 +58,7 @@ pipeline {
 //             }
 //         }
 
+
         stage('CodeQL Analysis') {
             steps {
                 echo 'Running CodeQL Analysis...'
@@ -65,6 +66,7 @@ pipeline {
                 mkdir -p codeql
                 wget https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
                 unzip -o codeql-linux64.zip -d codeql
+                rm -rf /home/jenkins-agent/workspace/chatter-pipline/codeql-db
                 ./codeql/codeql/codeql database create --language=java codeql-db
                 ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
                 '''
