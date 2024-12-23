@@ -1,17 +1,12 @@
 pipeline {
     agent any
+    tools {
+        git 'Default Git'  // Название, которое ты указал в Global Tool Configuration
+    }
     stages {
-        stage('Check Git') {
-            steps {
-                // Проверяем путь к git и версию
-                sh 'which git'
-                sh 'git --version'
-            }
-        }
         stage('Checkout') {
             steps {
-                // Простой checkout
-                git branch: 'main', url: 'https://github.com/maxim58r/Chatter.git'
+                git url: 'https://github.com/maxim58r/Chatter.git', branch: 'main'
             }
         }
     }
