@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
-        GITHUB_USER      = credentials('github_jenkins') // ID для GitHub Credentials
+        GITHUB_CRED      = credentials('github_jenkins') // ID для GitHub Credentials
     }
 
     stages {
@@ -32,19 +32,17 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                // Здесь поднимаем GitHub credentials, если нужно для приватного доступа (например, GitHub Packages)
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'github_jenkins',
-                        usernameVariable: 'GITHUB_USER',
-                        passwordVariable: 'GITHUB_TOKEN'
-                    )
-                ]) {
+//                 // Здесь поднимаем GitHub credentials, если нужно для приватного доступа (например, GitHub Packages)
+//                 withCredentials([
+//                     usernamePassword(
+//                         credentialsId: 'github_jenkins',
+//                         usernameVariable: 'GITHUB_USER',
+//                         passwordVariable: 'GITHUB_TOKEN'
+//                     )
+//                 ]) {
                     sh '''
                       echo "=== Build & Test with Maven ==="
-                      mvn clean package -s /home/jenkins-agent/.m2/settings.xml \
-                          -Dgithub.user=$GITHUB_USER \
-                          -Dgithub.token=$GITHUB_TOKEN
+                      mvn clean package -s /home/jenkins-agent/.m2/settings.xml
                     '''
                 }
             }
