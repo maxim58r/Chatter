@@ -1,150 +1,95 @@
-// pipeline {
-//     agent any
-//     tools {
-//         git 'Default Git'
-//     }
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 git url: 'https://github.com/maxim58r/Chatter.git', branch: 'main'
-//             }
-//         }
-//     }
-// }
-//
-//
-
-
-
 pipeline {
-    agent { label 'chatter' }  // Использование узла Jenkins
+    agent { label 'chatter' }  // Используем Jenkins-агент "chatter"
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker_hub')  // ID Docker Hub Credentials
-//         GITHUB_USER = credentials('github-cred')  // ID для GitHub Credentials
+        DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
+        GITHUB_USER      = credentials('github_jenkins') // ID для GitHub Credentials
     }
 
     stages {
-        stage('Clean Workspace') {
+
+        stage('Checkout Code') {
+            // Если в настройках job включена опция "Skip default checkout",
+            // тогда нам нужен явный checkout scm
+            // Если же Jenkins автоматически делает checkout, этот stage может быть опционален.
             steps {
-                deleteDir()
+                // Простейший вариант:
+                checkout scm
             }
         }
-//
-//         stage('Checkout Code') {
-//             steps {
-//                 checkout scm
-//                 sh '''
-//                 git submodule init
-//                 git submodule update
-//                 '''
-//             }
-//         }
 
         stage('Setup Environment') {
             steps {
                 sh '''
-                echo "Setting up Java, Maven, and Docker"
-                java -version
-                mvn --version
-                docker --version
+                  echo "=== Setup Environment ==="
+                  set -e
+                  java -version
+                  mvn --version
+                  docker --version
                 '''
             }
         }
 
-        stage('Run Tests') {
+        stage('Build & Test') {
             steps {
-                sh '''
-                echo "Running Maven Tests"
-                mvn -s /home/jenkins-agent/.m2/settings.xml test
-                '''
-            }
-        }
-
-//          stage('Build Maven Project') {
-//                     steps {
-//                         withCredentials([usernamePassword(credentialsId: 'github-cred',
-//                                                          usernameVariable: 'GITHUB_USER',
-//                                                          passwordVariable: 'GITHUB_TOKEN')]) {
-//                             sh '''
-//                                 mvn clean package \
-//                                     -Dgithub.user=$GITHUB_USER \
-//                                     -Dgithub.token=$GITHUB_TOKEN
-//                             '''
-//                         }
-//                     }
-//          }
-
-        stage('Build Artifacts') {
-            steps {
-                sh '''
-                echo "Building Maven Artifacts"
-                mvn -s /home/jenkins-agent/.m2/settings.xml package
-                '''
-            }
-        }
-
-//         stage('Run Checkstyle and SpotBugs') {
-//             steps {
-//                 sh '''
-//                 echo "Running Checkstyle..."
-//                 mvn checkstyle:check
-//
-//                 echo "Running SpotBugs..."
-//                 mvn spotbugs:check
-//                 '''
-//             }
-//         }
-
-
-        stage('CodeQL Analysis') {
-            steps {
-                echo 'Running CodeQL Analysis...'
-                sh '''
-                mkdir -p codeql
-                wget https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
-                unzip -o codeql-linux64.zip -d codeql
-                ./codeql/codeql/codeql database create --language=java codeql-db --overwrite
-                ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-                '''
-            }
-        }
-
-
-        stage('Login to Docker Hub') {
-            steps {
-                sh '''
-                echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin
-                '''
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
-                    services.each { service ->
-                        sh """
-                        docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
-                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
-                        docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                        """
-                    }
+                // Здесь поднимаем GitHub credentials, если нужно для приватного доступа (например, GitHub Packages)
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'github_jenkins',
+                        usernameVariable: 'GITHUB_USER',
+                        passwordVariable: 'GITHUB_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                      echo "=== Build & Test with Maven ==="
+                      mvn clean package -s /home/jenkins-agent/.m2/settings.xml \
+                          -Dgithub.user=$GITHUB_USER \
+                          -Dgithub.token=$GITHUB_TOKEN
+                    '''
                 }
             }
         }
 
-        stage('Push Docker Images') {
+        stage('CodeQL Analysis') {
+            steps {
+                echo '=== Running CodeQL Analysis... ==='
+                sh '''
+                  mkdir -p codeql
+                  wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
+                  unzip -o codeql-linux64.zip -d codeql
+                  ./codeql/codeql/codeql database create --language=java codeql-db --overwrite
+                  ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+                  rm -f codeql-linux64.zip
+                '''
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                // Один раз логинимся перед сборкой + пушем Docker-образов
+                sh '''
+                  echo "=== Docker Login ==="
+                  echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin
+                '''
+            }
+        }
+
+        stage('Build & Push Docker Images') {
             steps {
                 script {
-                    sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+                    // Собираем и пушим образы
                     services.each { service ->
                         sh """
-                        echo "Pushing Docker image for ${service}..."
-                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
-                        docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                          echo "=== Building Docker image for ${service} ==="
+                          docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
+
+                          echo "=== Pushing Docker image for ${service} ==="
+                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
+
+                          echo "=== Tagging 'latest' for ${service} ==="
+                          docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
                         """
                     }
                 }
@@ -153,18 +98,18 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             when {
-                branch 'main'  // Деплой в production только с ветки main
+                branch 'main'  // Деплой только с ветки main
             }
             steps {
                 sh '''
-                echo "Applying Kubernetes Manifests..."
-                kubectl apply -f k8s/
+                  echo "=== Deploy to Kubernetes ==="
+                  kubectl apply -f k8s/
 
-                echo "Checking Rollout Status..."
-                kubectl rollout status deployment/auth-service
-                kubectl rollout status deployment/chat-service
-                kubectl rollout status deployment/messaging-service
-                kubectl rollout status deployment/notification-service
+                  echo "=== Checking Rollout Status ==="
+                  kubectl rollout status deployment/auth-service
+                  kubectl rollout status deployment/chat-service
+                  kubectl rollout status deployment/messaging-service
+                  kubectl rollout status deployment/notification-service
                 '''
             }
         }
@@ -172,15 +117,15 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
-                echo "Performing Health Check..."
-                curl --fail http://localhost:8080/actuator/health || exit 1
+                  echo "=== Performing Health Check ==="
+                  curl --fail http://localhost:8080/actuator/health || exit 1
                 '''
             }
         }
 
         stage('Archive Reports') {
             steps {
-                echo 'Archiving Checkstyle, SpotBugs, and CodeQL reports...'
+                echo '=== Archiving reports (Checkstyle, SpotBugs, CodeQL) ==='
                 archiveArtifacts artifacts: '**/target/checkstyle-result.xml, **/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
             }
         }
