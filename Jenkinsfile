@@ -1,23 +1,17 @@
 pipeline {
     agent any
     tools {
-        git 'Default Git' // Имя, которое ты прописал в Global Tool Configuration
+        git 'Default Git'
     }
     stages {
-        stage('Check Git') {
-            steps {
-                sh 'which git'
-                sh 'git --version'
-            }
-        }
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/maxim58r/Chatter.git'
-                // Если репо приватный, добавь: credentialsId: 'github-cred'
+                git url: 'https://github.com/maxim58r/Chatter.git', branch: 'main'
             }
         }
     }
 }
+
 
 
 
