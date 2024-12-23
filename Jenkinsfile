@@ -1,18 +1,22 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
+        stage('Check Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/maxim58r/Chatter.git'
+                // Проверяем путь к git и версию
+                sh 'which git'
+                sh 'git --version'
             }
         }
-        stage('Print Git Version') {
+        stage('Checkout') {
             steps {
-                sh 'git --version'
+                // Простой checkout
+                git branch: 'main', url: 'https://github.com/maxim58r/Chatter.git'
             }
         }
     }
 }
+
 
 
 // pipeline {
