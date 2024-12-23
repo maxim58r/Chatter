@@ -44,7 +44,7 @@ pipeline {
                       echo "=== Build & Test with Maven ==="
                       mvn clean package -s /home/jenkins-agent/.m2/settings.xml
                     '''
-                }
+//                 }
             }
         }
 
