@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        git 'Default Git'
+        git 'Default'
     }
     stages {
         stage('Check Git') {
