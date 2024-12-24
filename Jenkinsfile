@@ -71,20 +71,35 @@ pipeline {
 //                 }
             }
         }
+//
+//         stage('CodeQL Analysis') {
+//             steps {
+//                 echo '=== Running CodeQL Analysis... ==='
+//                 sh '''
+//                   mkdir -p codeql
+//                   wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
+//                   unzip -o codeql-linux64.zip -d codeql
+//                   ./codeql/codeql/codeql database create --language=java codeql-db --overwrite
+//                   ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+//                   rm -f codeql-linux64.zip
+//                 '''
+//             }
+//         }
 
         stage('CodeQL Analysis') {
             steps {
                 echo '=== Running CodeQL Analysis... ==='
-                sh '''
-                  mkdir -p codeql
-                  wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
-                  unzip -o codeql-linux64.zip -d codeql
-                  ./codeql/codeql/codeql database create --language=java codeql-db --overwrite
-                  ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-                  rm -f codeql-linux64.zip
-                '''
+                script {
+                    docker.image('ghcr.io/github/codeql/codeql-cli:latest').inside {
+                        sh """
+                          codeql database create --language=java codeql-db --overwrite
+                          codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+                        """
+                    }
+                }
             }
         }
+
 
         stage('Login to Docker Hub') {
             steps {
