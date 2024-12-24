@@ -88,19 +88,39 @@ pipeline {
 
         stage('CodeQL Analysis') {
             steps {
-                echo '=== Running CodeQL Analysis... ==='
                 script {
-                    docker.withRegistry('https://ghcr.io', 'docker_hub') {
-                        docker.image('ghcr.io/github/codeql/codeql-cli:latest').inside {
-                            sh """
-                                codeql database create --language=java codeql-db --overwrite
-                                codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-                            """
-                        }
+                    // Определяем путь для кэширования
+                    def cacheDir = "${env.WORKSPACE}/codeql_cache"
+                    def codeqlZip = "${cacheDir}/codeql-linux64.zip"
+                    def codeqlExtractDir = "${cacheDir}/codeql"
+
+                    // Создаем директорию для кэша, если она отсутствует
+                    sh "mkdir -p ${cacheDir}"
+
+                    // Проверяем, есть ли уже скачанный файл
+                    if (!fileExists(codeqlZip)) {
+                        echo "Downloading CodeQL CLI..."
+                        sh """
+                            wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip -O ${codeqlZip}
+                        """
+                    } else {
+                        echo "CodeQL CLI found in cache."
                     }
+
+                    // Распаковываем CodeQL CLI
+                    sh """
+                        unzip -o ${codeqlZip} -d ${codeqlExtractDir}
+                    """
+
+                    // Выполняем анализ с помощью CodeQL
+                    sh """
+                        ${codeqlExtractDir}/codeql/codeql database create --language=java codeql-db --overwrite
+                        ${codeqlExtractDir}/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+                    """
                 }
             }
         }
+
 
         stage('Login to Docker Hub') {
             steps {
