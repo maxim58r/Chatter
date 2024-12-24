@@ -43,6 +43,17 @@ pipeline {
             }
         }
 
+        stage('Verify Maven Settings') {
+            steps {
+                sh '''
+                if [ ! -f /home/jenkins-agent/.m2/settings.xml ]; then
+                  echo "Error: settings.xml not found!"
+                  exit 1
+                fi
+                '''
+            }
+        }
+
         stage('Build & Test') {
             steps {
 //                 // Здесь поднимаем GitHub credentials, если нужно для приватного доступа (например, GitHub Packages)
