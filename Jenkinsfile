@@ -90,16 +90,17 @@ pipeline {
             steps {
                 echo '=== Running CodeQL Analysis... ==='
                 script {
-                    docker.image('ghcr.io/github/codeql/codeql-cli:latest').inside {
-                        sh """
-                          codeql database create --language=java codeql-db --overwrite
-                          codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-                        """
+                    docker.withRegistry('https://ghcr.io', 'docker_hub') {
+                        docker.image('ghcr.io/github/codeql/codeql-cli:latest').inside {
+                            sh """
+                                codeql database create --language=java codeql-db --overwrite
+                                codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+                            """
+                        }
                     }
                 }
             }
         }
-
 
         stage('Login to Docker Hub') {
             steps {
