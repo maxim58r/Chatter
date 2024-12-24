@@ -18,6 +18,19 @@ pipeline {
             }
         }
 
+//         stage('SonarQube Analysis') {
+//             environment {
+//                 SONAR_TOKEN = credentials('sonarqube-token')
+//             }
+//             steps {
+//                 script {
+//                     withSonarQubeEnv('SonarQube') {
+//                         sh 'mvn sonar:sonar -Dsonar.projectKey=my-project'
+//                     }
+//                 }
+//             }
+//         }
+
         stage('Setup Environment') {
             steps {
                 sh '''
@@ -123,8 +136,8 @@ pipeline {
 
         stage('Archive Reports') {
             steps {
-                echo '=== Archiving reports (Checkstyle, SpotBugs, CodeQL) ==='
-                archiveArtifacts artifacts: '**/target/checkstyle-result.xml, **/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
+                echo '=== Archiving reports (SpotBugs, CodeQL) ==='
+                archiveArtifacts artifacts: '**/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
             }
         }
     }
