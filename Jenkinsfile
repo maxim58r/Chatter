@@ -71,55 +71,33 @@ pipeline {
 //                 }
             }
         }
-//
+
 //         stage('CodeQL Analysis') {
 //             steps {
-//                 echo '=== Running CodeQL Analysis... ==='
-//                 sh '''
-//                   mkdir -p codeql
-//                   wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
-//                   unzip -o codeql-linux64.zip -d codeql
-//                   ./codeql/codeql/codeql database create --language=java codeql-db --overwrite
-//                   ./codeql/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-//                   rm -f codeql-linux64.zip
-//                 '''
+//                 script {
+//                     withCodeQL(codeql: 'CodeQL 2.5.5') {
+//                         sh '''
+//                           echo "=== Running CodeQL Analysis ==="
+//                           codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
+//                           codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+//                         '''
+//                     }
+//                 }
 //             }
 //         }
 
         stage('CodeQL Analysis') {
             steps {
                 script {
-                    // Определяем путь для кэширования
-                    def cacheDir = "${env.WORKSPACE}/codeql_cache"
-                    def codeqlZip = "${cacheDir}/codeql-linux64.zip"
-                    def codeqlExtractDir = "${cacheDir}/codeql"
-
-                    // Создаем директорию для кэша, если она отсутствует
-                    sh "mkdir -p ${cacheDir}"
-
-                    // Проверяем, есть ли уже скачанный файл
-                    if (!fileExists(codeqlZip)) {
-                        echo "Downloading CodeQL CLI..."
-                        sh """
-                            wget -q https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip -O ${codeqlZip}
-                        """
-                    } else {
-                        echo "CodeQL CLI found in cache."
-                    }
-
-                    // Распаковываем CodeQL CLI
+                    def codeqlPath = tool name: 'CodeQL 2.2.0', type: 'CodeQLCLI'
                     sh """
-                        unzip -o ${codeqlZip} -d ${codeqlExtractDir}
-                    """
-
-                    // Выполняем анализ с помощью CodeQL с явным указанием команды сборки
-                    sh """
-                        ${codeqlExtractDir}/codeql/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
-                        ${codeqlExtractDir}/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+                        ${codeqlPath}/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
+                        ${codeqlPath}/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
                     """
                 }
             }
         }
+
 
         stage('Login to Docker Hub') {
             steps {
