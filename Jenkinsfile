@@ -89,7 +89,7 @@ pipeline {
         stage('CodeQL Analysis') {
             steps {
                 script {
-                    def codeqlPath = tool name: 'CodeQL', type: 'CodeQL'
+                    def codeqlPath = tool name: 'CodeQL', type: 'CodeQL CLI'
                     sh """
                         ${codeqlPath}/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
                         ${codeqlPath}/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
