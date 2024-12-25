@@ -99,13 +99,23 @@ pipeline {
 //         }
 
 
-        stage('CodeQL Version') {
-            steps {
-                withCodeQL(codeql: 'CodeQL') {
-                    sh 'codeql --version'
-                }
-            }
+        stage('Set CodeQL path') {
+            def codeqlHome = tool name: 'CodeQL'
+            env.PATH = "${codeqlHome}/codeql:${env.PATH}"
         }
+
+        stage('Check version') {
+            sh 'codeql --version'
+        }
+
+
+//         stage('CodeQL Version') {
+//             steps {
+//                 withCodeQL(codeql: 'CodeQL') {
+//                     sh 'codeql --version'
+//                 }
+//             }
+//         }
 
         stage('Login to Docker Hub') {
             steps {
