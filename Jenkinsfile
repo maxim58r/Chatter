@@ -112,15 +112,14 @@ pipeline {
                         unzip -o ${codeqlZip} -d ${codeqlExtractDir}
                     """
 
-                    // Выполняем анализ с помощью CodeQL
+                    // Выполняем анализ с помощью CodeQL с явным указанием команды сборки
                     sh """
-                        ${codeqlExtractDir}/codeql/codeql database create --language=java codeql-db --overwrite
+                        ${codeqlExtractDir}/codeql/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
                         ${codeqlExtractDir}/codeql/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
                     """
                 }
             }
         }
-
 
         stage('Login to Docker Hub') {
             steps {
