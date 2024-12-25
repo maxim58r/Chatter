@@ -86,18 +86,26 @@ pipeline {
 //             }
 //         }
 
-        stage('CodeQL Analysis') {
+//         stage('CodeQL Analysis') {
+//             steps {
+//                 script {
+//                     def codeqlPath = tool name: 'CodeQL', type: 'CodeQL CLI'
+//                     sh """
+//                         ${codeqlPath}/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
+//                         ${codeqlPath}/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
+//                     """
+//                 }
+//             }
+//         }
+
+
+        stage('CodeQL Version') {
             steps {
-                script {
-                    def codeqlPath = tool name: 'CodeQL', type: 'CodeQL CLI'
-                    sh """
-                        ${codeqlPath}/codeql database create --language=java codeql-db --overwrite --command "mvn clean package"
-                        ${codeqlPath}/codeql database analyze codeql-db --format=sarif-latest --output=codeql-results.sarif
-                    """
+                withCodeQL(codeql: 'CodeQL') {
+                    sh 'codeql --version'
                 }
             }
         }
-
 
         stage('Login to Docker Hub') {
             steps {
