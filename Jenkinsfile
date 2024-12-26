@@ -102,7 +102,7 @@ pipeline {
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}:8080/actuator/health || {
+                          curl --fail http://${service}.default.svc.cluster.local:8080/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
