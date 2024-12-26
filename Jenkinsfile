@@ -98,6 +98,7 @@ pipeline {
             steps {
                 script {
                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+                    echo "Services to check: ${services.join(', ')}"
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
