@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: chat-service
-          image: maxim58r/chat-service:latest
+          image: maxim558r/chat-service:latest
           ports:
             - containerPort: 8080
           env:
@@ -33,6 +33,6 @@ spec:
     app: chat-service
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
   type: ClusterIP

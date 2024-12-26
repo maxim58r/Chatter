@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: username/notification-service:latest
+          image: maxim558r/notification-service:latest
           ports:
             - containerPort: 8080
           env:
@@ -33,6 +33,6 @@ spec:
     app: notification-service
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
   type: ClusterIP
