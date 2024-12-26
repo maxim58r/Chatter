@@ -16,42 +16,42 @@ pipeline {
 
         stage('Setup Environment') {
             steps {
-                sh '''
+                sh """
                   echo "=== Setup Environment ==="
                   set -e
                   java -version
                   mvn --version
                   docker --version
-                '''
+                """
             }
         }
 
         stage('Verify Maven Settings') {
             steps {
-                sh '''
+                sh """
                 if [ ! -f /home/jenkins-agent/.m2/settings.xml ]; then
                   echo "Error: settings.xml not found!"
                   exit 1
                 fi
-                '''
+                """
             }
         }
 
         stage('Build & Test') {
             steps {
-                sh '''
+                sh """
                   echo "=== Build & Test with Maven ==="
                   mvn clean package -s /home/jenkins-agent/.m2/settings.xml
-                '''
+                """
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
-                sh '''
+                sh """
                   echo "=== Docker Login ==="
-                  echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin
-                '''
+                  echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
+                """
             }
         }
 
@@ -81,7 +81,7 @@ pipeline {
                 branch 'main' // Деплой только с ветки main
             }
             steps {
-                sh '''
+                sh """
                   echo "=== Deploy to Kubernetes ==="
                   kubectl apply -f k8s/
 
@@ -90,7 +90,7 @@ pipeline {
                   kubectl rollout status deployment/chat-service
                   kubectl rollout status deployment/messaging-service
                   kubectl rollout status deployment/notification-service
-                '''
+                """
             }
         }
 
@@ -99,13 +99,13 @@ pipeline {
                 script {
                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
                     services.each { service ->
-                        sh '''
+                        sh """
                           echo "=== Performing Health Check for ${service} ==="
                           curl --fail http://${service}.default.svc.cluster.local:8080/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
-                        '''
+                        """
                     }
                 }
             }
