@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: maxim558r/api-gateway:latest
+          image: maxim58r/api-gateway:latest
           ports:
             - containerPort: 8080
           env:

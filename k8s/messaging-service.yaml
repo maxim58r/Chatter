@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: messaging-service
-          image: maxim558r/messaging-service:latest
+          image: maxim58r/messaging-service:latest
           ports:
             - containerPort: 8080
           env:

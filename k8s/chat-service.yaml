@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: chat-service
-          image: maxim558r/chat-service:latest
+          image: maxim58r/chat-service:latest
           ports:
             - containerPort: 8080
           env:
