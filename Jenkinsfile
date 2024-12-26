@@ -159,10 +159,15 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sh '''
-                  echo "=== Performing Health Check ==="
-                  curl --fail http://localhost:8080/actuator/health || exit 1
-                '''
+                script {
+                    def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+                    services.each { service ->
+                        sh """
+                          echo "=== Performing Health Check for ${service} ==="
+                          curl --fail http://${service}:8080/actuator/health || exit 1
+                        """
+                    }
+                }
             }
         }
 
