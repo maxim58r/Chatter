@@ -164,12 +164,28 @@ pipeline {
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}:8080/actuator/health || exit 1
+                          curl --fail http://${service}.default.svc.cluster.local:8080/actuator/health || exit 1
+
                         """
                     }
                 }
             }
         }
+//         stage('Health Check') {
+//             steps {
+//                 script {
+//                     def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+//                     services.each { service ->
+//                         sh """
+//                           echo "=== Performing Health Check for ${service} ==="
+// //                           curl --fail http://${service}:8080/actuator/health || exit 1
+//                           curl --fail http://${service}.default.svc.cluster.local:8080/actuator/health || exit 1
+//
+//                         """
+//                     }
+//                 }
+//             }
+//         }
 
         stage('Archive Reports') {
             steps {
