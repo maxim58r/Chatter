@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: maxim58r/auth-service:latest
+          image: maxim558r/auth-service:latest
           ports:
             - containerPort: 8080
           env:
