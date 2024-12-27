@@ -1,13 +1,13 @@
 [submodule "services/authservice"]
-    path = services/auth-service
+	path = services/authservice
     url = git@github.com:maxim58r/auth-service.git
 [submodule "services/chatservice"]
-    path = services/chat-service
+	path = services/chatservice
     url = git@github.com:maxim58r/chat-service.git
 [submodule "services/messagingservice"]
-    path = services/messaging-service
+	path = services/messagingservice
     url = git@github.com:maxim58r/messaging-service.git
 [submodule "services/notificationservice"]
-    path = services/notification-service
+	path = services/notificationservice
     url = git@github.com:maxim58r/notification-service.git
 
