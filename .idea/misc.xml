@@ -10,10 +10,10 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/services/notification-service/pom.xml" />
-        <option value="$PROJECT_DIR$/services/messaging-service/pom.xml" />
-        <option value="$PROJECT_DIR$/services/chat-service/pom.xml" />
-        <option value="$PROJECT_DIR$/services/auth-service/pom.xml" />
+        <option value="$PROJECT_DIR$/services/authservice/pom.xml" />
+        <option value="$PROJECT_DIR$/services/chatservice/pom.xml" />
+        <option value="$PROJECT_DIR$/services/messagingservice/pom.xml" />
+        <option value="$PROJECT_DIR$/services/notificationservice/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>

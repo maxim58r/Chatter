@@ -2,9 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/authservice" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/chatservice" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/messagingservice" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/notificationservice" vcs="Git" />
   </component>
 </project>
