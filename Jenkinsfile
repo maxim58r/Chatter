@@ -59,7 +59,7 @@ pipeline {
         stage('Build & Push Docker Images') {
             steps {
                 script {
-                    def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+                    def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
                     services.each { service ->
                         sh """
                           echo "=== Building Docker image for ${service} ==="
@@ -101,10 +101,10 @@ pipeline {
                   done
 
                   echo "=== Checking Rollout Status ==="
-                  kubectl rollout status deployment/auth-service
-                  kubectl rollout status deployment/chat-service
+                  kubectl rollout status deployment/authservice
+                  kubectl rollout status deployment/chatservice
                   kubectl rollout status deployment/messaging-service
-                  kubectl rollout status deployment/notification-service
+                  kubectl rollout status deployment/notificationservice
                 '''
             }
         }
@@ -112,7 +112,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 script {
-                    def services = ['auth-service', 'chat-service', 'messaging-service', 'notification-service']
+                    def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
                     echo "Services to check: ${services.join(', ')}"
                     services.each { service ->
                         sh """
