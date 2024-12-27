@@ -22,17 +22,3 @@ spec:
           env:
             - name: POSTGRES_URL
               value: "jdbc:postgresql://postgres:5432/chatdb"
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: chat-service
-spec:
-  selector:
-    app: chat-service
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  type: ClusterIP

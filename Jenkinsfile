@@ -15,17 +15,6 @@ pipeline {
             }
         }
 
-        stage('Verify Kubernetes Connection') {
-            steps {
-                script {
-                    sh '''
-                    echo "Using KUBECONFIG: $KUBECONFIG"
-                    kubectl get nodes
-                    '''
-                }
-            }
-        }
-
         stage('Setup Environment') {
             steps {
                 sh """
@@ -88,6 +77,17 @@ pipeline {
             }
         }
 
+        stage('Verify Kubernetes Connection') {
+            steps {
+                script {
+                    sh '''
+                    echo "Using KUBECONFIG: $KUBECONFIG"
+                    kubectl get nodes
+                    '''
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes') {
             when {
                 branch 'main' // Деплой только с ветки main
@@ -95,7 +95,10 @@ pipeline {
             steps {
                 sh """
                   echo "=== Deploy to Kubernetes ==="
-                  kubectl apply -f k8s/
+                  for service in $(ls k8s); do
+                      kubectl apply -f k8s/$service/deployment.yaml
+                      kubectl apply -f k8s/$service/service.yaml
+                  done
 
                   echo "=== Checking Rollout Status ==="
                   kubectl rollout status deployment/auth-service
