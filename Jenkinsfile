@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
         GITHUB_CRED      = credentials('github_jenkins') // ID для GitHub Credentials
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -11,6 +12,17 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Verify Kubernetes Connection') {
+            steps {
+                script {
+                    sh '''
+                    echo "Using KUBECONFIG: $KUBECONFIG"
+                    kubectl get nodes
+                    '''
+                }
             }
         }
 
