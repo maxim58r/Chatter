@@ -93,7 +93,7 @@ pipeline {
                 branch 'main' // Деплой только с ветки main
             }
             steps {
-                sh """
+                sh '''
                   echo "=== Deploy to Kubernetes ==="
                   for service in $(ls k8s); do
                       kubectl apply -f k8s/$service/deployment.yaml
@@ -105,7 +105,7 @@ pipeline {
                   kubectl rollout status deployment/chat-service
                   kubectl rollout status deployment/messaging-service
                   kubectl rollout status deployment/notification-service
-                """
+                '''
             }
         }
 

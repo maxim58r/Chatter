@@ -18,10 +18,10 @@
 
     <!-- Модули микросервисов -->
     <modules>
-        <module>services/auth-service</module>
-        <module>services/messaging-service</module>
-        <module>services/chat-service</module>
-        <module>services/notification-service</module>
+        <module>services/authservice</module>
+        <module>services/messagingservice</module>
+        <module>services/chatservice</module>
+        <module>services/notificationservice</module>
     </modules>
 
     <repositories>

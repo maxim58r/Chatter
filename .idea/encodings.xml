@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
-    <file url="file://$PROJECT_DIR$/services/auth-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/auth-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/chat-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/chat-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/chat-service/src/main/resources/application.yaml" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/messaging-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/messaging-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/messaging-service/src/main/resources/application.yaml" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/notification-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/notification-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/authservice/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/authservice/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/chatservice/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/chatservice/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/chatservice/src/main/resources/application.yaml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/messagingservice/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/messagingservice/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/messagingservice/src/main/resources/application.yaml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/notificationservice/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/notificationservice/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
 </project>
