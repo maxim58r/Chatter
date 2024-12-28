@@ -10,4 +10,3 @@
 [submodule "services/notificationservice"]
 	path = services/notificationservice
     url = git@github.com:maxim58r/notification-service.git
-
