@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-service
+  name: authservice
   labels:
-    app: auth-service
+    app: authservice
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: auth-service
+      app: authservice
   template:
     metadata:
       labels:
-        app: auth-service
+        app: authservice
     spec:
       containers:
-        - name: auth-service
-          image: maxim58r/auth-service:latest
+        - name: authservice
+          image: maxim58r/authservice:latest
           ports:
             - containerPort: 8080
           env:

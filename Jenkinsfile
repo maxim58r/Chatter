@@ -11,7 +11,12 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scm
+//                 checkout scm
+
+                git branch: 'main',
+                    credentialsId: 'github_jenkins',
+                    url: 'https://github.com/maxim58r/Chatter.git'
+
             }
         }
 
@@ -46,6 +51,14 @@ pipeline {
                 """
             }
         }
+
+        stage('SpotBugs Analysis') {
+            steps {
+                sh "mvn spotbugs:spotbugs"
+                // Или spotbugs:check
+            }
+        }
+
 
         stage('Login to Docker Hub') {
             steps {
@@ -83,6 +96,7 @@ pipeline {
                     sh '''
                     echo "Using KUBECONFIG: $KUBECONFIG"
                     kubectl get nodes
+                    kubectl config get-context
                     '''
                 }
             }
@@ -103,7 +117,7 @@ pipeline {
                   echo "=== Checking Rollout Status ==="
                   kubectl rollout status deployment/authservice
                   kubectl rollout status deployment/chatservice
-                  kubectl rollout status deployment/messaging-service
+                  kubectl rollout status deployment/messagingservice
                   kubectl rollout status deployment/notificationservice
                 '''
             }

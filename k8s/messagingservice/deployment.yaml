@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: messaging-service
+  name: messagingservice
   labels:
-    app: messaging-service
+    app: messagingservice
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: messaging-service
+      app: messagingservice
   template:
     metadata:
       labels:
-        app: messaging-service
+        app: messagingservice
     spec:
       containers:
-        - name: messaging-service
-          image: maxim58r/messaging-service:latest
+        - name: messagingservice
+          image: maxim58r/messagingservice:latest
           ports:
             - containerPort: 8080
           env:
