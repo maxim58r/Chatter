@@ -117,6 +117,7 @@ pipeline {
                         sh """
                           kubectl apply -f k8s/${s}/deployment.yaml
                           kubectl apply -f k8s/${s}/service.yaml
+                          kubectl apply -f k8s/${s}/ingress.yaml
                         """
                     }
 
