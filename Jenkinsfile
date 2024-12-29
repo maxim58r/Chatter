@@ -108,14 +108,7 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'develop'
-                }
-            }
             steps {
-                // Вариант 1: всё в одном script
                 script {
                     sh 'echo "=== Deploy to Kubernetes ==="'
 
