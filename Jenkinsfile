@@ -3,20 +3,25 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
-        GITHUB_CRED      = credentials('github_jenkins') // ID для GitHub Credentials
+        GITHUB_CRED      = credentials('github_ssh_key') // ID для GitHub Credentials
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-//                 checkout scm
-
-                git branch: 'main',
-                    credentialsId: 'github_jenkins',
-                    url: 'https://github.com/maxim58r/Chatter.git'
-
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:maxim58r/Chatter.git',
+                        credentialsId: 'github_ssh_key'  // ID SSH Credentials
+                    ]],
+                    extensions: [
+                        [$class: 'SubmoduleOption', recursiveSubmodules: true]
+                    ]
+                ])
             }
         }
 
@@ -47,7 +52,7 @@ pipeline {
             steps {
                 sh """
                   echo "=== Build & Test with Maven ==="
-                  mvn clean package -s /home/jenkins-agent/.m2/settings.xml
+                  mvn clean package
                 """
             }
         }

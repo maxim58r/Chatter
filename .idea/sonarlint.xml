@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SonarLintProjectSettings">
+    <option name="moduleMapping">
+      <map>
+        <entry key="chatservice" value="chat-service" />
+        <entry key="messagingservice" value="messaging-service" />
+        <entry key="notificationservice" value="notification-service" />
+      </map>
+    </option>
+  </component>
+</project>
