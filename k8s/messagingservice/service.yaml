@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: messaging-service
+  name: messagingservice
 spec:
   selector:
-    app: messaging-service
+    app: messagingservice
   ports:
     - protocol: TCP
       port: 8080
