@@ -101,7 +101,7 @@ pipeline {
                     sh '''
                     echo "Using KUBECONFIG: $KUBECONFIG"
                     kubectl get nodes
-                    kubectl config get-context
+                    kubectl config get-contexts
                     '''
                 }
             }
