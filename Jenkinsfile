@@ -115,27 +115,29 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                  echo "=== Deploy to Kubernetes ==="
-                '''
+                // Вариант 1: всё в одном script
+                script {
+                    sh 'echo "=== Deploy to Kubernetes ==="'
 
-                def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
-                services.each { s ->
-                  sh """
-                    kubectl apply -f k8s/${s}/deployment.yaml
-                    kubectl apply -f k8s/${s}/service.yaml
-                  """
+                    def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
+                    services.each { s ->
+                        sh """
+                          kubectl apply -f k8s/${s}/deployment.yaml
+                          kubectl apply -f k8s/${s}/service.yaml
+                        """
+                    }
+
+                    sh '''
+                      echo "=== Checking Rollout Status ==="
+                      kubectl rollout status deployment/authservice
+                      kubectl rollout status deployment/chatservice
+                      kubectl rollout status deployment/messagingservice
+                      kubectl rollout status deployment/notificationservice
+                    '''
                 }
-
-                sh '''
-                  echo "=== Checking Rollout Status ==="
-                  kubectl rollout status deployment/authservice
-                  kubectl rollout status deployment/chatservice
-                  kubectl rollout status deployment/messagingservice
-                  kubectl rollout status deployment/notificationservice
-                '''
             }
         }
+
 
         stage('Health Check') {
             steps {
