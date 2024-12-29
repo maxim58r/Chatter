@@ -109,16 +109,25 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             when {
-                branch 'main' // Деплой только с ветки main
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
             }
             steps {
                 sh '''
                   echo "=== Deploy to Kubernetes ==="
-                  for service in $(ls k8s); do
-                      kubectl apply -f k8s/$service/deployment.yaml
-                      kubectl apply -f k8s/$service/service.yaml
-                  done
+                '''
 
+                def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
+                services.each { s ->
+                  sh """
+                    kubectl apply -f k8s/${s}/deployment.yaml
+                    kubectl apply -f k8s/${s}/service.yaml
+                  """
+                }
+
+                sh '''
                   echo "=== Checking Rollout Status ==="
                   kubectl rollout status deployment/authservice
                   kubectl rollout status deployment/chatservice
@@ -132,11 +141,10 @@ pipeline {
             steps {
                 script {
                     def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
-                    echo "Services to check: ${services.join(', ')}"
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}.default.svc.cluster.local:8080/actuator/health || {
+                          curl --fail http://${service}.local/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
