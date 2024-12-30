@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'chatter' } // Используем Jenkins-агент "chatter"
+    agent none
 
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Ветка для сборки')
@@ -15,6 +15,7 @@ pipeline {
     stages {
 
         stage('Checkout') {
+            agent { label 'chatter' }
             steps {
                 echo "=== Checkout branch: ${params.BRANCH_NAME} ==="
                 checkout([
@@ -22,7 +23,7 @@ pipeline {
                     branches: [[name: "*/${params.BRANCH_NAME}"]],
                     userRemoteConfigs: [[
                         url: 'git@github.com:maxim58r/Chatter.git',
-                        credentialsId: 'github_ssh_key'  // ID SSH Credentials
+                        credentialsId: 'github_ssh_key'
                     ]],
                     extensions: [
                         [$class: 'SubmoduleOption', recursiveSubmodules: true]
@@ -31,7 +32,24 @@ pipeline {
             }
         }
 
+        stage('Setup Environment') {
+            agent { label 'chatter' }
+            when {
+                expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Setup' }
+            }
+            steps {
+                sh """
+                  echo "=== Setup Environment ==="
+                  set -e
+                  java -version
+                  mvn --version
+                  docker --version
+                """
+            }
+        }
+
         stage('Build & Test') {
+            agent { label 'chatter' }
             when {
                 expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Build' }
             }
@@ -44,12 +62,14 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
+            agent { label 'chatter' }
             when {
                 expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Deploy' }
             }
             steps {
                 script {
                     sh 'echo "=== Deploy to Kubernetes ==="'
+
                     def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
                     services.each { s ->
                         sh """
@@ -59,18 +79,19 @@ pipeline {
                         """
                     }
 
-                    sh '''
+                    sh """
                       echo "=== Checking Rollout Status ==="
                       kubectl rollout status deployment/authservice
                       kubectl rollout status deployment/chatservice
                       kubectl rollout status deployment/messagingservice
                       kubectl rollout status deployment/notificationservice
-                    '''
+                    """
                 }
             }
         }
 
         stage('Health Check') {
+            agent { label 'chatter' }
             when {
                 expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'HealthCheck' }
             }
@@ -80,13 +101,24 @@ pipeline {
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}.local:<NodePort>/actuator/health || {
+                          curl --fail http://${service}.local:31547/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
                         """
                     }
                 }
+            }
+        }
+
+        stage('Archive Reports') {
+            agent { label 'chatter' }
+            when {
+                expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Archive' }
+            }
+            steps {
+                echo '=== Archiving reports (SpotBugs, CodeQL) ==='
+                archiveArtifacts artifacts: '**/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
             }
         }
     }
@@ -100,3 +132,4 @@ pipeline {
         }
     }
 }
+
