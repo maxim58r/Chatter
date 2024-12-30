@@ -140,7 +140,7 @@ pipeline {
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}.local/actuator/health || {
+                          curl --fail http://${service}.local:31547/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
