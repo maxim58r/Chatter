@@ -2,64 +2,59 @@ pipeline {
     agent { label 'chatter' }
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker_hub')
-        GITHUB_CRED      = credentials('github_ssh_key')
+        DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
+        GITHUB_CRED      = credentials('github_ssh_key') // ID для GitHub Credentials
         KUBECONFIG       = "/var/lib/jenkins/.kube/config"
-        SERVICES         = "authservice chatservice messagingservice notificationservice"
-    }
-
-    options {
-        timestamps() // Добавляем временные метки к логам
-        timeout(time: 60, unit: 'MINUTES') // Общий таймаут пайплайна
+        SERVICES         = "authservice chatservice messagingservice notificationservice" // Список сервисов
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                script {
-                    checkout scm: [
-                        $class: 'GitSCM',
-                        branches: [[name: '*/main']],
-                        userRemoteConfigs: [[
-                            url: 'git@github.com:maxim58r/Chatter.git',
-                            credentialsId: 'github_ssh_key'
-                        ]],
-                        extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]]
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:maxim58r/Chatter.git',
+                        credentialsId: 'github_ssh_key'
+                    ]],
+                    extensions: [
+                        [$class: 'SubmoduleOption', recursiveSubmodules: true]
                     ]
-                }
+                ])
             }
         }
 
         stage('Setup Environment') {
             steps {
-                sh '''
+                sh """
                   echo "=== Setup Environment ==="
                   set -e
                   java -version
                   mvn --version
                   docker --version
-                '''
+                """
             }
         }
 
         stage('Verify Maven Settings') {
             steps {
-                sh '''
+                sh """
                   if [ ! -f /home/jenkins-agent/.m2/settings.xml ]; then
                     echo "Error: settings.xml not found!"
                     exit 1
                   fi
-                '''
+                """
             }
         }
 
         stage('Build & Test') {
             steps {
-                sh '''
+                sh """
                   echo "=== Build & Test with Maven ==="
                   mvn clean package
-                '''
+                """
             }
         }
 
@@ -71,12 +66,10 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                script {
-                    sh '''
-                      echo "=== Docker Login ==="
-                      echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
-                    '''
-                }
+                sh """
+                  echo "=== Docker Login ==="
+                  echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
+                """
             }
         }
 
@@ -86,19 +79,10 @@ pipeline {
                     env.SERVICES.split().each { service ->
                         echo "=== Building Docker image for ${service} ==="
                         sh """
-                            docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service} || {
-                                echo "Error building image for ${service}";
-                                exit 1;
-                            }
-                            docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} || {
-                                echo "Error pushing image for ${service}";
-                                exit 1;
-                            }
-                            docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                            docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest || {
-                                echo "Error tagging/pushing 'latest' for ${service}";
-                                exit 1;
-                            }
+                          docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
+                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
+                          docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
                         """
                     }
                 }
@@ -119,15 +103,27 @@ pipeline {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        sh '''
-                          echo "=== Deploying ${service} to Kubernetes ==="
-                          kubectl apply -f k8s/${service}/deployment.yaml
-                          kubectl apply -f k8s/${service}/service.yaml
-                          kubectl apply -f k8s/${service}/ingress.yaml
+                        echo "=== Deploying ${service} to Kubernetes ==="
+                        sh """
+                          if [ -f k8s/${service}/deployment.yaml ]; then
+                              kubectl apply -f k8s/${service}/deployment.yaml
+                          else
+                              echo "Warning: deployment.yaml for ${service} not found!"
+                          fi
 
-                          echo "=== Checking Rollout Status for ${service} ==="
-                          kubectl rollout status deployment/${service} --timeout=60s
-                        '''
+                          if [ -f k8s/${service}/service.yaml ]; then
+                              kubectl apply -f k8s/${service}/service.yaml
+                          else
+                              echo "Warning: service.yaml for ${service} not found!"
+                          fi
+
+                          if [ -f k8s/${service}/ingress.yaml ]; then
+                              kubectl apply -f k8s/${service}/ingress.yaml
+                          else
+                              echo "Warning: ingress.yaml for ${service} not found!"
+                          fi
+                        """
+                        sh "kubectl rollout status deployment/${service} --timeout=60s || exit 1"
                     }
                 }
             }
@@ -137,13 +133,13 @@ pipeline {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        sh '''
-                          echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}.local:31547/actuator/health || {
-                              echo "Health check failed for ${service}"
-                              exit 1
+                        echo "=== Performing Health Check for ${service} ==="
+                        sh """
+                          curl --fail --max-time 10 http://${service}.local:31547/actuator/health || {
+                              echo "Health check failed for ${service}";
+                              exit 1;
                           }
-                        '''
+                        """
                     }
                 }
             }
@@ -151,6 +147,7 @@ pipeline {
 
         stage('Archive Reports') {
             steps {
+                echo '=== Archiving reports (SpotBugs, CodeQL) ==='
                 archiveArtifacts artifacts: '**/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
             }
         }
