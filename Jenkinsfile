@@ -84,17 +84,22 @@ pipeline {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        sh '''
-                          echo "=== Building Docker image for ${service} ==="
-                          docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
-
-                          echo "=== Pushing Docker image for ${service} ==="
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
-
-                          echo "=== Tagging 'latest' for ${service} ==="
-                          docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                        '''
+                        echo "=== Building Docker image for ${service} ==="
+                        sh """
+                            docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service} || {
+                                echo "Error building image for ${service}";
+                                exit 1;
+                            }
+                            docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} || {
+                                echo "Error pushing image for ${service}";
+                                exit 1;
+                            }
+                            docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                            docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest || {
+                                echo "Error tagging/pushing 'latest' for ${service}";
+                                exit 1;
+                            }
+                        """
                     }
                 }
             }
