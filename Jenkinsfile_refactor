@@ -1,13 +1,6 @@
 pipeline {
     agent { label 'chatter' }
 
-    parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Название ветки для сборки')
-        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Пропустить этап тестирования')
-        booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
-        booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
-    }
-
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
         GITHUB_CRED      = credentials('github_ssh_key') // ID для GitHub Credentials
@@ -16,12 +9,11 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: "*/${params.BRANCH_NAME}"]],
+                    branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'git@github.com:maxim58r/Chatter.git',
                         credentialsId: 'github_ssh_key'
@@ -45,10 +37,18 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
-            when {
-                expression { !params.SKIP_TESTS }
+        stage('Verify Maven Settings') {
+            steps {
+                sh """
+                  if [ ! -f /home/jenkins-agent/.m2/settings.xml ]; then
+                    echo "Error: settings.xml not found!"
+                    exit 1
+                  fi
+                """
             }
+        }
+
+        stage('Build & Test') {
             steps {
                 sh """
                   echo "=== Build & Test with Maven ==="
@@ -58,9 +58,6 @@ pipeline {
         }
 
         stage('SpotBugs Analysis') {
-            when {
-                expression { !params.SKIP_TESTS }
-            }
             steps {
                 sh "mvn spotbugs:spotbugs"
             }
@@ -91,10 +88,17 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            when {
-                expression { params.DEPLOY_TO_KUBERNETES }
+        stage('Verify Kubernetes Connection') {
+            steps {
+                sh '''
+                  echo "=== Verifying Kubernetes Connection ==="
+                  kubectl get nodes
+                  kubectl config get-contexts
+                '''
             }
+        }
+
+        stage('Deploy to Kubernetes') {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
@@ -125,9 +129,6 @@ pipeline {
         }
 
         stage('Health Check') {
-            when {
-                expression { params.RUN_HEALTH_CHECK }
-            }
             steps {
                 script {
                     env.SERVICES.split().each { service ->
