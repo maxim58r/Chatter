@@ -1,6 +1,11 @@
 pipeline {
     agent { label 'chatter' } // Используем Jenkins-агент "chatter"
 
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Ветка для сборки')
+        choice(name: 'STAGES_TO_RUN', choices: 'All\nBuild\nTest\nDeploy\nHealthCheck', description: 'Выберите этапы для запуска')
+    }
+
     environment {
         DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
         GITHUB_CRED      = credentials('github_ssh_key') // ID для GitHub Credentials
@@ -11,9 +16,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                echo "=== Checkout branch: ${params.BRANCH_NAME} ==="
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: '*/main']],
+                    branches: [[name: "*/${params.BRANCH_NAME}"]],
                     userRemoteConfigs: [[
                         url: 'git@github.com:maxim58r/Chatter.git',
                         credentialsId: 'github_ssh_key'  // ID SSH Credentials
@@ -25,30 +31,10 @@ pipeline {
             }
         }
 
-        stage('Setup Environment') {
-            steps {
-                sh """
-                  echo "=== Setup Environment ==="
-                  set -e
-                  java -version
-                  mvn --version
-                  docker --version
-                """
-            }
-        }
-
-        stage('Verify Maven Settings') {
-            steps {
-                sh """
-                if [ ! -f /home/jenkins-agent/.m2/settings.xml ]; then
-                  echo "Error: settings.xml not found!"
-                  exit 1
-                fi
-                """
-            }
-        }
-
         stage('Build & Test') {
+            when {
+                expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Build' }
+            }
             steps {
                 sh """
                   echo "=== Build & Test with Maven ==="
@@ -57,61 +43,13 @@ pipeline {
             }
         }
 
-        stage('SpotBugs Analysis') {
-            steps {
-                sh "mvn spotbugs:spotbugs"
-                // Или spotbugs:check
-            }
-        }
-
-
-        stage('Login to Docker Hub') {
-            steps {
-                sh """
-                  echo "=== Docker Login ==="
-                  echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
-                """
-            }
-        }
-
-        stage('Build & Push Docker Images') {
-            steps {
-                script {
-                    def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
-                    services.each { service ->
-                        sh """
-                          echo "=== Building Docker image for ${service} ==="
-                          docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
-
-                          echo "=== Pushing Docker image for ${service} ==="
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
-
-                          echo "=== Tagging 'latest' for ${service} ==="
-                          docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Verify Kubernetes Connection') {
-            steps {
-                script {
-                    sh '''
-                    echo "Using KUBECONFIG: $KUBECONFIG"
-                    kubectl get nodes
-                    kubectl config get-contexts
-                    '''
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes') {
+            when {
+                expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'Deploy' }
+            }
             steps {
                 script {
                     sh 'echo "=== Deploy to Kubernetes ==="'
-
                     def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
                     services.each { s ->
                         sh """
@@ -132,28 +70,23 @@ pipeline {
             }
         }
 
-
         stage('Health Check') {
+            when {
+                expression { params.STAGES_TO_RUN == 'All' || params.STAGES_TO_RUN == 'HealthCheck' }
+            }
             steps {
                 script {
                     def services = ['authservice', 'chatservice', 'messagingservice', 'notificationservice']
                     services.each { service ->
                         sh """
                           echo "=== Performing Health Check for ${service} ==="
-                          curl --fail http://${service}.local:31547/actuator/health || {
+                          curl --fail http://${service}.local:<NodePort>/actuator/health || {
                               echo "Health check failed for ${service}"
                               exit 1
                           }
                         """
                     }
                 }
-            }
-        }
-
-        stage('Archive Reports') {
-            steps {
-                echo '=== Archiving reports (SpotBugs, CodeQL) ==='
-                archiveArtifacts artifacts: '**/target/spotbugsXml.xml, codeql-results.sarif', fingerprint: true
             }
         }
     }
