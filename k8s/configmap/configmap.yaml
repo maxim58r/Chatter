@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+  namespace: default
+data:
+  # Общие параметры для всех сервисов
+  SPRING_PROFILES_ACTIVE: "prod"
+  MANAGEMENT_BASE_PATH: "/actuator"
+  LIVENESS_PATH: "/actuator/health/liveness"
+  READINESS_PATH: "/actuator/health/readiness"
+  LIVENESS_INITIAL_DELAY_SECONDS: "10"
+  LIVENESS_PERIOD_SECONDS: "5"
+  READINESS_INITIAL_DELAY_SECONDS: "10"
+  READINESS_PERIOD_SECONDS: "5"
+
+  authservice.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: authservice
+      redis:
+        enabled: false
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "*"
+        base-path: /actuator
+      endpoint:
+        health:
+          probes:
+            enabled: true
+          show-details: ALWAYS
+      security:
+        enabled: false
+
+  chatservice.yaml: |
+    server:
+      port: 8081
+    spring:
+      application:
+        name: chatservice
+    management:
+      endpoint:
+        health:
+          probes:
+            enabled: true
+          show-details: ALWAYS
+
+  messagingservice.yaml: |
+    server:
+      port: 8082
+    spring:
+      application:
+        name: messagingservice
+    management:
+      endpoint:
+        health:
+          probes:
+            enabled: true
+          show-details: ALWAYS
+
+  notificationservice.yaml: |
+    server:
+      port: 8083
+    spring:
+      application:
+        name: notificationservice
+    management:
+      endpoint:
+        health:
+          probes:
+            enabled: true
+          show-details: ALWAYS

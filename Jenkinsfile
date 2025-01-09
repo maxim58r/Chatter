@@ -91,6 +91,14 @@ pipeline {
             }
         }
 
+        stage('Apply ConfigMap') {
+            steps {
+                script {
+                    sh 'kubectl apply -f k8s/configmap/configmap.yaml'
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes') {
             when {
                 expression { params.DEPLOY_TO_KUBERNETES }
