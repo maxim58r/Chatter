@@ -41,6 +41,7 @@ pipeline {
                   java -version
                   mvn --version
                   docker --version
+                  helm version
                 """
             }
         }
@@ -99,34 +100,20 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Kubernetes with Helm') {
             when {
                 expression { params.DEPLOY_TO_KUBERNETES }
             }
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        echo "=== Deploying ${service} to Kubernetes ==="
+                        echo "=== Deploying ${service} to Kubernetes with Helm ==="
                         sh """
-                          if [ -f k8s/${service}/deployment.yaml ]; then
-                              kubectl apply -f k8s/${service}/deployment.yaml
-                          else
-                              echo "Warning: deployment.yaml for ${service} not found!"
-                          fi
-
-                          if [ -f k8s/${service}/service.yaml ]; then
-                              kubectl apply -f k8s/${service}/service.yaml
-                          else
-                              echo "Warning: service.yaml for ${service} not found!"
-                          fi
-
-                          if [ -f k8s/${service}/ingress.yaml ]; then
-                              kubectl apply -f k8s/${service}/ingress.yaml
-                          else
-                              echo "Warning: ingress.yaml for ${service} not found!"
-                          fi
+                          helm upgrade --install ${service} ./k8s/${service}/helm \
+                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
+                              --set image.tag=latest \
+                              --set replicas=2
                         """
-                        sh "kubectl rollout status deployment/${service} --timeout=60s || exit 1"
                     }
                 }
             }
@@ -141,7 +128,7 @@ pipeline {
                     env.SERVICES.split().each { service ->
                         echo "=== Performing Health Check for ${service} ==="
                         sh """
-                          curl --fail --max-time 10 http://${service}.local:31547/actuator/health || {
+                          curl --fail --max-time 10 http://${service}.local/actuator/health || {
                               echo "Health check failed for ${service}";
                               exit 1;
                           }

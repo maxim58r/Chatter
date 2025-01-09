@@ -1,0 +1,22 @@
+name: notificationservice
+replicas: 2
+
+image:
+  repository: maxim58r/notificationservice
+  tag: latest
+
+containerPort: 8080
+
+springProfilesActive: "prod"
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+readiness:
+  path: /actuator/health/readiness
+  port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
