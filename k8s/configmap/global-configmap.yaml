@@ -1,18 +1,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap
+  name: global-configmap
   namespace: default
 data:
-  # Общие параметры для всех сервисов
-  SPRING_PROFILES_ACTIVE: "prod"
-  MANAGEMENT_BASE_PATH: "/actuator"
   LIVENESS_PATH: "/actuator/health/liveness"
   READINESS_PATH: "/actuator/health/readiness"
   LIVENESS_INITIAL_DELAY_SECONDS: "10"
   LIVENESS_PERIOD_SECONDS: "5"
   READINESS_INITIAL_DELAY_SECONDS: "10"
   READINESS_PERIOD_SECONDS: "5"
+
 
   authservice.yaml: |
     server:

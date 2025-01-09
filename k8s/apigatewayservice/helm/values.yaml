@@ -3,7 +3,7 @@ replicas: 2
 
 image:
   repository: maxim58r/apigatewayservice
-  tag: latest
+  tag: 1.0.0
 
 containerPort: 8080
 

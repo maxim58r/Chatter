@@ -111,8 +111,7 @@ pipeline {
                         sh """
                           helm upgrade --install ${service} ./k8s/${service}/helm \
                               --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
-                              --set image.tag=latest \
-                              --set replicas=2
+                              --set image.tag=${env.BUILD_NUMBER} \
                         """
                     }
                 }
