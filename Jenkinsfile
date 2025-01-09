@@ -2,7 +2,7 @@ pipeline {
     agent { label 'chatter' }
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Название ветки для сборки')
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Название ветки для сборки')
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Пропустить этап тестирования')
         booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
         booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
