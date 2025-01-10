@@ -13,6 +13,7 @@ pipeline {
         GITHUB_CRED      = credentials('github_ssh_key')
         KUBECONFIG       = "/var/lib/jenkins/.kube/config"
         SERVICES         = "authservice chatservice messagingservice notificationservice"
+        DOCKER_BUILDKIT  = '1' // Enable BuildKit
     }
 
     stages {
@@ -84,13 +85,23 @@ pipeline {
             }
         }
 
+        stage('Prepare Buildx') {
+            steps {
+                sh """
+                  docker buildx create --name mybuilder --driver docker-container --use || true
+                  docker buildx inspect --bootstrap
+                """
+            }
+        }
+
         stage('Build & Push Docker Images with Buildx') {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
                         echo "=== Building Docker image for ${service} ==="
                         sh """
-                          docker buildx build --platform linux/amd64,linux/arm64 \
+                          docker buildx build \
+                              --platform linux/amd64,linux/arm64 \
                               -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
                               -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
                               --push ./services/${service}
