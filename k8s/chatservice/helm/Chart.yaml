@@ -1,0 +1,6 @@
+apiVersion: v2
+name: chatservice
+description: A Helm chart for deploying chatservice
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

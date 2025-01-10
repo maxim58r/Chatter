@@ -2,34 +2,43 @@ pipeline {
     agent { label 'chatter' }
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Название ветки для сборки')
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Название ветки для сборки')
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Пропустить этап тестирования')
         booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
         booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
     }
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker_hub')    // ID Docker Hub Credentials (username + password)
-        GITHUB_CRED      = credentials('github_ssh_key') // ID для GitHub Credentials
+        DOCKER_HUB_CREDS = credentials('docker_hub')
+        GITHUB_CRED      = credentials('github_ssh_key')
         KUBECONFIG       = "/var/lib/jenkins/.kube/config"
-        SERVICES         = "authservice chatservice messagingservice notificationservice" // Список сервисов
+        SERVICES         = "authservice chatservice messagingservice notificationservice"
+        DOCKER_BUILDKIT  = '1' // Enable BuildKit
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${params.BRANCH_NAME}"]],
-                    userRemoteConfigs: [[
-                        url: 'git@github.com:maxim58r/Chatter.git',
-                        credentialsId: 'github_ssh_key'
-                    ]],
-                    extensions: [
-                        [$class: 'SubmoduleOption', recursiveSubmodules: true]
-                    ]
-                ])
+                script {
+                    echo "Checking out branch ${params.BRANCH_NAME}..."
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        userRemoteConfigs: [[
+                            url: 'git@github.com:maxim58r/Chatter.git',
+                            credentialsId: 'github_ssh_key'
+                        ]],
+                        extensions: [
+                            [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
+                        ]
+                    ])
+                    sh """
+                      echo "Updating submodules to branch ${params.BRANCH_NAME}..."
+                      git submodule foreach --recursive 'git checkout ${params.BRANCH_NAME} || true'
+                      git submodule foreach --recursive 'git pull origin ${params.BRANCH_NAME} || true'
+                    """
+                }
             }
         }
 
@@ -41,6 +50,7 @@ pipeline {
                   java -version
                   mvn --version
                   docker --version
+                  helm version
                 """
             }
         }
@@ -75,16 +85,26 @@ pipeline {
             }
         }
 
-        stage('Build & Push Docker Images') {
+        stage('Prepare Buildx') {
+            steps {
+                sh """
+                  docker buildx create --name mybuilder --driver docker-container --use || true
+                  docker buildx inspect --bootstrap
+                """
+            }
+        }
+
+        stage('Build & Push Docker Images with Buildx') {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
                         echo "=== Building Docker image for ${service} ==="
                         sh """
-                          docker build -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ./services/${service}
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER}
-                          docker tag ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} ${DOCKER_HUB_CREDS_USR}/${service}:latest
-                          docker push ${DOCKER_HUB_CREDS_USR}/${service}:latest
+                          docker buildx build \
+                              --platform linux/amd64,linux/arm64 \
+                              -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
+                              -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
+                              --push ./services/${service}
                         """
                     }
                 }
@@ -94,39 +114,24 @@ pipeline {
         stage('Apply ConfigMap') {
             steps {
                 script {
-                    sh 'kubectl apply -f k8s/configmap/configmap.yaml'
+                    sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Kubernetes with Helm') {
             when {
                 expression { params.DEPLOY_TO_KUBERNETES }
             }
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        echo "=== Deploying ${service} to Kubernetes ==="
+                        echo "=== Deploying ${service} to Kubernetes with Helm ==="
                         sh """
-                          if [ -f k8s/${service}/deployment.yaml ]; then
-                              kubectl apply -f k8s/${service}/deployment.yaml
-                          else
-                              echo "Warning: deployment.yaml for ${service} not found!"
-                          fi
-
-                          if [ -f k8s/${service}/service.yaml ]; then
-                              kubectl apply -f k8s/${service}/service.yaml
-                          else
-                              echo "Warning: service.yaml for ${service} not found!"
-                          fi
-
-                          if [ -f k8s/${service}/ingress.yaml ]; then
-                              kubectl apply -f k8s/${service}/ingress.yaml
-                          else
-                              echo "Warning: ingress.yaml for ${service} not found!"
-                          fi
+                          helm upgrade --install ${service} ./k8s/${service}/helm \
+                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
+                              --set image.tag=latest
                         """
-                        sh "kubectl rollout status deployment/${service} --timeout=60s || exit 1"
                     }
                 }
             }
@@ -141,7 +146,7 @@ pipeline {
                     env.SERVICES.split().each { service ->
                         echo "=== Performing Health Check for ${service} ==="
                         sh """
-                          curl --fail --max-time 10 http://${service}.local:31547/actuator/health || {
+                          curl --fail --max-time 10 http://${service}.local/actuator/health || {
                               echo "Health check failed for ${service}";
                               exit 1;
                           }

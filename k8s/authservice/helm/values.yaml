@@ -1,0 +1,33 @@
+name: authservice
+namespace: default
+replicas: 1
+
+image:
+  repository: maxim58r/authservice
+  tag: 1.0.0
+
+containerPort: 8080
+server:
+  port: 8081
+
+springProfilesActive: "prod"
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+readiness:
+  path: /actuator/health/readiness
+  port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+globalConfigMap: global-configmap
+
+serviceAccountName: prod-service-account
+
+storage:
+  size: 100Mi
+
