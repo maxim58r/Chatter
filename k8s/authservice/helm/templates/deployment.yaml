@@ -17,6 +17,7 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.name | default "authservice" }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -43,19 +44,16 @@ spec:
             - name: app-storage
               mountPath: /data
 
-          # Явное указание переменных через env
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfilesActive }}
             - name: CUSTOM_PORT
               value: "{{ .Values.server.port }}"
 
-          # Подключение глобального ConfigMap
           envFrom:
             - configMapRef:
                 name: {{ .Values.globalConfigMap }}
 
-          # Liveness Probe
           livenessProbe:
             httpGet:
               path: {{ .Values.liveness.path }}
@@ -63,7 +61,6 @@ spec:
             initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.liveness.periodSeconds }}
 
-          # Readiness Probe
           readinessProbe:
             httpGet:
               path: {{ .Values.readiness.path }}
