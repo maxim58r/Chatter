@@ -43,7 +43,6 @@ spec:
           volumeMounts:
             - name: app-storage
               mountPath: /data
-
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfilesActive }}

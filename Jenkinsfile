@@ -19,17 +19,25 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${params.BRANCH_NAME}"]],
-                    userRemoteConfigs: [[
-                        url: 'git@github.com:maxim58r/Chatter.git',
-                        credentialsId: 'github_ssh_key'
-                    ]],
-                    extensions: [
-                        [$class: 'SubmoduleOption', recursiveSubmodules: true]
-                    ]
-                ])
+                script {
+                    echo "Checking out branch ${params.BRANCH_NAME}..."
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        userRemoteConfigs: [[
+                            url: 'git@github.com:maxim58r/Chatter.git',
+                            credentialsId: 'github_ssh_key'
+                        ]],
+                        extensions: [
+                            [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
+                        ]
+                    ])
+                    sh """
+                      echo "Updating submodules to branch ${params.BRANCH_NAME}..."
+                      git submodule foreach --recursive 'git checkout ${params.BRANCH_NAME} || true'
+                      git submodule foreach --recursive 'git pull origin ${params.BRANCH_NAME} || true'
+                    """
+                }
             }
         }
 
@@ -111,7 +119,7 @@ pipeline {
                         sh """
                           helm upgrade --install ${service} ./k8s/${service}/helm \
                               --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
-                              --set image.tag=latest \
+                              --set image.tag=latest
                         """
                     }
                 }
