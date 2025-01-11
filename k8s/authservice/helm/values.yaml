@@ -8,7 +8,7 @@ image:
 
 containerPort: 8080
 server:
-  port: 8081
+  port: 8080
 
 springProfilesActive: "prod"
 
