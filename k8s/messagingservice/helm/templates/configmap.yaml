@@ -7,11 +7,16 @@ data:
   application.yaml: |
     server:
       port: {{ .Values.server.port }}
+
     spring:
       application:
         name: {{ .Values.name }}
         redis:
           enabled: false
+        security:
+          user:
+            name: admin
+
     management:
       endpoints:
         web:
@@ -23,3 +28,5 @@ data:
           probes:
             enabled: true
           show-details: ALWAYS
+      security:
+        enabled: false
