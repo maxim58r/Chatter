@@ -26,7 +26,7 @@ readiness:
 
 globalConfigMap: global-configmap
 
-serviceAccountName: prod-service-account
+serviceAccountName: notificationservice-sa
 
 storage:
   size: 100Mi
