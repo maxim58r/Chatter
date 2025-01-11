@@ -15,13 +15,13 @@ springProfilesActive: "prod"
 liveness:
   path: /actuator/health/liveness
   port: 8080
-  initialDelaySeconds: 10
+  initialDelaySeconds: 40
   periodSeconds: 5
 
 readiness:
   path: /actuator/health/readiness
   port: 8080
-  initialDelaySeconds: 10
+  initialDelaySeconds: 40
   periodSeconds: 5
 
 globalConfigMap: global-configmap
