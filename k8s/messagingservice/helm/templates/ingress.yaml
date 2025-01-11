@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name | default "messagingservice" }}-ingress
+  name: {{ .Values.name }}-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: {{ .Values.name | default "messagingservice" }}.local
+    - host: {{ .Values.name }}.local
       http:
         paths:
-            - path: /
-              pathType: Prefix
-              backend:
-                service:
-                  name: {{ .Values.name | default "messagingservice" }}
-                  port:
-                    number: {{ .Values.containerPort }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: {{ .Values.containerPort }}

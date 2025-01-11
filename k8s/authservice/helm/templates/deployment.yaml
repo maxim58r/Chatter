@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name | default "authservice" }}
-  namespace: {{ .Values.namespace | default "default" }}
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    app: {{ .Values.name | default "authservice" }}
+    app: {{ .Values.name }}
     app.kubernetes.io/name: {{ .Chart.Name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
@@ -16,12 +16,12 @@ spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.name | default "authservice" }}
+      app: {{ .Values.name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.name | default "authservice" }}
+        app: {{ .Values.name }}
         app.kubernetes.io/name: {{ .Chart.Name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
@@ -29,7 +29,7 @@ spec:
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
-        - name: {{ .Values.name | default "authservice" }}
+        - name: {{ .Values.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.containerPort }}

@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name | default "authservice" }}-ingress
+  name: {{ .Values.name }}-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: {{ .Values.name | default "authservice" }}.local
+    - host: {{ .Values.name }}.local
       http:
         paths:
             - path: /
               pathType: Prefix
               backend:
                 service:
-                  name: {{ .Values.name | default "authservice" }}
+                  name: {{ .Values.name }}
                   port:
                     number: {{ .Values.containerPort }}

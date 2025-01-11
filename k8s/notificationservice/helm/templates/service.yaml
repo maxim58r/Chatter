@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.name | default "notificationservice" }}
+  name: {{ .Values.name }}
 spec:
   type: ClusterIP
   selector:
-    app: {{ .Values.name | default "notificationservice" }}
+    app: {{ .Values.name }}
   ports:
     - protocol: TCP
       port: {{ .Values.containerPort }}
