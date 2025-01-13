@@ -4,6 +4,6 @@ metadata:
   name: {{ .Values.name }}-pod-reader
   namespace: {{ .Values.namespace }}
 rules:
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["get", "list", "watch"]
+  - apiGroups: [ "" ]
+    resources: [ "pods" ]
+    verbs: [ "get", "list", "watch" ]
