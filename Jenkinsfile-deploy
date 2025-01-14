@@ -19,12 +19,16 @@ pipeline {
         stage('Fetch Build Info') {
             steps {
                 script {
-                    // Загружаем файл с успешной сборкой
+                    // Копируем артефакт из конкретной сборки
                     copyArtifacts(
-                        projectName: 'chatter-multimodule-build-pipeline',  // Имя пайплайна сборки
-                        selector: specificBuild(params.BUILD_ID),           // ID сборки
+                        projectName: 'chatter-multimodule-build-pipeline',  // Имя вашего build-пайплайна
+                        selector: [
+                            $class: 'SpecificBuildSelector',
+                            buildNumber: params.BUILD_ID
+                        ],
                         filter: 'successful-build-id.txt'
                     )
+
                     def buildId = readFile('successful-build-id.txt').trim()
                     echo "Using Build ID: ${buildId}"
                 }
