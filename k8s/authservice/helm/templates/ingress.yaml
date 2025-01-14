@@ -1,18 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name | default "authservice" }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
+  name: {{ .Values.name }}-ingress
+  namespace: {{ .Values.namespace }}
+  #annotations:
+  # (По желанию) дополнительные аннотации для nginx
+  # nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
-    - host: {{ .Values.name | default "authservice" }}.local
+    - host: {{ .Values.name }}.local
       http:
         paths:
-            - path: /
-              pathType: Prefix
-              backend:
-                service:
-                  name: {{ .Values.name | default "authservice" }}
-                  port:
-                    number: {{ .Values.containerPort }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: {{ .Values.containerPort }}

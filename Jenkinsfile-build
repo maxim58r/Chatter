@@ -1,0 +1,123 @@
+pipeline {
+    agent { label 'chatter' }
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Название ветки для сборки')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Пропустить этап тестирования')
+    }
+
+    environment {
+        DOCKER_HUB_CREDS = credentials('docker_hub')
+        GITHUB_CRED      = credentials('github_ssh_key')
+        SERVICES         = "authservice chatservice messagingservice notificationservice"
+        DOCKER_BUILDKIT  = '1'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Checking out branch ${params.BRANCH_NAME}..."
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        userRemoteConfigs: [[
+                            url: 'git@github.com:maxim58r/Chatter.git',
+                            credentialsId: 'github_ssh_key'
+                        ]],
+                        extensions: [
+                            [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
+                        ]
+                    ])
+                }
+            }
+        }
+
+        stage('Setup Environment') {
+            steps {
+                sh """
+                  echo "=== Setup Environment ==="
+                  set -e
+                  java -version
+                  mvn --version
+                  docker --version
+                """
+            }
+        }
+
+        stage('Build & Test') {
+            when {
+                expression { !params.SKIP_TESTS }
+            }
+            steps {
+                sh """
+                  echo "=== Build & Test with Maven ==="
+                  mvn clean package
+                """
+            }
+        }
+
+        stage('SpotBugs Analysis') {
+            when {
+                expression { !params.SKIP_TESTS }
+            }
+            steps {
+                sh "mvn spotbugs:spotbugs"
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                sh """
+                  echo "=== Docker Login ==="
+                  echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
+                """
+            }
+        }
+
+        stage('Prepare Buildx') {
+            steps {
+                sh """
+                  docker buildx create --name mybuilder --driver docker-container --use || true
+                  docker buildx inspect --bootstrap
+                """
+            }
+        }
+
+        stage('Build & Push Docker Images') {
+            steps {
+                script {
+                    env.SERVICES.split().each { service ->
+                        echo "=== Building Docker image for ${service} ==="
+                        sh """
+                          docker buildx build \
+                              --platform linux/amd64,linux/arm64 \
+                              -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
+                              -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
+                              --push ./services/${service}
+                        """
+                    }
+                }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "✅ Build successful!"
+            script {
+                // Сохраняем ID успешной сборки в файл
+                writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+                archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
+            }
+        }
+        failure {
+            echo "❌ Build failed!"
+        }
+        cleanup {
+            sh "docker logout"
+        }
+    }
+}

@@ -1,18 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name | default "notificationservice" }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
+  name: {{ .Values.name }}-ingress
 spec:
+  ingressClassName: nginx
   rules:
-    - host: {{ .Values.name | default "notificationservice" }}.local
+    - host: {{ .Values.name }}.local
       http:
         paths:
-            - path: /
-              pathType: Prefix
-              backend:
-                service:
-                  name: {{ .Values.name | default "notificationservice" }}
-                  port:
-                    number: {{ .Values.containerPort }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: {{ .Values.containerPort }}

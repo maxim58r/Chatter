@@ -144,13 +144,17 @@ pipeline {
             steps {
                 script {
                     env.SERVICES.split().each { service ->
-                        echo "=== Performing Health Check for ${service} ==="
-                        sh """
-                          curl --fail --max-time 10 http://${service}.local/actuator/health || {
-                              echo "Health check failed for ${service}";
-                              exit 1;
-                          }
-                        """
+                      echo "=== Waiting for ${service} Deployment to be ready ==="
+                      sh """
+                        kubectl rollout status deployment/${service} --namespace=default --timeout=60s
+                      """
+                      echo "=== Performing Health Check for ${service} ==="
+                      sh """
+                        curl --fail --max-time 10 http://${service}.local/actuator/health || {
+                          echo "Health check failed for ${service}";
+                          exit 1;
+                        }
+                      """
                     }
                 }
             }
