@@ -6,7 +6,6 @@ pipeline {
         booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
         string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Тег Docker-образов для деплоя')
         string(name: 'BUILD_ID', defaultValue: '', description: 'ID успешной сборки для деплоя')
-
     }
 
     environment {
@@ -20,10 +19,10 @@ pipeline {
         stage('Fetch Build Info') {
             steps {
                 script {
-                    // Загружаем файл с успешными сборками
+                    // Загружаем файл с успешной сборкой
                     copyArtifacts(
                         projectName: 'chatter-multimodule-build-pipeline',  // Имя пайплайна сборки
-                        selector: buildSelector("${params.BUILD_ID}"),  // ID сборки
+                        selector: specificBuild(params.BUILD_ID),           // ID сборки
                         filter: 'successful-build-id.txt'
                     )
                     def buildId = readFile('successful-build-id.txt').trim()
