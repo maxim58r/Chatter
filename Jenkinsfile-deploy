@@ -5,6 +5,8 @@ pipeline {
         booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
         booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
         string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Тег Docker-образов для деплоя')
+        string(name: 'BUILD_ID', defaultValue: '', description: 'ID успешной сборки для деплоя')
+
     }
 
     environment {
@@ -44,6 +46,7 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Deploying build ID: ${params.BUILD_ID}"
                     env.SERVICES.split().each { service ->
                         echo "=== Deploying ${service} to Kubernetes with Helm ==="
                         sh """

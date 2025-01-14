@@ -107,11 +107,11 @@ pipeline {
     post {
         success {
             echo "✅ Build successful!"
-                script {
-                    // Сохраняем ID успешной сборки в файл
-                    writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
-                    archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
-                }
+            script {
+                // Сохраняем ID успешной сборки в файл
+                writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+                archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
+            }
         }
         failure {
             echo "❌ Build failed!"
