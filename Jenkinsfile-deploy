@@ -23,7 +23,7 @@ pipeline {
                     // Загружаем файл с успешными сборками
                     copyArtifacts(
                         projectName: 'chatter-multimodule-build-pipeline',  // Имя пайплайна сборки
-                        selector: specific("${params.BUILD_ID}"),  // ID сборки
+                        selector: buildSelector("${params.BUILD_ID}"),  // ID сборки
                         filter: 'successful-build-id.txt'
                     )
                     def buildId = readFile('successful-build-id.txt').trim()
