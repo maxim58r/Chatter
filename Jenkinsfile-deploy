@@ -15,6 +15,21 @@ pipeline {
 
     stages {
 
+        stage('Fetch Build Info') {
+            steps {
+                script {
+                    // Загружаем файл с успешными сборками
+                    copyArtifacts(
+                        projectName: 'chatter-multimodule-build-pipeline',  // Имя пайплайна сборки
+                        selector: specific("${params.BUILD_ID}"),  // ID сборки
+                        filter: 'successful-build-id.txt'
+                    )
+                    def buildId = readFile('successful-build-id.txt').trim()
+                    echo "Using Build ID: ${buildId}"
+                }
+            }
+        }
+
         stage('Apply ConfigMap') {
             steps {
                 script {
