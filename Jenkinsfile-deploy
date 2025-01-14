@@ -25,4 +25,53 @@ pipeline {
 
         stage('Deploy to Kubernetes with Helm') {
             when {
-                expression { params.DEPLOY_TO_KUB
+                expression { params.DEPLOY_TO_KUBERNETES }
+            }
+            steps {
+                script {
+                    env.SERVICES.split().each { service ->
+                        echo "=== Deploying ${service} to Kubernetes with Helm ==="
+                        sh """
+                          helm upgrade --install ${service} ./k8s/${service}/helm \
+                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
+                              --set image.tag=${params.IMAGE_TAG}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Health Check') {
+            when {
+                expression { params.RUN_HEALTH_CHECK }
+            }
+            steps {
+                script {
+                    env.SERVICES.split().each { service ->
+                      echo "=== Waiting for ${service} Deployment to be ready ==="
+                      sh """
+                        kubectl rollout status deployment/${service} --namespace=default --timeout=60s
+                      """
+                      echo "=== Performing Health Check for ${service} ==="
+                      sh """
+                        curl --fail --max-time 10 http://${service}.local/actuator/health || {
+                          echo "Health check failed for ${service}";
+                          exit 1;
+                        }
+                      """
+                    }
+                }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "✅ Deployment successful!"
+        }
+        failure {
+            echo "❌ Deployment failed!"
+        }
+    }
+}
