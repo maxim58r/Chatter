@@ -1,0 +1,28 @@
+pipeline {
+    agent { label 'chatter' }
+
+    parameters {
+        booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
+        booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Тег Docker-образов для деплоя')
+    }
+
+    environment {
+        DOCKER_HUB_CREDS = credentials('docker_hub')
+        KUBECONFIG       = "/var/lib/jenkins/.kube/config"
+        SERVICES         = "authservice chatservice messagingservice notificationservice"
+    }
+
+    stages {
+
+        stage('Apply ConfigMap') {
+            steps {
+                script {
+                    sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes with Helm') {
+            when {
+                expression { params.DEPLOY_TO_KUB
