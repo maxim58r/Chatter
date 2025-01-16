@@ -41,6 +41,13 @@ pipeline {
                             [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
                         ]
                     ])
+
+                    // Переключение сабмодулей на ветку develop
+                    sh '''
+                    echo "Switching all submodules to branch ${params.BRANCH_NAME}"
+                    git submodule foreach --recursive '
+                      git fetch origin && git checkout ${params.BRANCH_NAME} && git pull origin ${params.BRANCH_NAME}'
+                    '''
                 }
             }
         }
@@ -119,7 +126,6 @@ pipeline {
         success {
             echo "✅ Build successful!"
             script {
-                // Сохраняем ID успешной сборки в файл
                 writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
                 archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
             }
@@ -128,7 +134,11 @@ pipeline {
             echo "❌ Build failed!"
         }
         cleanup {
-            sh "docker logout"
+            sh """
+              echo "=== Cleanup ==="
+              docker logout
+              docker buildx rm mybuilder || true
+            """
         }
     }
 }
