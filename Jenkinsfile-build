@@ -40,8 +40,7 @@ pipeline {
                     sh '''
                     echo "=== Running Liquibase for AuthService ==="
                     mvn liquibase:update \
-                      -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
-                      -Dliquibase.url=jdbc:postgresql://192.168.1.35:32172/postgres_auth \
+                      -Dliquibase.url=jdbc:postgresql://postgres-postgresql:5432/postgres_auth \
                       -Dliquibase.username=postgres \
                       -Dliquibase.password=postgres
                     '''
