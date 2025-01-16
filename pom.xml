@@ -95,13 +95,17 @@
                 <plugin>
                     <groupId>org.liquibase</groupId>
                     <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>4.20.0</version> <!-- Укажите актуальную версию -->
+                    <version>4.20.0</version>
                     <configuration>
                         <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
                         <url>jdbc:postgresql://127.0.0.1:32172/postgres_auth</url>
                         <username>postgres</username>
                         <password>postgres</password>
                         <driver>org.postgresql.Driver</driver>
+                        <classpath>
+                            <!-- Укажите путь к PostgreSQL-драйверу -->
+                            ${settings.localRepository}/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar
+                        </classpath>
                     </configuration>
                 </plugin>
             </plugins>
