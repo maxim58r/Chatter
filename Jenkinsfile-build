@@ -15,17 +15,6 @@ pipeline {
 
     stages {
 
-        stage('Apply Liquibase Changes') {
-            steps {
-                sh '''
-                mvn liquibase:update \
-                  -Dliquibase.url=jdbc:postgresql://192.168.1.35:32172/postgres_auth \
-                  -Dliquibase.username=postgres \
-                  -Dliquibase.password=postgres
-                '''
-            }
-        }
-
         stage('Checkout') {
             steps {
                 script {
@@ -41,12 +30,20 @@ pipeline {
                             [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
                         ]
                     ])
+                }
+            }
+        }
 
-                    // Переключение сабмодулей на ветку develop
+        stage('Apply Liquibase Changes for AuthService') {
+            steps {
+                dir('services/authservice') {
                     sh '''
-                    echo "Switching all submodules to branch ${params.BRANCH_NAME}"
-                    git submodule foreach --recursive '
-                      git fetch origin && git checkout ${params.BRANCH_NAME} && git pull origin ${params.BRANCH_NAME}'
+                    echo "=== Running Liquibase for AuthService ==="
+                    mvn liquibase:update \
+                      -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
+                      -Dliquibase.url=jdbc:postgresql://192.168.1.35:32172/postgres_auth \
+                      -Dliquibase.username=postgres \
+                      -Dliquibase.password=postgres
                     '''
                 }
             }
