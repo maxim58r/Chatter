@@ -37,7 +37,7 @@ pipeline {
             steps {
                 sh '''
                 mvn liquibase:update \
-                  -Dliquibase.url=jdbc:postgresql://192.168.1.35:32172/postgres_auth \
+                  -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
                   -Dliquibase.username=postgres \
                   -Dliquibase.password=postgres
                 '''
