@@ -17,6 +17,32 @@ pipeline {
     }
 
     stages {
+	
+		stage('Deploy PostgreSQL') {
+            steps {
+                script {
+                    sh '''
+                    helm repo add bitnami https://charts.bitnami.com/bitnami
+                    helm repo update
+                    helm install postgres bitnami/postgresql \
+                      --set persistence.enabled=true \
+                      --set persistence.size=8Gi \
+                      --set auth.username=postgres,auth.password=postgres_password,auth.database=your_database_name
+                    '''
+                }
+            }
+        }
+
+        stage('Apply Liquibase Changes') {
+            steps {
+                sh '''
+                mvn liquibase:update \
+                  -Dliquibase.url=jdbc:postgresql://192.168.1.35:32172/postgres_auth \
+                  -Dliquibase.username=postgres \
+                  -Dliquibase.password=postgres
+                '''
+            }
+        }
 
         stage('Checkout') {
             steps {

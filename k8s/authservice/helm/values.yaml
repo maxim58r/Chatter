@@ -7,10 +7,11 @@ image:
   tag: 1.0.0
 
 containerPort: 8080
+
 server:
   port: 8080
 
-springProfilesActive: "prod"
+springProfilesActive: "ift"
 
 liveness:
   path: /actuator/health/liveness
@@ -31,3 +32,45 @@ serviceAccountName: authservice-sa
 storage:
   size: 100Mi
 
+spring:
+  application:
+    name: authservice
+
+  datasource:
+    url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/postgres_auth
+    username: postgres
+    password: "{{ .Values.datasource.password }}" # Перенесите в секреты
+  liquibase:
+    enabled: true
+    changeLog: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    hibernate:
+      ddlAuto: validate
+    showSql: true
+    properties:
+      hibernateDialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    user:
+      name: admin
+
+redis:
+  host: 192.168.1.35
+  port: 31015
+  connectTimeout: 60000
+  passwordFromSecret: redis-password
+
+jwt:
+  secret: secret_key
+  expiration: 3600000 # 1 час
+
+logging:
+  level:
+    org.springframework.boot.context.properties: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+datasource:
+  host: 192.168.1.35
+  port: 32172
+  password: postgres # Перенесите в секреты
