@@ -14,6 +14,9 @@ pipeline {
         KUBECONFIG       = "/var/lib/jenkins/.kube/config"
         SERVICES         = "authservice chatservice messagingservice notificationservice"
         DOCKER_BUILDKIT  = '1' // Enable BuildKit
+        DATABASE_URL = 'jdbc:postgresql://127.0.0.1:32172/postgres_auth'
+        DATABASE_USERNAME = 'postgres'
+        DATABASE_PASSWORD = 'postgres'
     }
 
     stages {

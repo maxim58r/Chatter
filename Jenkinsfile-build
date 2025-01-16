@@ -11,6 +11,9 @@ pipeline {
         GITHUB_CRED      = credentials('github_ssh_key')
         SERVICES         = "authservice chatservice messagingservice notificationservice"
         DOCKER_BUILDKIT  = '1'
+        DATABASE_URL = 'jdbc:postgresql://127.0.0.1:32172/postgres_auth'
+        DATABASE_USERNAME = 'postgres'
+        DATABASE_PASSWORD = 'postgres'
     }
 
     stages {
@@ -38,8 +41,11 @@ pipeline {
             steps {
                 dir('services/authservice') {
                     sh '''
-                    echo "=== Running Liquibase for AuthService ==="
-                    mvn liquibase:update
+                        mvn liquibase:update \
+                        -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
+                        -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
+                        -Dliquibase.username=postgres \
+                        -Dliquibase.password=postgres
                     '''
                 }
             }
