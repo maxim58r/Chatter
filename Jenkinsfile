@@ -36,9 +36,9 @@ pipeline {
         stage('Apply Liquibase Changes for AuthService') {
             steps {
                 dir('services/authservice') {
-                    sh '
-                    mvn liquibase:update
-                    '
+                    //sh 'mvn liquibase:update'
+                    sh 'mvn -X clean compile liquibase:update'
+
                 }
             }
         }
