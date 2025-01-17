@@ -74,3 +74,7 @@ datasource:
   host: 192.168.1.35
   port: 32172
   password: postgres # Перенесите в секреты
+
+secrets:
+  redisPassword: "CfAb11y5gLQ3quvc"
+  datasourcePassword: "postgres"
