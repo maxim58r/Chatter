@@ -15,8 +15,7 @@ data:
       datasource:
         url: {{ .Values.spring.datasource.url }}
         username: {{ .Values.spring.datasource.username }}
-        password: {{ .Values.spring.datasource.password | default (lookup "v1" "Secret" .Release.Namespace (printf "%s-secrets" .Release.Name)).data."datasource-password" | b64dec }}
-
+        password: {{ .Values.spring.datasource.password | default ((lookup "v1" "Secret" .Release.Namespace (printf "%s-secrets" .Release.Name)).data."datasource-password" | b64dec) | quote }}
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
         change-log: {{ .Values.spring.liquibase.changeLog | quote }}
