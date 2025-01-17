@@ -15,7 +15,7 @@ data:
       datasource:
         url: {{ .Values.spring.datasource.url }}
         username: {{ .Values.spring.datasource.username }}
-        password: {{ .Values.spring.datasource.password | default ((lookup "v1" "Secret" .Release.Namespace (printf "%s-secrets" .Release.Name)).data.datasourcePassword | b64dec) | quote }}
+        password: ${DATASOURCE_PASSWORD}
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
         change-log: {{ .Values.spring.liquibase.changeLog | quote }}
@@ -35,14 +35,7 @@ data:
       host: {{ .Values.redis.host | quote }}
       port: {{ .Values.redis.port }}
       connect-timeout: {{ .Values.redis.connectTimeout }}
-      password: |
-        {{- with (lookup "v1" "Secret" .Release.Namespace (printf "%s-secret" .Release.Name)) -}}
-        {{- if .data.redisPassword -}}
-          {{ .data.redisPassword | b64dec }}
-        {{- else -}}
-        "default-password"
-        {{- end -}}
-        {{- end }}
+      password: ${REDIS_PASSWORD}
 
     jwt:
       secret: {{ .Values.jwt.secret | quote }}

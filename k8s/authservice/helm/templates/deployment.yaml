@@ -60,6 +60,16 @@ spec:
             - name: SPRING_CONFIG_LOCATION
               value: "classpath:/,file:/config/application.yaml"
 
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: datasourcePassword
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: redisPassword
           # Пример: Можно оставить envFrom глобальных ConfigMap/Secret, если нужно
           envFrom:
             - configMapRef:
