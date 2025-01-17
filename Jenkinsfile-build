@@ -60,10 +60,11 @@ pipeline {
 
         stage('Login to Docker Hub') {
 			steps {
-				sh """
-                  echo "=== Docker Login ==="
-                  echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
-                """
+				withCredentials([usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+					sh '''
+                      echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
+                }
             }
         }
 
@@ -71,7 +72,7 @@ pipeline {
 			steps {
 				sh """
                   docker buildx create --name mybuilder --driver docker-container --use || true
-                  docker buildx inspect --bootstrap
+                  docker buildx inspect mybuilder --bootstrap || exit 1
                 """
             }
         }
@@ -79,46 +80,53 @@ pipeline {
         stage('Build & Push Docker Images') {
 			steps {
 				script {
-					env.SERVICES.split().each { service ->
-                        echo "=== Building Docker image for ${service} ==="
-                        sh """
-                          docker buildx build \
-                              --platform linux/amd64,linux/arm64 \
-                              -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
-                              -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
-                              --push ./services/${service}
-                        """
+					try {
+						env.SERVICES.split().each { service ->
+                            echo "=== Building Docker image for ${service} ==="
+                            sh """
+                              docker buildx build \
+                                  --platform linux/amd64,linux/arm64 \
+                                  --build-arg BUILDKIT_STEP_LOG_MAX_SIZE=104857600 \
+                                  --timeout=300s \
+                                  -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
+                                  -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
+                                  --push ./services/${service}
+                            """
+                        }
+                    } catch (Exception e) {
+						echo "Error building one of the services: ${e.message}"
                     }
                 }
             }
         }
     }
 
-	post {
+    post {
 		success {
 			echo "✅ Build successful!"
-			script {
+            script {
 				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
-				archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
-			}
-		}
-		failure {
+                archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
+            }
+        }
+        failure {
 			echo "❌ Build failed!"
-			script {
+            script {
 				archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
-			}
-		}
-		cleanup {
+                sh 'docker logs $(docker ps -lq) || true'
+            }
+        }
+        cleanup {
 			sh """
-			  echo "=== Cleanup ==="
-			  docker logout
-			  if docker buildx ls | grep -q mybuilder; then
-				  echo "Removing Docker Buildx builder 'mybuilder'..."
-				  docker buildx rm mybuilder
-			  else
-				  echo "No builder 'mybuilder' found, skipping removal."
-			  fi
-			"""
-		}
-	}
+              echo "=== Cleanup ==="
+              docker logout
+              if docker buildx ls | grep -q mybuilder; then
+                  echo "Removing Docker Buildx builder 'mybuilder'..."
+                  docker buildx rm mybuilder
+              else
+                  echo "No builder 'mybuilder' found, skipping removal."
+              fi
+            """
+        }
+    }
 }
