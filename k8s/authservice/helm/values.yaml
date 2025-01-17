@@ -13,7 +13,7 @@ server:
 
 springProfilesActive: "ift"
 
-livenessProbe:
+liveness:
   httpGet:
     path: /actuator/health/liveness
     port: 8080
@@ -23,7 +23,7 @@ livenessProbe:
   successThreshold: 1
   failureThreshold: 3
 
-readinessProbe:
+readiness:
   httpGet:
     path: /actuator/health/readiness
     port: 8080
