@@ -41,7 +41,7 @@ pipeline {
                     echo "Applying Kubernetes manifests..."
                     env.SERVICES.split().each { service ->
                         sh """
-                          kubectl apply -f k8s/secrets/${service}-secrets.yaml
+                          kubectl apply -f k8s/${service}/helm/templates/secret.yaml
                         """
                     }
                 }
