@@ -78,10 +78,10 @@ pipeline {
         }
 
 		stage('Build & Push Docker Images') {
-					steps {
-						script {
-							try {
-								env.SERVICES.split().each { service ->
+			steps {
+				script {
+					try {
+						env.SERVICES.split().each { service ->
 							echo "=== Building Docker image for ${service} ==="
 							sh """
 							  docker buildx build \
@@ -93,7 +93,7 @@ pipeline {
 							"""
 						}
 					} catch (Exception e) {
-								echo "Error building one of the services: ${e.message}"
+						echo "Error building one of the services: ${e.message}"
 						currentBuild.result = 'FAILURE'
 						error("Build failed for service: ${service}")
 					}
@@ -101,32 +101,33 @@ pipeline {
 			}
 		}
 
-    post {
-		success {
-			echo "✅ Build successful!"
-            script {
-				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
-                archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
-            }
-        }
-        failure {
-			echo "❌ Build failed!"
-            script {
-				archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
-                sh 'docker logs $(docker ps -lq) || true'
-            }
-        }
-        cleanup {
-			sh """
-              echo "=== Cleanup ==="
-              docker logout
-              if docker buildx ls | grep -q mybuilder; then
-                  echo "Removing Docker Buildx builder 'mybuilder'..."
-                  docker buildx rm mybuilder
-              else
-                  echo "No builder 'mybuilder' found, skipping removal."
-              fi
-            """
-        }
-    }
+		post {
+			success {
+				echo "✅ Build successful!"
+				script {
+					writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+					archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
+				}
+			}
+			failure {
+				echo "❌ Build failed!"
+				script {
+					archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+					sh 'docker logs $(docker ps -lq) || true'
+				}
+			}
+			cleanup {
+				sh """
+				  echo "=== Cleanup ==="
+				  docker logout
+				  if docker buildx ls | grep -q mybuilder; then
+					  echo "Removing Docker Buildx builder 'mybuilder'..."
+					  docker buildx rm mybuilder
+				  else
+					  echo "No builder 'mybuilder' found, skipping removal."
+				  fi
+				"""
+			}
+		}
+	}
 }
