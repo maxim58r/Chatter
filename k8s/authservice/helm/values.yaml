@@ -14,24 +14,16 @@ server:
 springProfilesActive: "ift"
 
 liveness:
-  httpGet:
-    path: /actuator/health/liveness
-    port: 8080
-    scheme: HTTP
+  path: /actuator/health/liveness
+  port: 8080
   initialDelaySeconds: 60
   periodSeconds: 5
-  successThreshold: 1
-  failureThreshold: 3
 
 readiness:
-  httpGet:
-    path: /actuator/health/readiness
-    port: 8080
-    scheme: HTTP
+  path: /actuator/health/readiness
+  port: 8080
   initialDelaySeconds: 60
   periodSeconds: 5
-  successThreshold: 1
-  failureThreshold: 3
 
 
 globalConfigMap: global-configmap
