@@ -1,16 +1,16 @@
 pipeline {
-    agent { label 'chatter' }
+	agent { label 'chatter' }
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Название ветки для сборки')
+		string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Название ветки для сборки')
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Пропустить этап тестирования')
     }
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker_hub')
-        GITHUB_CRED      = credentials('github_ssh_key')
-        SERVICES         = "authservice chatservice messagingservice notificationservice"
-        DOCKER_BUILDKIT  = '1'
+		DOCKER_HUB_CREDS = credentials('docker_hub')
+        GITHUB_CRED = credentials('github_ssh_key')
+        SERVICES = "authservice chatservice messagingservice notificationservice"
+        DOCKER_BUILDKIT = '1'
         DATABASE_URL = 'jdbc:postgresql://127.0.0.1:32172/postgres_auth'
         DATABASE_USERNAME = 'postgres'
         DATABASE_PASSWORD = 'postgres'
@@ -18,10 +18,10 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                script {
-                    echo "Checking out branch ${params.BRANCH_NAME}..."
+		stage('Checkout') {
+			steps {
+				script {
+					echo "Checking out branch ${params.BRANCH_NAME}..."
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "*/${params.BRANCH_NAME}"]],
@@ -38,22 +38,22 @@ pipeline {
         }
 
         stage('Apply Liquibase Changes for AuthService') {
-            steps {
-                dir('services/authservice') {
-                    sh '''
+			steps {
+				dir('services/authservice') {
+					sh '''
                         mvn liquibase:update \
                         -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
                         -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
                         -Dliquibase.username=postgres \
                         -Dliquibase.password=postgres
                     '''
-                }
+				}
             }
         }
 
         stage('Setup Environment') {
-            steps {
-                sh """
+			steps {
+				sh """
                   echo "=== Setup Environment ==="
                   set -e
                   java -version
@@ -64,11 +64,11 @@ pipeline {
         }
 
         stage('Build & Test') {
-            when {
-                expression { !params.SKIP_TESTS }
+			when {
+				expression { !params.SKIP_TESTS }
             }
             steps {
-                sh """
+				sh """
                   echo "=== Build & Test with Maven ==="
                   mvn clean package
                 """
@@ -76,17 +76,17 @@ pipeline {
         }
 
         stage('SpotBugs Analysis') {
-            when {
-                expression { !params.SKIP_TESTS }
+			when {
+				expression { !params.SKIP_TESTS }
             }
             steps {
-                sh "mvn spotbugs:spotbugs"
+				sh "mvn spotbugs:spotbugs"
             }
         }
 
         stage('Login to Docker Hub') {
-            steps {
-                sh """
+			steps {
+				sh """
                   echo "=== Docker Login ==="
                   echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin
                 """
@@ -94,8 +94,8 @@ pipeline {
         }
 
         stage('Prepare Buildx') {
-            steps {
-                sh """
+			steps {
+				sh """
                   docker buildx create --name mybuilder --driver docker-container --use || true
                   docker buildx inspect --bootstrap
                 """
@@ -103,9 +103,9 @@ pipeline {
         }
 
         stage('Build & Push Docker Images') {
-            steps {
-                script {
-                    env.SERVICES.split().each { service ->
+			steps {
+				script {
+					env.SERVICES.split().each { service ->
                         echo "=== Building Docker image for ${service} ==="
                         sh """
                           docker buildx build \
@@ -122,18 +122,18 @@ pipeline {
     }
 
     post {
-        success {
-            echo "✅ Build successful!"
+		success {
+			echo "✅ Build successful!"
             script {
-                writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
                 archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
             }
         }
         failure {
-            echo "❌ Build failed!"
+			echo "❌ Build failed!"
         }
         cleanup {
-            sh """
+			sh """
               echo "=== Cleanup ==="
               docker logout
               docker buildx rm mybuilder || true
