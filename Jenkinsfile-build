@@ -41,7 +41,7 @@ pipeline {
 			steps {
 				dir('services/authservice') {
 					sh '''
-                        mvn liquibase:update \
+                        mvn -X liquibase:update \
                         -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
                         -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
                         -Dliquibase.username=postgres \
