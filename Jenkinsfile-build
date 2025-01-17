@@ -77,28 +77,29 @@ pipeline {
             }
         }
 
-        stage('Build & Push Docker Images') {
-			steps {
-				script {
-					try {
-						env.SERVICES.split().each { service ->
-                            echo "=== Building Docker image for ${service} ==="
-                            sh """
-								docker buildx build \
-									--platform linux/amd64,linux/arm64 \
-									--build-arg BUILDKIT_STEP_LOG_MAX_SIZE=104857600 \
-									-t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
-									-t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
-									--push ./services/${service}
-                            """
-                        }
-                    } catch (Exception e) {
-						echo "Error building one of the services: ${e.message}"
-                    }
-                }
-            }
-        }
-    }
+		stage('Build & Push Docker Images') {
+					steps {
+						script {
+							try {
+								env.SERVICES.split().each { service ->
+							echo "=== Building Docker image for ${service} ==="
+							sh """
+							  docker buildx build \
+								  --platform linux/amd64,linux/arm64 \
+								  --build-arg BUILDKIT_STEP_LOG_MAX_SIZE=104857600 \
+								  -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
+								  -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
+								  --push ./services/${service}
+							"""
+						}
+					} catch (Exception e) {
+								echo "Error building one of the services: ${e.message}"
+						currentBuild.result = 'FAILURE'
+						error("Build failed for service: ${service}")
+					}
+				}
+			}
+		}
 
     post {
 		success {
