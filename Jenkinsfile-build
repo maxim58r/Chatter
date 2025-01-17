@@ -64,7 +64,7 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
 					sh '''
-                      echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin --timeout=600
+                      echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     '''
                 }
             }
@@ -74,7 +74,7 @@ pipeline {
 			steps {
 				sh """
                   docker buildx create --name mybuilder --driver docker-container --use || true
-                  docker buildx inspect mybuilder --bootstrap --timeout=600 || exit 1
+                  docker buildx inspect mybuilder --bootstrap || exit 1
                 """
             }
         }
