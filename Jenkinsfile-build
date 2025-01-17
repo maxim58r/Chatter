@@ -92,7 +92,7 @@ pipeline {
                                   --build-arg BUILDKIT_STEP_LOG_MAX_RETRIES=10 \
                                   -t ${DOCKER_HUB_CREDS_USR}/${service}:${env.BUILD_NUMBER} \
                                   -t ${DOCKER_HUB_CREDS_USR}/${service}:latest \
-                                  --push ./services/${service} --timeout=600
+                                  --push ./services/${service}
                             """
                         }
                     } catch (Exception e) {
