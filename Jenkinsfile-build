@@ -11,9 +11,6 @@ pipeline {
         GITHUB_CRED = credentials('github_ssh_key')
         SERVICES = "authservice chatservice messagingservice notificationservice"
         DOCKER_BUILDKIT = '1'
-        DATABASE_URL = 'jdbc:postgresql://127.0.0.1:32172/postgres_auth'
-        DATABASE_USERNAME = 'postgres'
-        DATABASE_PASSWORD = 'postgres'
     }
 
     stages {
@@ -95,25 +92,24 @@ pipeline {
                 }
             }
         }
-
     }
 
 	post {
-			success {
-				echo "✅ Build successful!"
+		success {
+			echo "✅ Build successful!"
 			script {
-					writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
 				archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
 			}
 		}
 		failure {
-				echo "❌ Build failed!"
+			echo "❌ Build failed!"
 			script {
-					archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+				archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
 			}
 		}
 		cleanup {
-				sh """
+			sh """
 			  echo "=== Cleanup ==="
 			  docker logout
 			  if docker buildx ls | grep -q mybuilder; then
