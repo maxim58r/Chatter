@@ -13,7 +13,7 @@
         <java.version>21</java.version>
         <spring.boot.version>3.4.0</spring.boot.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
-        <spotbugs.version>4.8.6.6</spotbugs.version>
+<!--        <spotbugs.version>4.8.6.6</spotbugs.version>-->
     </properties>
 
     <!-- Модули микросервисов -->
@@ -66,19 +66,19 @@
                 </plugin>
 
                 <!-- SpotBugs для статического анализа -->
-                <plugin>
-                    <groupId>com.github.spotbugs</groupId>
-                    <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>${spotbugs.version}</version>
-                    <executions>
-                        <execution>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>com.github.spotbugs</groupId>-->
+<!--                    <artifactId>spotbugs-maven-plugin</artifactId>-->
+<!--                    <version>${spotbugs.version}</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <phase>verify</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>check</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>

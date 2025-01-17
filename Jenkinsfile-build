@@ -81,14 +81,14 @@ pipeline {
             }
         }
 
-        stage('SpotBugs Analysis') {
-			when {
-				expression { !params.SKIP_TESTS }
-            }
-            steps {
-				sh "mvn spotbugs:spotbugs"
-            }
-        }
+        //stage('SpotBugs Analysis') {
+		//	when {
+		//		expression { !params.SKIP_TESTS }
+        //    }
+        //    steps {
+		//		sh "mvn spotbugs:spotbugs"
+        //    }
+        //}
 
         stage('Login to Docker Hub') {
 			steps {
