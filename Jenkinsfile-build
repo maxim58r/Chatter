@@ -18,12 +18,6 @@ pipeline {
 
     stages {
 
-		stage('Cleanup Workspace') {
-			steps {
-				cleanWs()
-            }
-        }
-
 		stage('Checkout') {
 			steps {
 				script {
@@ -42,20 +36,6 @@ pipeline {
                 }
             }
         }
-
-        //stage('Apply Liquibase Changes for AuthService') {
-		//	steps {
-		//		dir('services/authservice') {
-		//			sh '''
-        //                mvn -X liquibase:update \
-        //                -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
-        //                -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
-        //                -Dliquibase.username=postgres \
-        //                -Dliquibase.password=postgres
-        //            '''
-		//		}
-        //    }
-        //}
 
         stage('Setup Environment') {
 			steps {
@@ -80,15 +60,6 @@ pipeline {
                 """
             }
         }
-
-        //stage('SpotBugs Analysis') {
-		//	when {
-		//		expression { !params.SKIP_TESTS }
-        //    }
-        //    steps {
-		//		sh "mvn spotbugs:spotbugs"
-        //    }
-        //}
 
         stage('Login to Docker Hub') {
 			steps {
@@ -127,23 +98,31 @@ pipeline {
 
     }
 
-    post {
-		success {
-			echo "✅ Build successful!"
-            script {
-				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
-                archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
-            }
-        }
-        failure {
-			echo "❌ Build failed!"
-        }
-        cleanup {
-			sh """
-              echo "=== Cleanup ==="
-              docker logout
-              docker buildx rm mybuilder || true
-            """
-        }
-    }
+	post {
+			success {
+				echo "✅ Build successful!"
+			script {
+					writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+				archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
+			}
+		}
+		failure {
+				echo "❌ Build failed!"
+			script {
+					archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+			}
+		}
+		cleanup {
+				sh """
+			  echo "=== Cleanup ==="
+			  docker logout
+			  if docker buildx ls | grep -q mybuilder; then
+				  echo "Removing Docker Buildx builder 'mybuilder'..."
+				  docker buildx rm mybuilder
+			  else
+				  echo "No builder 'mybuilder' found, skipping removal."
+			  fi
+			"""
+		}
+	}
 }

@@ -20,6 +20,13 @@ pipeline {
     }
 
     stages {
+
+
+        stage('Cleanup Workspace') {
+			steps {
+				cleanWs()
+            }
+        }
 	
 		stage('Deploy PostgreSQL') {
             steps {
@@ -67,6 +74,20 @@ pipeline {
                       git submodule foreach --recursive 'git pull origin ${params.BRANCH_NAME} || true'
                     """
                 }
+            }
+        }
+
+        stage('Apply Liquibase Changes for AuthService') {
+			steps {
+				dir('services/authservice') {
+					sh '''
+                        mvn -X liquibase:update \
+                        -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
+                        -Dliquibase.url=jdbc:postgresql://127.0.0.1:32172/postgres_auth \
+                        -Dliquibase.username=postgres \
+                        -Dliquibase.password=postgres
+                    '''
+				}
             }
         }
 
