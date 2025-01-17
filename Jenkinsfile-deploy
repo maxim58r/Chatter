@@ -36,12 +36,12 @@ pipeline {
         }
 
         stage('Apply Manifests') {
-            steps {
-                script {
-                    echo "Applying Kubernetes manifests..."
+                    steps {
+                        script {
+                            echo "Applying Kubernetes manifests using Helm..."
                     env.SERVICES.split().each { service ->
                         sh """
-                          kubectl apply -f k8s/${service}/helm/templates/secret.yaml
+                          helm upgrade --install ${service} ./k8s/${service}/helm
                         """
                     }
                 }
