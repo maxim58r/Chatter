@@ -100,34 +100,34 @@ pipeline {
 				}
 			}
 		}
+	}
 
-		post {
-			success {
-				echo "✅ Build successful!"
+	post {
+		success {
+			echo "✅ Build successful!"
 				script {
-					writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
+				writeFile file: 'successful-build-id.txt', text: "${env.BUILD_NUMBER}"
 					archiveArtifacts artifacts: 'successful-build-id.txt', fingerprint: true
 				}
 			}
-			failure {
-				echo "❌ Build failed!"
-				script {
-					archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
-					sh 'docker logs $(docker ps -lq) || true'
-				}
+		failure {
+		echo "❌ Build failed!"
+			script {
+			archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+				sh 'docker logs $(docker ps -lq) || true'
 			}
-			cleanup {
-				sh """
-				  echo "=== Cleanup ==="
-				  docker logout
-				  if docker buildx ls | grep -q mybuilder; then
-					  echo "Removing Docker Buildx builder 'mybuilder'..."
-					  docker buildx rm mybuilder
-				  else
-					  echo "No builder 'mybuilder' found, skipping removal."
-				  fi
-				"""
-			}
+		}
+		cleanup {
+		sh """
+			  echo "=== Cleanup ==="
+			  docker logout
+			  if docker buildx ls | grep -q mybuilder; then
+				  echo "Removing Docker Buildx builder 'mybuilder'..."
+				  docker buildx rm mybuilder
+			  else
+				  echo "No builder 'mybuilder' found, skipping removal."
+			  fi
+			"""
 		}
 	}
 }
