@@ -35,6 +35,19 @@ pipeline {
             }
         }
 
+        stage('Apply Manifests') {
+            steps {
+                script {
+                    echo "Applying Kubernetes manifests..."
+                    env.SERVICES.split().each { service ->
+                        sh """
+                          kubectl apply -f k8s/secrets/${service}-secrets.yaml
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Apply ConfigMap') {
             steps {
                 script {
