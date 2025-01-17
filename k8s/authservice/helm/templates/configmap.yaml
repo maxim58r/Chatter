@@ -41,8 +41,8 @@ data:
       secret: {{ .Values.jwt.secret | quote }}
       expiration: {{ .Values.jwt.expiration }}
 
-    logging:
-      level:
-        org.springframework.boot.context.properties: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}
-        org.hibernate.SQL: {{ .Values.logging.level.org.hibernate.SQL | quote }}
-        org.hibernate.type.descriptor.sql.BasicBinder: {{ .Values.logging.level.org.hibernate.type.descriptor.sql.BasicBinder | quote }}
+{{/*    logging:*/}}
+{{/*      level:*/}}
+{{/*        org.springframework.boot.context.properties: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}*/}}
+{{/*        org.hibernate.SQL: {{ .Values.logging.level.org.hibernate.SQL | quote }}*/}}
+{{/*        org.hibernate.type.descriptor.sql.BasicBinder: {{ .Values.logging.level.org.hibernate.type.descriptor.sql.BasicBinder | quote }}*/}}
