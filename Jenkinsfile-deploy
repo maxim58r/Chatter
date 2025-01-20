@@ -55,25 +55,26 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes with Helm') {
-			when {
-				expression { params.DEPLOY_TO_KUBERNETES }
-            }
-            steps {
-				script {
-					echo "Deploying build ID: ${params.BUILD_ID}"
-                    env.SERVICES.split().each { service ->
-                        echo "=== Deploying ${service} to Kubernetes with Helm ==="
-                        sh """
-                          helm upgrade --install ${service} ./k8s/${service}/helm \
-                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
-                              --set image.tag=${params.IMAGE_TAG} \
-                              --set deployment.annotations.redeploy=$(date +%s)
-                        """
-                    }
-                }
-            }
-        }
+		stage('Deploy to Kubernetes with Helm') {
+					when {
+						expression { params.DEPLOY_TO_KUBERNETES }
+			}
+			steps {
+						script {
+							echo "Deploying build ID: ${params.BUILD_ID}"
+					env.SERVICES.split().each { service ->
+						echo "=== Deploying ${service} to Kubernetes with Helm ==="
+						sh """
+						  helm upgrade --install ${service} ./k8s/${service}/helm \\
+							  --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \\
+							  --set image.tag=${params.IMAGE_TAG} \\
+							  --set deployment.annotations.redeploy=\$(date +%s)
+						"""
+					}
+				}
+			}
+		}
+
 
         stage('Health Check') {
 			when {
