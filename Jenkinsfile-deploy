@@ -10,7 +10,7 @@ pipeline {
 
     environment {
 		DOCKER_HUB_CREDS = credentials('docker_hub')
-		KUBECONFIG       = "/var/lib/jenkins/.kube/config"
+		KUBECONFIG = "/var/lib/jenkins/.kube/config"
         SERVICES = "authservice chatservice messagingservice notificationservice"
     }
 
@@ -57,12 +57,12 @@ pipeline {
         }
 
 		stage('Deploy to Kubernetes with Helm') {
-					when {
-						expression { params.DEPLOY_TO_KUBERNETES }
+			when {
+				expression { params.DEPLOY_TO_KUBERNETES }
 			}
 			steps {
-						script {
-							echo "Deploying build ID: ${params.BUILD_ID}"
+				script {
+					echo "Deploying build ID: ${params.BUILD_ID}"
 					env.SERVICES.split().each { service ->
 						echo "=== Deploying ${service} to Kubernetes with Helm ==="
 						sh """
