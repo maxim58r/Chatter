@@ -17,13 +17,13 @@ springProfilesActive: "ift"
 liveness:
   path: /actuator/health/liveness
   port: 8080
-  initialDelaySeconds: 60
+  initialDelaySeconds: 40
   periodSeconds: 5
 
 readiness:
   path: /actuator/health/readiness
   port: 8080
-  initialDelaySeconds: 60
+  initialDelaySeconds: 40
   periodSeconds: 5
 
 globalConfigMap: global-configmap
@@ -38,7 +38,7 @@ spring:
   datasource:
     url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/postgres_auth
     username: postgres
-    password: "{{ .Values.datasource.password }}"
+    password: ""
   liquibase:
     enabled: true
     changeLog: classpath:db/changelog/db.changelog-master.xml
@@ -51,6 +51,11 @@ spring:
   security:
     user:
       name: admin
+  management:
+    endpoint:
+      health:
+        probes:
+          enabled: true
 
 redis:
   host: 192.168.1.35
