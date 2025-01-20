@@ -10,6 +10,7 @@ pipeline {
 
     environment {
 		DOCKER_HUB_CREDS = credentials('docker_hub')
+		KUBECONFIG       = "/var/lib/jenkins/.kube/config"
         SERVICES = "authservice chatservice messagingservice notificationservice"
     }
 
