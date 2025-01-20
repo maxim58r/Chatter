@@ -1,25 +1,24 @@
 pipeline {
-    agent { label 'chatter' }
+	agent { label 'chatter' }
 
     parameters {
-        booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
+		booleanParam(name: 'DEPLOY_TO_KUBERNETES', defaultValue: true, description: 'Выполнять деплой на Kubernetes')
         booleanParam(name: 'RUN_HEALTH_CHECK', defaultValue: true, description: 'Выполнять проверку состояния сервисов')
         string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Тег Docker-образов для деплоя')
         string(name: 'BUILD_ID', defaultValue: '', description: 'ID успешной сборки для деплоя')
     }
 
     environment {
-        DOCKER_HUB_CREDS = credentials('docker_hub')
-        KUBECONFIG       = "/var/lib/jenkins/.kube/config"
-        SERVICES         = "authservice chatservice messagingservice notificationservice"
+		DOCKER_HUB_CREDS = credentials('docker_hub')
+        SERVICES = "authservice chatservice messagingservice notificationservice"
     }
 
     stages {
 
-        stage('Fetch Build Info') {
-            steps {
-                script {
-                    // Копируем артефакт из конкретной сборки
+		stage('Fetch Build Info') {
+			steps {
+				script {
+					// Копируем артефакт из конкретной сборки
                     copyArtifacts(
                         projectName: 'chatter-multimodule-build-pipeline',  // Имя вашего build-пайплайна
                         selector: [
@@ -36,9 +35,9 @@ pipeline {
         }
 
         stage('Apply Manifests') {
-                    steps {
-                        script {
-                            echo "Applying Kubernetes manifests using Helm..."
+			steps {
+				script {
+					echo "Applying Kubernetes manifests using Helm..."
                     env.SERVICES.split().each { service ->
                         sh """
                           helm upgrade --install ${service} ./k8s/${service}/helm
@@ -49,26 +48,27 @@ pipeline {
         }
 
         stage('Apply ConfigMap') {
-            steps {
-                script {
-                    sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
+			steps {
+				script {
+					sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
                 }
             }
         }
 
         stage('Deploy to Kubernetes with Helm') {
-            when {
-                expression { params.DEPLOY_TO_KUBERNETES }
+			when {
+				expression { params.DEPLOY_TO_KUBERNETES }
             }
             steps {
-                script {
-                    echo "Deploying build ID: ${params.BUILD_ID}"
+				script {
+					echo "Deploying build ID: ${params.BUILD_ID}"
                     env.SERVICES.split().each { service ->
                         echo "=== Deploying ${service} to Kubernetes with Helm ==="
                         sh """
                           helm upgrade --install ${service} ./k8s/${service}/helm \
                               --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
-                              --set image.tag=${params.IMAGE_TAG}
+                              --set image.tag=${params.IMAGE_TAG} \
+                              --set deployment.annotations.redeploy=$(date +%s)
                         """
                     }
                 }
@@ -76,12 +76,12 @@ pipeline {
         }
 
         stage('Health Check') {
-            when {
-                expression { params.RUN_HEALTH_CHECK }
+			when {
+				expression { params.RUN_HEALTH_CHECK }
             }
             steps {
-                script {
-                    env.SERVICES.split().each { service ->
+				script {
+					env.SERVICES.split().each { service ->
                       echo "=== Waiting for ${service} Deployment to be ready ==="
                       sh """
                         kubectl rollout status deployment/${service} --namespace=default --timeout=60s
@@ -101,11 +101,11 @@ pipeline {
     }
 
     post {
-        success {
-            echo "✅ Deployment successful!"
+		success {
+			echo "✅ Deployment successful!"
         }
         failure {
-            echo "❌ Deployment failed!"
+			echo "❌ Deployment failed!"
         }
     }
 }
