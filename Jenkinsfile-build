@@ -11,8 +11,8 @@ pipeline {
         GITHUB_CRED = credentials('github_ssh_key')
         SERVICES = "authservice chatservice messagingservice notificationservice"
         DOCKER_BUILDKIT = '1'
-        DOCKER_CLIENT_TIMEOUT = '600'  // Увеличение клиентского таймаута до 10 минут
-        COMPOSE_HTTP_TIMEOUT = '600'  // Таймаут для Docker Compose
+        DOCKER_CLIENT_TIMEOUT = '600'
+        COMPOSE_HTTP_TIMEOUT = '600'
     }
 
     stages {

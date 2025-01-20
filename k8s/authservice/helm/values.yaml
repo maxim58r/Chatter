@@ -26,9 +26,7 @@ readiness:
   initialDelaySeconds: 60
   periodSeconds: 5
 
-
 globalConfigMap: global-configmap
-
 serviceAccountName: authservice-sa
 
 storage:
@@ -37,11 +35,10 @@ storage:
 spring:
   application:
     name: authservice
-
   datasource:
     url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/postgres_auth
     username: postgres
-    password: "{{ .Values.datasource.password }}" # Перенесите в секреты
+    password: "{{ .Values.datasource.password }}"
   liquibase:
     enabled: true
     changeLog: classpath:db/changelog/db.changelog-master.xml
@@ -51,7 +48,6 @@ spring:
     showSql: true
     properties:
       hibernateDialect: org.hibernate.dialect.PostgreSQLDialect
-
   security:
     user:
       name: admin
@@ -60,11 +56,11 @@ redis:
   host: 192.168.1.35
   port: 31015
   connectTimeout: 60000
-  passwordFromSecret: redis-password
+  passwordFromSecret: ""
 
 jwt:
   secret: secret_key
-  expiration: 3600000 # 1 час
+  expiration: 3600000
 
 logging:
   level:
@@ -75,4 +71,7 @@ logging:
 datasource:
   host: 192.168.1.35
   port: 32172
-  password: postgres # Перенесите в секреты
+  password: ""  # В реальном проекте храните в Secret
+deployment:
+  annotations:
+    redeploy: ""  # Переопределяется через --set

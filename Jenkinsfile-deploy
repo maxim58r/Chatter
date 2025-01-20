@@ -10,7 +10,7 @@ pipeline {
 
     environment {
 		DOCKER_HUB_CREDS = credentials('docker_hub')
-		KUBECONFIG = "/var/lib/jenkins/.kube/config"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
         SERVICES = "authservice chatservice messagingservice notificationservice"
     }
 
@@ -19,31 +19,20 @@ pipeline {
 		stage('Fetch Build Info') {
 			steps {
 				script {
-					// Копируем артефакт из конкретной сборки
+					// Копируем артефакт с номером билда
                     copyArtifacts(
-                        projectName: 'chatter-multimodule-build-pipeline',  // Имя вашего build-пайплайна
+                        projectName: 'chatter-multimodule-build-pipeline',
                         selector: [
                             $class: 'SpecificBuildSelector',
                             buildNumber: params.BUILD_ID
                         ],
                         filter: 'successful-build-id.txt'
                     )
-
                     def buildId = readFile('successful-build-id.txt').trim()
                     echo "Using Build ID: ${buildId}"
-                }
-            }
-        }
 
-        stage('Apply Manifests') {
-			steps {
-				script {
-					echo "Applying Kubernetes manifests using Helm..."
-                    env.SERVICES.split().each { service ->
-                        sh """
-                          helm upgrade --install ${service} ./k8s/${service}/helm
-                        """
-                    }
+                    // Переопределяем IMAGE_TAG, чтобы не оставлять 'latest'
+                    env.IMAGE_TAG = buildId
                 }
             }
         }
@@ -51,31 +40,31 @@ pipeline {
         stage('Apply ConfigMap') {
 			steps {
 				script {
-					sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
+					echo "Applying global ConfigMap..."
+                    sh 'kubectl apply -f k8s/configmap/global-configmap.yaml'
                 }
             }
         }
 
-		stage('Deploy to Kubernetes with Helm') {
+        stage('Deploy to Kubernetes with Helm') {
 			when {
 				expression { params.DEPLOY_TO_KUBERNETES }
-			}
-			steps {
+            }
+            steps {
 				script {
-					echo "Deploying build ID: ${params.BUILD_ID}"
-					env.SERVICES.split().each { service ->
-						echo "=== Deploying ${service} to Kubernetes with Helm ==="
-						sh """
-						  helm upgrade --install ${service} ./k8s/${service}/helm \\
-							  --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \\
-							  --set image.tag=${params.IMAGE_TAG} \\
-							  --set deployment.annotations.redeploy=\$(date +%s)
-						"""
-					}
-				}
-			}
-		}
-
+					echo "Deploying build ID: ${params.BUILD_ID}, image tag: ${env.IMAGE_TAG}"
+                    env.SERVICES.split().each { service ->
+                        echo "=== Deploying ${service} with image tag ${env.IMAGE_TAG} ==="
+                        sh """
+                          helm upgrade --install ${service} ./k8s/${service}/helm \\
+                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \\
+                              --set image.tag=${env.IMAGE_TAG} \\
+                              --set deployment.annotations.redeploy=\$(date +%s)
+                        """
+                    }
+                }
+            }
+        }
 
         stage('Health Check') {
 			when {
@@ -84,17 +73,17 @@ pipeline {
             steps {
 				script {
 					env.SERVICES.split().each { service ->
-                      echo "=== Waiting for ${service} Deployment to be ready ==="
-                      sh """
-                        kubectl rollout status deployment/${service} --namespace=default --timeout=60s
-                      """
-                      echo "=== Performing Health Check for ${service} ==="
-                      sh """
-                        curl --fail --max-time 10 http://${service}.local/actuator/health || {
-                          echo "Health check failed for ${service}";
-                          exit 1;
-                        }
-                      """
+                        echo "=== Waiting for ${service} Deployment to be ready ==="
+                        sh """
+                          kubectl rollout status deployment/${service} --namespace=default --timeout=60s
+                        """
+                        echo "=== Performing Health Check for ${service} ==="
+                        sh """
+                          curl --fail --max-time 10 http://${service}.local/actuator/health || {
+                            echo "Health check failed for ${service}";
+                            exit 1;
+                          }
+                        """
                     }
                 }
             }

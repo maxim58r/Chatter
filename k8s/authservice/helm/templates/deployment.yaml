@@ -26,6 +26,9 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
+      annotations:
+        # !! Важно: эта аннотация меняется при деплое (redeploy: <timestamp>)
+        redeploy: "{{ .Values.deployment.annotations.redeploy }}"
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
@@ -42,21 +45,18 @@ spec:
               memory: "256Mi"
               cpu: "500m"
 
-          # Важно: монтируем ConfigMap как файл application.yaml в /config
           volumeMounts:
             - name: app-storage
               mountPath: /data
             - name: config-volume
-              mountPath: /config    # всю директорию /config делаем
-              readOnly: true        # обычно ConfigMap монтируют readOnly
+              mountPath: /config
+              readOnly: true
 
-          # Переменные окружения
           env:
-            # профиль (если нужен), берем из values:
+            # Обязательно возьмём строковое значение из values:
             - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.springProfilesActive }}
+              value: "{{ .Values.springProfilesActive }}"
 
-            # Указываем Spring, что нужно читать файл application.yaml из /config
             - name: SPRING_CONFIG_LOCATION
               value: "classpath:/,file:/config/application.yaml"
 
@@ -70,12 +70,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: redisPassword
-          # Пример: Можно оставить envFrom глобальных ConfigMap/Secret, если нужно
+
           envFrom:
             - configMapRef:
                 name: {{ .Values.globalConfigMap }}
 
-          # Пробы
           livenessProbe:
             httpGet:
               path: {{ .Values.liveness.path }}
@@ -94,12 +93,9 @@ spec:
         - name: app-storage
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-pvc
-
-        # Подключаем ConfigMap
         - name: config-volume
           configMap:
             name: {{ .Release.Name }}-configmap
-            # Если хотим, чтобы файл назывался именно application.yaml:
             items:
               - key: application.yaml
                 path: application.yaml
