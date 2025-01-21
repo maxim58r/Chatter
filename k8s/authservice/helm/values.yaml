@@ -19,8 +19,8 @@ spring:
     name: authservice
   datasource:
     username: postgres
-    host: 192.168.1.35
-    port: 32172
+    host: postgres-postgresql.default.svc.cluster.local
+    port: 5432
     dbName: postgres_auth
     password: ""
   liquibase:
@@ -42,8 +42,8 @@ spring:
           enabled: true
 
 redis:
-  host: 192.168.1.35
-  port: 31015
+  host: redis-master.default.svc.cluster.local
+  port: 6379
   connectTimeout: 60000
   passwordFromSecret: ""
 
