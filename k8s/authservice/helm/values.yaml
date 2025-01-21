@@ -88,4 +88,4 @@ globalConfigMap: global-configmap
 serviceAccountName: authservice-sa
 
 storage:
-  size: 100Miй
+  size: 100Mi
