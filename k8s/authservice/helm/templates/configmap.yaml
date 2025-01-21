@@ -13,9 +13,10 @@ data:
         name: {{ .Values.spring.application.name }}
 
       datasource:
-        url: {{ .Values.spring.datasource.url }}
-        username: {{ .Values.spring.datasource.username }}
+        url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/{{ .Values.datasource.dbName }}
+        username: {{ .Values.spring.datasource.username | quote }}
         password: ${DATASOURCE_PASSWORD}
+
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
         change-log: {{ .Values.spring.liquibase.changeLog | quote }}
@@ -41,8 +42,9 @@ data:
       secret: {{ .Values.jwt.secret | quote }}
       expiration: {{ .Values.jwt.expiration }}
 
-{{/*    logging:*/}}
-{{/*      level:*/}}
-{{/*        org.springframework.boot.context.properties: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}*/}}
-{{/*        org.hibernate.SQL: {{ .Values.logging.level.org.hibernate.SQL | quote }}*/}}
-{{/*        org.hibernate.type.descriptor.sql.BasicBinder: {{ .Values.logging.level.org.hibernate.type.descriptor.sql.BasicBinder | quote }}*/}}
+    logging:
+      level:
+        org.springframework.boot.context.properties: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}
+        org.hibernate.SQL: {{ .Values.logging.level.org.hibernate.SQL | quote }}
+        org.hibernate.type.descriptor.sql.BasicBinder: {{ .Values.logging.level.org.hibernate.type.descriptor.sql.BasicBinder | quote }}
+

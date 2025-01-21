@@ -27,7 +27,6 @@ spec:
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
       annotations:
-        # !! Важно: эта аннотация меняется при деплое (redeploy: <timestamp>)
         redeploy: "{{ .Values.deployment.annotations.redeploy }}"
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
@@ -45,21 +44,11 @@ spec:
               memory: "256Mi"
               cpu: "500m"
 
-          volumeMounts:
-            - name: app-storage
-              mountPath: /data
-            - name: config-volume
-              mountPath: /config
-              readOnly: true
-
           env:
-            # Обязательно возьмём строковое значение из values:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{ .Values.springProfilesActive }}"
-
             - name: SPRING_CONFIG_LOCATION
               value: "classpath:/,file:/config/application.yaml"
-
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -75,13 +64,19 @@ spec:
             - configMapRef:
                 name: {{ .Values.globalConfigMap }}
 
+          volumeMounts:
+            - name: app-storage
+              mountPath: /data
+            - name: config-volume
+              mountPath: /config
+              readOnly: true
+
           livenessProbe:
             httpGet:
               path: {{ .Values.liveness.path }}
               port: {{ .Values.liveness.port }}
             initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.liveness.periodSeconds }}
-
           readinessProbe:
             httpGet:
               path: {{ .Values.readiness.path }}

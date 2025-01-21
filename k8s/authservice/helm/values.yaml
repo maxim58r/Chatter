@@ -14,31 +14,16 @@ server:
 
 springProfilesActive: "ift"
 
-liveness:
-  path: /actuator/health/liveness
-  port: 8080
-  initialDelaySeconds: 40
-  periodSeconds: 5
-
-readiness:
-  path: /actuator/health/readiness
-  port: 8080
-  initialDelaySeconds: 40
-  periodSeconds: 5
-
-globalConfigMap: global-configmap
-serviceAccountName: authservice-sa
-
-storage:
-  size: 100Mi
+datasource:
+  host: 192.168.1.35
+  port: 32172
+  dbName: postgres_auth
+  password: ""  # в реальном проекте храним в Secret
 
 spring:
-  application:
-    name: authservice
   datasource:
-    url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/postgres_auth
     username: postgres
-    password: ""
+    url: ""  # пусто, потому что собираем в шаблоне
   liquibase:
     enabled: true
     changeLog: classpath:db/changelog/db.changelog-master.xml
@@ -73,10 +58,24 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-datasource:
-  host: 192.168.1.35
-  port: 32172
-  password: ""  # В реальном проекте храните в Secret
 deployment:
   annotations:
-    redeploy: ""  # Переопределяется через --set
+    redeploy: ""
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8080
+  initialDelaySeconds: 40
+  periodSeconds: 5
+
+readiness:
+  path: /actuator/health/readiness
+  port: 8080
+  initialDelaySeconds: 40
+  periodSeconds: 5
+
+globalConfigMap: global-configmap
+serviceAccountName: authservice-sa
+
+storage:
+  size: 100Miй

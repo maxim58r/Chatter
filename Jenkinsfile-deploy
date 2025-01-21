@@ -19,23 +19,28 @@ pipeline {
 		stage('Fetch Build Info') {
 			steps {
 				script {
-					// Копируем артефакт с номером билда
-                    copyArtifacts(
-                        projectName: 'chatter-multimodule-build-pipeline',
-                        selector: [
-                            $class: 'SpecificBuildSelector',
-                            buildNumber: params.BUILD_ID
-                        ],
-                        filter: 'successful-build-id.txt'
-                    )
-                    def buildId = readFile('successful-build-id.txt').trim()
-                    echo "Using Build ID: ${buildId}"
+					if (params.BUILD_ID) {
+						// Если BUILD_ID указан, читаем файл с билдом и устанавливаем IMAGE_TAG
+						copyArtifacts(
+							projectName: 'chatter-multimodule-build-pipeline',
+							selector: [
+								$class: 'SpecificBuildSelector',
+								buildNumber: params.BUILD_ID
+							],
+							filter: 'successful-build-id.txt'
+						)
+						def buildId = readFile('successful-build-id.txt').trim()
+						echo "Using Build ID: ${buildId}"
+						env.IMAGE_TAG = buildId
+					} else {
+						// Если BUILD_ID не указан, оставляем пользовательский IMAGE_TAG
+						echo "Using user-provided IMAGE_TAG: ${params.IMAGE_TAG}"
+						env.IMAGE_TAG = params.IMAGE_TAG
+					}
+				}
+			}
+		}
 
-                    // Переопределяем IMAGE_TAG, чтобы не оставлять 'latest'
-                    env.IMAGE_TAG = buildId
-                }
-            }
-        }
 
         stage('Apply ConfigMap') {
 			steps {
@@ -57,6 +62,7 @@ pipeline {
                         echo "=== Deploying ${service} with image tag ${env.IMAGE_TAG} ==="
                         sh """
                           helm upgrade --install ${service} ./k8s/${service}/helm \\
+                          	  --atomic --timeout 180s \\
                               --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \\
                               --set image.tag=${env.IMAGE_TAG} \\
                               --set deployment.annotations.redeploy=\$(date +%s)
@@ -88,7 +94,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
