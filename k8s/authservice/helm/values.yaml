@@ -56,9 +56,17 @@ jwt:
 
 logging:
   level:
-    org.springframework.boot.context.properties: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org:
+      springframework:
+        boot:
+          context:
+            properties: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
 
 deployment:
   annotations:
