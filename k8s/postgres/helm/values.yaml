@@ -1,9 +1,8 @@
 global:
   storageClass: "standard"
-architecture: "standalone"
-master:
+primary:
   persistence:
-    size: 5Gi
-auth:
-  enabled: true
-  password: "my_redis_password"
+    size: 10Gi
+postgresqlDatabase: "postgres_auth"
+postgresqlUsername: "postgres"
+postgresqlPassword: "my_password"

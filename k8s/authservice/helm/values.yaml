@@ -19,7 +19,7 @@ spring:
     name: authservice
   datasource:
     username: postgres
-    host: postgres-postgresql.default.svc.cluster.local
+    host: postgres-postgresql-0.default.svc.cluster.local
     port: 5432
     dbName: postgres_auth
     password: ""
