@@ -21,6 +21,8 @@ datasource:
   password: ""  # в реальном проекте храним в Secret
 
 spring:
+  application:
+    name: authservice
   datasource:
     username: postgres
     url: ""  # пусто, потому что собираем в шаблоне
