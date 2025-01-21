@@ -17,7 +17,18 @@ pipeline {
 
     stages {
 
-		stage('Checkout') {
+		stage('Validate Branch') {
+			steps {
+				script {
+					// Разрешаем сборку только из develop или main
+                    if (params.BRANCH_NAME != 'develop' && params.BRANCH_NAME != 'main') {
+						error("Branch name must be 'develop' or 'main' only!")
+                    }
+                }
+            }
+        }
+
+        stage('Checkout') {
 			steps {
 				script {
 					echo "Checking out branch ${params.BRANCH_NAME}..."
@@ -29,10 +40,22 @@ pipeline {
                             credentialsId: 'github_ssh_key'
                         ]],
                         extensions: [
+                            // Важно: trackingSubmodules = true, recursiveSubmodules = true
                             [$class: 'SubmoduleOption', recursiveSubmodules: true, trackingSubmodules: true]
                         ]
                     ])
                 }
+            }
+        }
+
+        stage('Update Submodules') {
+			steps {
+				sh """
+                  echo "=== Updating git submodules to the latest commit in their tracked branches ==="
+                  git submodule sync --recursive
+                  // переключение на ветку, прописанную в .gitmodules (или дефолтно) + мердж последних изменений
+                  git submodule update --init --recursive --remote --merge
+                """
             }
         }
 
