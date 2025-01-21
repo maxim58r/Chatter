@@ -9,23 +9,20 @@ image:
 containerPort: 8080
 nodePort: 31000
 
-server:
-  port: 8080
-
 springProfilesActive: "ift"
 
-datasource:
-  host: 192.168.1.35
-  port: 32172
-  dbName: postgres_auth
-  password: ""  # в реальном проекте храним в Secret
+server:
+  port: 8080
 
 spring:
   application:
     name: authservice
   datasource:
     username: postgres
-    url: ""  # пусто, потому что собираем в шаблоне
+    host: 192.168.1.35
+    port: 32172
+    dbName: postgres_auth
+    password: ""
   liquibase:
     enabled: true
     changeLog: classpath:db/changelog/db.changelog-master.xml

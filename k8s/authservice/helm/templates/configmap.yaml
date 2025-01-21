@@ -13,7 +13,7 @@ data:
         name: {{ .Values.spring.application.name }}
 
       datasource:
-        url: jdbc:postgresql://{{ .Values.datasource.host }}:{{ .Values.datasource.port }}/{{ .Values.datasource.dbName }}
+        url: jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}
         username: {{ .Values.spring.datasource.username | quote }}
         password: ${DATASOURCE_PASSWORD}
 
