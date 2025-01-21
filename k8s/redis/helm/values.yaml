@@ -1,0 +1,88 @@
+name: authservice
+namespace: default
+replicas: 1
+
+image:
+  repository: maxim58r/authservice
+  tag: 1.0.0
+
+containerPort: 8080
+nodePort: 31000
+
+springProfilesActive: "ift"
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: authservice
+  datasource:
+    username: postgres
+    host: postgres-postgresql.default.svc.cluster.local
+    port: 5432
+    dbName: postgres_auth
+    password: ""
+  liquibase:
+    enabled: true
+    changeLog: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    hibernate:
+      ddlAuto: validate
+    showSql: true
+    properties:
+      hibernateDialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    user:
+      name: admin
+  management:
+    endpoint:
+      health:
+        probes:
+          enabled: true
+
+redis:
+  host: redis-master.default.svc.cluster.local
+  port: 6379
+  connectTimeout: 60000
+  passwordFromSecret: ""
+
+jwt:
+  secret: secret_key
+  expiration: 3600000
+
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          context:
+            properties: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+
+deployment:
+  annotations:
+    redeploy: ""
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8080
+  initialDelaySeconds: 40
+  periodSeconds: 5
+
+readiness:
+  path: /actuator/health/readiness
+  port: 8080
+  initialDelaySeconds: 40
+  periodSeconds: 5
+
+globalConfigMap: global-configmap
+serviceAccountName: authservice-sa
+
+storage:
+  size: 100Mi

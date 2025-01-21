@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.name }}-secret-reader
+  namespace: {{ .Values.namespace }}
+rules:
+  - apiGroups: [ "" ] # Группа для стандартных API Kubernetes
+    resources: [ "pods" ]
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups: [ "" ] # Доступ к секретам
+    resources: [ "secrets" ]
+    resourceNames:
+      - {{ .Release.Name }}-secrets # Ограничиваем доступ только к указанному секрету
+    verbs: [ "get" ] # Только получение

@@ -1,0 +1,9 @@
+global:
+  storageClass: "standard"
+architecture: "standalone"
+master:
+  persistence:
+    size: 5Gi
+auth:
+  enabled: true
+  password: "my_redis_password"

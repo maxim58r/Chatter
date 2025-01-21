@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  application.yaml: |
+    server:
+      port: {{ .Values.server.port }}
+
+    spring:
+      application:
+        name: {{ .Values.spring.application.name }}
+
+      datasource:
+        url: jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}
+        username: {{ .Values.spring.datasource.username | quote }}
+        password: ${DATASOURCE_PASSWORD}
+
+      liquibase:
+        enabled: {{ .Values.spring.liquibase.enabled | quote }}
+        change-log: {{ .Values.spring.liquibase.changeLog | quote }}
+
+      jpa:
+        hibernate:
+          ddl-auto: {{ .Values.spring.jpa.hibernate.ddlAuto | quote }}
+        show-sql: {{ .Values.spring.jpa.showSql | quote }}
+        properties:
+          hibernate.dialect: {{ .Values.spring.jpa.properties.hibernateDialect | quote }}
+
+      security:
+        user:
+          name: {{ .Values.spring.security.user.name | quote }}
+
+    redis:
+      host: {{ .Values.redis.host | quote }}
+      port: {{ .Values.redis.port }}
+      connect-timeout: {{ .Values.redis.connectTimeout }}
+      password: ${REDIS_PASSWORD}
+
+    jwt:
+      secret: {{ .Values.jwt.secret | quote }}
+      expiration: {{ .Values.jwt.expiration }}
+
+    logging:
+      level:
+        org.springframework.boot.context.properties: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}
+        org.hibernate.SQL: {{ .Values.logging.level.org.hibernate.SQL | quote }}
+        org.hibernate.type.descriptor.sql.BasicBinder: {{ .Values.logging.level.org.hibernate.type.descriptor.sql.BasicBinder | quote }}
+
