@@ -53,7 +53,7 @@ pipeline {
 				sh """
                   echo "=== Updating git submodules to the latest commit in their tracked branches ==="
                   git submodule sync --recursive
-                  // переключение на ветку, прописанную в .gitmodules (или дефолтно) + мердж последних изменений
+                  # переключение на ветку, прописанную в .gitmodules (или дефолтно) + мердж последних изменений
                   git submodule update --init --recursive --remote --merge
                 """
             }
