@@ -48,13 +48,27 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{ .Values.springProfilesActive }}"
             - name: SPRING_CONFIG_LOCATION
-              value: "classpath:/,file:/config/application.yaml"
-            - name: DATASOURCE_PASSWORD
+              value: {{ .Values.spring.classpath }}
+
+            - name: IFT_DATASOURCE_URL
+              value: jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}
+
+            - name: IFT_DATASOURCE_USERNAME
+              value: {{ .Values.spring.datasource.username }}
+
+            - name: IFT_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: datasourcePassword
-            - name: REDIS_PASSWORD
+
+            - name: IFT_REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+
+            - name: IFT_REDIS_PORT
+              value: {{ .Values.redis.port }}
+
+            - name: IFT_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
@@ -63,6 +77,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.globalConfigMap }}
+
 
           volumeMounts:
             - name: app-storage

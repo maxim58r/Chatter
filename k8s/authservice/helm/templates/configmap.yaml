@@ -13,9 +13,9 @@ data:
         name: {{ .Values.spring.application.name }}
 
       datasource:
-        url: jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}
-        username: {{ .Values.spring.datasource.username | quote }}
-        password: ${DATASOURCE_PASSWORD}
+        url: ${IFT_DATASOURCE_URL}
+        username: ${IFT_DATASOURCE_USERNAME}
+        password: ${IFT_DATASOURCE_PASSWORD}
 
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
@@ -33,8 +33,8 @@ data:
           name: {{ .Values.spring.security.user.name | quote }}
 
     redis:
-      host: {{ .Values.redis.host | quote }}
-      port: {{ .Values.redis.port }}
+      host: ${IFT_REDIS_HOST}
+      port: ${IFT_REDIS_PORT}
       connect-timeout: {{ .Values.redis.connectTimeout }}
       password: ${REDIS_PASSWORD}
 
