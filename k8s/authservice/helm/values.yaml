@@ -87,3 +87,12 @@ serviceAccountName: authservice-sa
 
 storage:
   size: 100Mi
+
+container:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

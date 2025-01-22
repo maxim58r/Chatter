@@ -40,11 +40,11 @@ spec:
             - containerPort: {{ .Values.containerPort }}
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "250m"
+              memory: {{ .Values.container.resources.requests.memory }}
+              cpu: {{ .Values.container.resources.requests.cpu }}
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: {{ .Values.container.resources.limits.memory }}
+              cpu: {{ .Values.container.resources.requests.cpu }}
 
           env:
             - name: SPRING_PROFILES_ACTIVE
