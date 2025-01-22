@@ -40,7 +40,7 @@ data:
 
     jwt:
       secret: {{ .Values.jwt.secret | quote }}
-      expiration: {{ .Values.jwt.expiration | quote }}
+      expiration: {{ .Values.jwt.expiration }}
 
     logging:
       level:
