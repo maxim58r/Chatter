@@ -61,10 +61,11 @@ pipeline {
                     env.SERVICES.split().each { service ->
                         echo "=== Deploying ${service} with image tag ${env.IMAGE_TAG} ==="
                         sh """
-                          helm upgrade --install ${service} ./k8s/${service}/helm \\
-                          	  --atomic --timeout 180s \\
-                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \\
-                              --set image.tag=${env.IMAGE_TAG} \\
+                          helm upgrade --install ${service} ./k8s/${service}/helm \
+                          	  --atomic=false \
+                          	  --timeout 360s \
+                              --set image.repository=${DOCKER_HUB_CREDS_USR}/${service} \
+                              --set image.tag=${env.IMAGE_TAG} \
                               --set deployment.annotations.redeploy=\$(date +%s)
                         """
                     }
