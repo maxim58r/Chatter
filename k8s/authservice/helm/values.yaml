@@ -40,7 +40,7 @@ spring:
       health:
         probes:
           enabled: true
-  classpath: "classpath:/,file:/config/application.yaml"
+  classpath: classpath:/,file:/config/application.yaml
 
 redis:
   host: redis-master.default.svc.cluster.local

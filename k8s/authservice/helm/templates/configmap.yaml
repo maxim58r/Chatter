@@ -6,11 +6,11 @@ metadata:
 data:
   application.yaml: |
     server:
-      port: {{ .Values.server.port }}
+      port: {{ .Values.server.port | quote }}
 
     spring:
       application:
-        name: {{ .Values.spring.application.name }}
+        name: {{ .Values.spring.application.name | quote }}
 
       datasource:
         url: ${IFT_DATASOURCE_URL}
@@ -35,12 +35,12 @@ data:
     redis:
       host: ${IFT_REDIS_HOST}
       port: ${IFT_REDIS_PORT}
-      connect-timeout: {{ .Values.redis.connectTimeout }}
+      connect-timeout: {{ .Values.redis.connectTimeout | quote }}
       password: ${REDIS_PASSWORD}
 
     jwt:
       secret: {{ .Values.jwt.secret | quote }}
-      expiration: {{ .Values.jwt.expiration }}
+      expiration: {{ .Values.jwt.expiration | quote }}
 
     logging:
       level:

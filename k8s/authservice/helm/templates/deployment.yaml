@@ -48,13 +48,13 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{ .Values.springProfilesActive }}"
             - name: SPRING_CONFIG_LOCATION
-              value: {{ .Values.spring.classpath }}
+              value: {{ .Values.spring.classpath | quote }}
 
             - name: IFT_DATASOURCE_URL
-              value: jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}
+              value: "jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}"
 
             - name: IFT_DATASOURCE_USERNAME
-              value: {{ .Values.spring.datasource.username }}
+              value: {{ .Values.spring.datasource.username | quote }}
 
             - name: IFT_DATASOURCE_PASSWORD
               valueFrom:
@@ -66,7 +66,7 @@ spec:
               value: {{ .Values.redis.host | quote }}
 
             - name: IFT_REDIS_PORT
-              value: {{ .Values.redis.port }}
+              value: {{ .Values.redis.port | quote }}
 
             - name: IFT_REDIS_PASSWORD
               valueFrom:
