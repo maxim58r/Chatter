@@ -82,7 +82,7 @@ pipeline {
 					env.SERVICES.split().each { service ->
                         echo "=== Waiting for ${service} Deployment to be ready ==="
                         sh """
-                          kubectl rollout status deployment/${service} --namespace=default --timeout=180s
+                          kubectl rollout status deployment/${service} --namespace=default --timeout=360s
                         """
                         echo "=== Performing Health Check for ${service} ==="
                         sh """
