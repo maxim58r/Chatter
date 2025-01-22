@@ -11,6 +11,6 @@ spec:
     matchNames:
       - default
   endpoints:
-    - port: {{ .Values.containerPort }}
+    - port: http
       path: /actuator/prometheus
       interval: 15s
