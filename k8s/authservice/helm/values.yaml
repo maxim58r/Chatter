@@ -73,14 +73,16 @@ deployment:
 liveness:
   path: /actuator/health/liveness
   port: 8080
-  initialDelaySeconds: 60
+  initialDelaySeconds: 120
   periodSeconds: 5
+  failureThreshold: 5
 
 readiness:
   path: /actuator/health/readiness
   port: 8080
-  initialDelaySeconds: 60
+  initialDelaySeconds: 120
   periodSeconds: 5
+  failureThreshold: 5
 
 globalConfigMap: global-configmap
 serviceAccountName: authservice-sa
