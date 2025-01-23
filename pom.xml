@@ -11,7 +11,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>23</java.version>
-        <spring.boot.version>3.4.0</spring.boot.version>
+        <spring.boot.version>3.5.0</spring.boot.version>
+        <spring.boot.dependencies.version>3.4.1</spring.boot.dependencies.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
 <!--        <spotbugs.version>4.8.6.6</spotbugs.version>-->
     </properties>
@@ -24,13 +25,6 @@
         <module>services/notificationservice</module>
     </modules>
 
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>github</id>-->
-<!--            <url>https://maven.pkg.github.com/maxim58r/shared-library</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
-
     <!-- Общие зависимости -->
     <dependencyManagement>
         <dependencies>
@@ -38,15 +32,10 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${spring.boot.dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.chatter</groupId>-->
-<!--                <artifactId>shared-library</artifactId>-->
-<!--                <version>1.0.2</version>-->
-<!--            </dependency>-->
 
         </dependencies>
     </dependencyManagement>
@@ -82,7 +71,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring.boot.version}</version>
+                    <version>${spring.boot.dependencies.version}</version>
                     <executions>
                         <execution>
                             <goals>
@@ -95,7 +84,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.8.1</version>
                     <executions>
                         <execution>
                             <id>analyze</id>
@@ -109,7 +98,7 @@
                 <plugin>
                     <groupId>org.liquibase</groupId>
                     <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>4.30.0</version>
+                    <version>4.31.0</version>
                 </plugin>
 
             </plugins>
