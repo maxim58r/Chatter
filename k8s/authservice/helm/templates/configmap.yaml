@@ -56,7 +56,7 @@ data:
       endpoints:
         web:
           exposure:
-            include: "*"
+            include: health, info, prometheus
       prometheus:
         metrics:
           export:

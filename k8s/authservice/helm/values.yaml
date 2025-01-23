@@ -60,11 +60,11 @@ logging:
           context:
             properties: DEBUG
       hibernate:
-        SQL: DEBUG
+        SQL: OFF
         type:
           descriptor:
             sql:
-              BasicBinder: TRACE
+              BasicBinder: OFF
 
 deployment:
   annotations:
