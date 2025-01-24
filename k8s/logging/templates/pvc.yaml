@@ -10,32 +10,32 @@ spec:
     requests:
       storage: 1Gi  # Уменьшаем запрос до 1 ГБ
   storageClassName: local-path
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: elasticsearch-master-elasticsearch-master-1
-  namespace: logging
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi  # Уменьшаем запрос до 1 ГБ
-  storageClassName: local-path
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: elasticsearch-master-elasticsearch-master-2
-  namespace: logging
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi  # Уменьшаем запрос до 1 ГБ
-  storageClassName: local-path
+{{/*---*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: PersistentVolumeClaim*/}}
+{{/*metadata:*/}}
+{{/*  name: elasticsearch-master-elasticsearch-master-1*/}}
+{{/*  namespace: logging*/}}
+{{/*spec:*/}}
+{{/*  accessModes:*/}}
+{{/*    - ReadWriteOnce*/}}
+{{/*  resources:*/}}
+{{/*    requests:*/}}
+{{/*      storage: 1Gi  # Уменьшаем запрос до 1 ГБ*/}}
+{{/*  storageClassName: local-path*/}}
+{{/*---*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: PersistentVolumeClaim*/}}
+{{/*metadata:*/}}
+{{/*  name: elasticsearch-master-elasticsearch-master-2*/}}
+{{/*  namespace: logging*/}}
+{{/*spec:*/}}
+{{/*  accessModes:*/}}
+{{/*    - ReadWriteOnce*/}}
+{{/*  resources:*/}}
+{{/*    requests:*/}}
+{{/*      storage: 1Gi  # Уменьшаем запрос до 1 ГБ*/}}
+{{/*  storageClassName: local-path*/}}
 
 # kubectl delete pvc elasticsearch-master-elasticsearch-master-0 -n logging
 # kubectl apply -f pvc.yaml
