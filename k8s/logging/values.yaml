@@ -1,0 +1,13 @@
+nodeSets:
+  - name: master
+    count: 1  # Одна мастер-нода
+    volumeClaimTemplates:
+      - metadata:
+          name: elasticsearch-data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi  # Уменьшаем запрос до 1 ГБ
+          storageClassName: local-path

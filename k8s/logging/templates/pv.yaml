@@ -43,3 +43,22 @@ spec:
 # kubectl delete pv elasticsearch-pv-1
 # kubectl apply -f pv.yaml
 # kubectl get pvc -n logging
+
+# sudo mkdir -p /mnt/data/elasticsearch1
+# sudo mkdir -p /mnt/data/elasticsearch2
+# sudo chmod -R 777 /mnt/data/elasticsearch1
+# sudo chmod -R 777 /mnt/data/elasticsearch2
+# sudo rm -rf /mnt/data/elasticsearch1
+# sudo rm -rf /mnt/data/elasticsearch2
+
+#  kubectl delete statefulset elasticsearch-master -n logging --cascade=orphan
+
+#  helm upgrade elasticsearch elastic/elasticsearch --namespace logging \
+#  --set nodeSets[0].count=2 \
+#  --set nodeSets[0].volumeClaimTemplates[0].resources.requests.storage=1Gi
+
+
+# helm upgrade elasticsearch elastic/elasticsearch --namespace logging \
+# --set replicas=1 \
+# --set volumeClaimTemplate.resources.requests.storage=1Gi
+
