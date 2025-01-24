@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv-0
+spec:
+  capacity:
+    storage: 1Gi  # Размер PV должен совпадать с запросом PVC
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-path  # StorageClass должен совпадать с PVC
+  hostPath:
+    path: /mnt/data/elasticsearch0  # Укажи реальный путь на твоей ноде
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv-1
+spec:
+  capacity:
+    storage: 1Gi  # Размер PV должен совпадать с запросом PVC
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-path  # StorageClass должен совпадать с PVC
+  hostPath:
+    path: /mnt/data/elasticsearch1  # Укажи реальный путь на твоей ноде
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv-2
+spec:
+  capacity:
+    storage: 1Gi  # Размер PV должен совпадать с запросом PVC
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-path  # StorageClass должен совпадать с PVC
+  hostPath:
+    path: /mnt/data/elasticsearch2  # Укажи реальный путь на твоей ноде
+
+# kubectl delete pv elasticsearch-pv-1
+# kubectl apply -f pv.yaml
+# kubectl get pvc -n logging
