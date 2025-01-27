@@ -10,7 +10,6 @@ spec:
     requests:
       storage: 1Gi  # Уменьшаем запрос до 1 ГБ
   storageClassName: local-path
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
