@@ -87,6 +87,8 @@ spec:
             - name: config-volume
               mountPath: /config
               readOnly: true
+            - name: app-logs
+              mountPath: /var/log/app  # Логи приложения
 
           livenessProbe:
             httpGet:
@@ -113,3 +115,5 @@ spec:
             items:
               - key: application.yaml
                 path: application.yaml
+        - name: app-logs
+          emptyDir: { }

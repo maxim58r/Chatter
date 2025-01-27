@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: logging
+data:
+  logstash.conf: |
+    input {
+      file {
+        path => "/var/log/app/*.log"  # Путь к логам моего проекта
+        start_position => "beginning"
+      }
+    }
+    filter {
+      # Добавь фильтры, если нужно обработать логи
+    }
+    output {
+      elasticsearch {
+        hosts => ["http://192.168.1.35:9200"]  # URL Elasticsearch
+        index => "app-logs-%{+YYYY.MM.dd}"
+      }
+    }
