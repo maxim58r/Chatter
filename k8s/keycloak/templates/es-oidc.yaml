@@ -1,8 +1,14 @@
 keystore:
-  - secretName: my-oidc-secret
+  - secretName: "my-oidc-secret"
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+
+extraVolumeMounts: |
+  - name: esconfig
+    mountPath: /usr/share/elasticsearch/config
+    # Ставим принудительно false, чтобы keystore мог перезаписать файл
+    readOnly: false
 
 esConfig:
   elasticsearch.yml: |
