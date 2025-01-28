@@ -1,71 +1,57 @@
-# 1) Убираем keystore: (полностью),
-#    так как мы теперь сами решаем, как добавить client_secret в keystore
-# keystore:
-#   - secretName: "my-oidc-secret"
-#     items:
-#       - key: client-secret
-#         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+# Пример es-oidc.yaml
 
+# Убираем keystore:
+# (Чтобы чарт не монтировал subPath для elasticsearch.keystore)
+# keystore: ...
+
+# 1) Создаём дополнительный volume для writable config
 extraVolumes: |
-  # volume для нашего RW каталога
   - name: config-writable
     emptyDir: {}
 
+# 2) Пробрасываем volumeMount для writable config
 extraVolumeMounts: |
-  # Монтируем writable каталог, чтобы и init-контейнер, и основной контейнер видели его
   - name: config-writable
     mountPath: /config-writable
 
-# 2) Собственный init-контейнер "prepare-config":
-#    - Копируем файлы из /usr/share/elasticsearch/config (read-only) в /config-writable
-#    - Создаём (или обновляем) keystore (добавляем client_secret)
+# 3) Собственный init-контейнер prepare-config
 extraInitContainers: |
   - name: prepare-config
     image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.1"
     command: ["/bin/sh","-c"]
     args:
       - >
-        # Копируем всё содержимое read-only config -> наш writable config
+        # 3.1 Копируем базовые конфиги (из read-only)
         cp -r /usr/share/elasticsearch/config/* /config-writable/;
 
-        # Создаём keystore, если нет
+        # 3.2 Создаём keystore, если нет
         if [ ! -f /config-writable/elasticsearch.keystore ]; then
           /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent --ks /config-writable/elasticsearch.keystore;
         fi
 
-        # Добавляем rp.client_secret в keystore
-        # Обычно тут нужно считать значение из K8S Secret,
-        # но для простоты укажем его "жёстко" - лучше читать из volumeMount Secret
+        # 3.3 Пример: "Эмуляция" записи client_secret.
+        # В реальности желательно считать из секретного файла:
         echo "PUT_YOUR_CLIENT_SECRET_HERE" | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
           xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
           --stdin --force --ks /config-writable/elasticsearch.keystore;
+
     volumeMounts:
-      # read-only конфиг (где elasticsearch.yml от чарта)
       - name: esconfig
         mountPath: /usr/share/elasticsearch/config
         readOnly: true
-
-      # наш writable volume для финального config
       - name: config-writable
         mountPath: /config-writable
 
-# 3) В основном контейнере задаём ENV: ES_PATH_CONF=/config-writable
-#    Это говорит Elasticsearch читать elasticsearch.yml + keystore из /config-writable
+# 4) Задаём ES_PATH_CONF, чтобы ES читал config + keystore из /config-writable
 extraEnvs: |
   - name: ES_PATH_CONF
     value: "/config-writable"
 
-# 4) Можно убрать принудительное readOnly: false, оно уже не нужно
-#    extraVolumeMounts: |
-#      - name: esconfig
-#        mountPath: /usr/share/elasticsearch/config
-#        readOnly: false
-
-# 5) Конфигурация elasticsearch.yml (OIDC)
+# 5) Собственно конфиг elasticsearch.yml (OIDC)
 esConfig:
   elasticsearch.yml: |
     xpack.security.enabled: true
-    xpack.security.authc.token.enabled: true  # для OIDC без TLS
+    xpack.security.authc.token.enabled: true
     xpack.security.authc.realms:
       oidc:
         oidc1:
