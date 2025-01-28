@@ -1,3 +1,9 @@
+secureSettings:
+  - secretName: "my-oidc-secret"
+    secretKeys:
+      - key: "client-secret"
+        path: "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
+
 esConfig:
   elasticsearch.yml: |
     xpack.security.enabled: true
