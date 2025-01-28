@@ -1,0 +1,33 @@
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+
+    # (Опционально, если нет/выключен) -- включаем TLS для transport.
+    # xpack.security.transport.ssl.enabled: true
+    # xpack.security.transport.ssl.verification_mode: certificate
+    # И т.д. -- зависит от того, как у тебя сейчас настроено, можно оставить как есть.
+
+    # Включаем HTTP SSL (рекомендуется, когда используем OIDC)
+    # xpack.security.http.ssl.enabled: true
+    # xpack.security.http.ssl.keystore.path: ...
+    # xpack.security.http.ssl.truststore.path: ...
+
+    xpack.security.authc.realms:
+      oidc:
+        oidc1:
+          order: 0
+          rp.client_id: "myKeycloakClientId"
+          rp.response_type: "code"
+          rp.redirect_uri: "https://kibana.mydomain.com/api/security/v1/oidc"
+          rp.post_logout_redirect_uri: "https://kibana.mydomain.com/logged_out"
+
+          # Адрес Keycloak (issuer) и основные endpoints
+          op.issuer: "https://keycloak.mydomain.com/realms/myrealm"
+          op.authorization_endpoint: "https://keycloak.mydomain.com/realms/myrealm/protocol/openid-connect/auth"
+          op.token_endpoint: "https://keycloak.mydomain.com/realms/myrealm/protocol/openid-connect/token"
+          op.jwkset_path: "https://keycloak.mydomain.com/realms/myrealm/protocol/openid-connect/certs"
+
+          rp.client_secret: "SECRET_FROM_KEYCLOAK"
+          claims.principal: sub
+          # claims.groups: "roles"   # Если Keycloak возвращает roles
+          # И прочие настройки

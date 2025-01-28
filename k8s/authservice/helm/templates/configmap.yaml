@@ -28,6 +28,11 @@ data:
         properties:
           hibernate.dialect: {{ .Values.spring.jpa.properties.hibernateDialect | quote }}
 
+      elasticsearch:
+        uris: ${ELASTICSEARCH_URI}
+        username: ${ELASTICSEARCH_USERNAME}
+        password: ${ELASTICSEARCH_PASSWORD}
+
       security:
         user:
           name: {{ .Values.spring.security.user.name | quote }}

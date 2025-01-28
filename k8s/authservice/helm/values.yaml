@@ -32,6 +32,11 @@ spring:
     showSql: true
     properties:
       hibernateDialect: org.hibernate.dialect.PostgreSQLDialect
+
+  elasticsearch:
+    uris: http://192.168.1.35:30429
+    username: elastic
+
   security:
     user:
       name: admin
@@ -46,7 +51,6 @@ redis:
   host: redis-master.default.svc.cluster.local
   port: 6379
   connectTimeout: 60000
-  passwordFromSecret: ""
 
 jwt:
   secret: secret_key

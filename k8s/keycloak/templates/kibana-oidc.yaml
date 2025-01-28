@@ -1,0 +1,33 @@
+elasticsearch:
+  hosts: "https://elasticsearch-master.logging.svc.cluster.local:9200"
+  username: "elastic"
+  password: "gsIXH6jxunkPrNZn"
+  ssl:
+    verificationMode: "none"
+
+kibanaConfig:
+  kibana.yml: |
+    server.publicBaseUrl: "https://kibana.mydomain.com"
+    xpack.security.enabled: true
+
+    # Включаем провайдер OIDC
+    xpack.security.authc.providers:
+      oidc.oidc1:
+        order: 0
+        realm: "oidc1"              # тот же, что настроен в ES
+        description: "Login via Keycloak"
+
+    # (Опционально) fallback на Basic
+    #  basic.basic1:
+    #    order: 1
+
+service:
+  type: NodePort
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 500m
+    memory: 1Gi

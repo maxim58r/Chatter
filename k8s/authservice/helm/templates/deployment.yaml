@@ -51,30 +51,33 @@ spec:
               value: "{{ .Values.springProfilesActive }}"
             - name: SPRING_CONFIG_LOCATION
               value: {{ .Values.spring.classpath | quote }}
-
             - name: IFT_DATASOURCE_URL
               value: "jdbc:postgresql://{{ .Values.spring.datasource.host }}:{{ .Values.spring.datasource.port }}/{{ .Values.spring.datasource.dbName }}"
-
             - name: IFT_DATASOURCE_USERNAME
               value: {{ .Values.spring.datasource.username | quote }}
-
             - name: IFT_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: datasourcePassword
-
             - name: IFT_REDIS_HOST
               value: {{ .Values.redis.host | quote }}
-
             - name: IFT_REDIS_PORT
               value: {{ .Values.redis.port | quote }}
-
             - name: IFT_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: redisPassword
+            - name: ELASTICSEARCH_URI
+              value: {{ .Values.spring.elasticsearch.uris | quote }}
+            - name: ELASTICSEARCH_USERNAME
+              value: {{ .Values.spring.elasticsearch.username | quote }}
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: elasticsearchPassword
 
           envFrom:
             - configMapRef:
