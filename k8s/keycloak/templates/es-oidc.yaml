@@ -24,22 +24,26 @@ extraInitContainers:
         export ES_PATH_CONF=/config-writable
         cp -r /usr/share/elasticsearch/config/* /config-writable/;
 
-        # Проверяем, существует ли уже keystore
-        if [ -f /config-writable/elasticsearch.keystore ]; then
-          echo "Keystore уже существует, пропускаем создание."
-        else
-          echo "Keystore не найден, создаём новый..."
-          /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent
+        # Указываем путь к keystore
+        export ES_KEYSTORE="/config-writable/elasticsearch.keystore"
+
+        # Если keystore уже есть, удаляем его и создаем заново
+        if [ -f "$ES_KEYSTORE" ]; then
+          echo "Keystore уже существует, удаляем и пересоздаём..."
+          rm "$ES_KEYSTORE"
         fi
 
+        echo "Создаём новый keystore..."
+        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent --ks "$ES_KEYSTORE"
+
         # Добавляем client_secret, если его нет
-        if /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+        if /usr/share/elasticsearch/bin/elasticsearch-keystore list --ks "$ES_KEYSTORE" | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
           echo "client_secret уже добавлен в keystore, пропускаем."
         else
           echo "Добавляем client_secret..."
           cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
             xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
-            --stdin --force
+            --stdin --force --ks "$ES_KEYSTORE"
         fi
     env:
       - name: ES_PATH_CONF
@@ -50,6 +54,7 @@ extraInitContainers:
       - name: oidc-secret-volume
         mountPath: /secrets
         readOnly: true
+
 
 extraEnvs:
   - name: ES_PATH_CONF
