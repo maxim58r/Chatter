@@ -1,51 +1,7 @@
-extraVolumes:
-  - name: config-writable
-    emptyDir: {}
-  - name: oidc-secret-volume
-    secret:
-      secretName: oidc-client-secret
-      items:
-        - key: client-secret
-          path: client-secret
-
-extraVolumeMounts:
-  - name: config-writable
-    mountPath: /config-writable
-  - name: oidc-secret-volume
-    mountPath: /secrets
-    readOnly: true
-
-extraInitContainers:
-  - name: prepare-config
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.1"
-    command: ["/bin/sh", "-c"]
-    args:
-      - |
-        export ES_PATH_CONF=/config-writable
-        cp -r /usr/share/elasticsearch/config/* /config-writable/;
-        if [ ! -f /config-writable/elasticsearch.keystore ]; then
-          /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent;
-        fi
-        # Удаляем возможный конфликт
-        /usr/share/elasticsearch/bin/elasticsearch-keystore remove xpack.security.authc.realms.oidc.oidc1.rp.client_secret || true
-        # Добавляем client_secret
-        cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
-          xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
-          --stdin --force;
-
-    env:
-      - name: ES_PATH_CONF
-        value: "/config-writable"
-    volumeMounts:
-      - name: config-writable
-        mountPath: /config-writable
-      - name: oidc-secret-volume
-        mountPath: /secrets
-        readOnly: true
-
-extraEnvs:
-  - name: ES_PATH_CONF
-    value: "/config-writable"
+secureSettings:
+  - secretName: oidc-client-secret
+    entries:
+      - key: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Указываем нужный ключ
 
 esConfig:
   elasticsearch.yml: |
