@@ -1,53 +1,45 @@
-# Пример es-oidc.yaml
-
-# Убираем keystore:
-# (Чтобы чарт не монтировал subPath для elasticsearch.keystore)
-# keystore: ...
-
-# 1) Создаём дополнительный volume для writable config
-extraVolumes: |
+extraVolumes:
   - name: config-writable
     emptyDir: {}
+  - name: oidc-secret-volume
+    secret:
+      secretName: oidc-client-secret
+      items:
+        - key: client-secret
+          path: client-secret
 
-# 2) Пробрасываем volumeMount для writable config
-extraVolumeMounts: |
+extraVolumeMounts:
   - name: config-writable
     mountPath: /config-writable
+  - name: oidc-secret-volume
+    mountPath: /secrets
+    readOnly: true
 
-# 3) Собственный init-контейнер prepare-config
-extraInitContainers: |
+extraInitContainers:
   - name: prepare-config
     image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.1"
-    command: ["/bin/sh","-c"]
+    command: ["/bin/sh", "-c"]
     args:
-      - >
-        # 3.1 Копируем базовые конфиги (из read-only)
+      - |
         cp -r /usr/share/elasticsearch/config/* /config-writable/;
-
-        # 3.2 Создаём keystore, если нет
         if [ ! -f /config-writable/elasticsearch.keystore ]; then
           /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent --ks /config-writable/elasticsearch.keystore;
         fi
-
-        # 3.3 Пример: "Эмуляция" записи client_secret.
-        # В реальности желательно считать из секретного файла:
-        echo "PUT_YOUR_CLIENT_SECRET_HERE" | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
+        # Чтение client_secret из смонтированного Secret
+        cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
           xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
           --stdin --force --ks /config-writable/elasticsearch.keystore;
-
     volumeMounts:
-      - name: esconfig
-        mountPath: /usr/share/elasticsearch/config
-        readOnly: true
       - name: config-writable
         mountPath: /config-writable
+      - name: oidc-secret-volume
+        mountPath: /secrets
+        readOnly: true
 
-# 4) Задаём ES_PATH_CONF, чтобы ES читал config + keystore из /config-writable
-extraEnvs: |
+extraEnvs:
   - name: ES_PATH_CONF
     value: "/config-writable"
 
-# 5) Собственно конфиг elasticsearch.yml (OIDC)
 esConfig:
   elasticsearch.yml: |
     xpack.security.enabled: true
@@ -65,3 +57,4 @@ esConfig:
           op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
           op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
           claims.principal: "sub"
+          claims.groups: groups
