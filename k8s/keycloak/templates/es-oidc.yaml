@@ -23,13 +23,19 @@ extraInitContainers:
       - |
         export ES_PATH_CONF=/config-writable
         cp -r /usr/share/elasticsearch/config/* /config-writable/;
+
+        # Проверяем, существует ли уже keystore
         if [ ! -f /config-writable/elasticsearch.keystore ]; then
-          /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent;
+          echo "Keystore не найден, создаём новый..."
+          /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent
+        else
+          echo "Keystore уже существует, пропускаем создание."
         fi
-        # Чтение client_secret из Secret
+
+        # Читаем client_secret из Kubernetes Secret и записываем в keystore
         cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
           xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
-          --stdin --force;
+          --stdin --force
     env:
       - name: ES_PATH_CONF
         value: "/config-writable"
