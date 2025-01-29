@@ -21,11 +21,12 @@ extraInitContainers:
     command: ["/bin/sh", "-c"]
     args:
       - |
+        export ES_PATH_CONF=/config-writable
         cp -r /usr/share/elasticsearch/config/* /config-writable/;
         if [ ! -f /config-writable/elasticsearch.keystore ]; then
           /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent;
         fi
-        # Чтение client_secret из смонтированного Secret
+        # Чтение client_secret из Secret
         cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
           xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
           --stdin --force;
