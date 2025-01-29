@@ -1,7 +1,8 @@
-secureSettings:
-  - secretName: oidc-client-secret
-    entries:
-      - key: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Указываем нужный ключ
+keystore:
+  - secretName: oidc-client-secret  # Имя секрета
+    items:
+      - key: client-secret  # Ключ внутри секрета
+        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
 
 esConfig:
   elasticsearch.yml: |
