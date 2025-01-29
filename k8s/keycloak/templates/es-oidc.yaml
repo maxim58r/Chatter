@@ -1,64 +1,9 @@
-extraVolumes:
-  - name: config-writable
-    emptyDir: {}
-  - name: oidc-secret-volume
-    secret:
-      secretName: oidc-client-secret
-      items:
-        - key: client-secret
-          path: client-secret
-
-extraVolumeMounts:
-  - name: config-writable
-    mountPath: /config-writable
-  - name: oidc-secret-volume
-    mountPath: /secrets
-    readOnly: true
-
-extraInitContainers:
-  - name: prepare-config
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.5.1"
-    command: ["/bin/sh", "-c"]
-    args:
-      - |
-        export ES_PATH_CONF=/config-writable
-        cp -r /usr/share/elasticsearch/config/* /config-writable/;
-
-        # Указываем путь к keystore
-        export ES_KEYSTORE="/config-writable/elasticsearch.keystore"
-
-        # Если keystore уже есть, удаляем его и создаем заново
-        if [ -f "$ES_KEYSTORE" ]; then
-          echo "Keystore уже существует, удаляем и пересоздаём..."
-          rm "$ES_KEYSTORE"
-        fi
-
-        echo "Создаём новый keystore..."
-        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent --ks "$ES_KEYSTORE"
-
-        # Добавляем client_secret, если его нет
-        if /usr/share/elasticsearch/bin/elasticsearch-keystore list --ks "$ES_KEYSTORE" | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
-          echo "client_secret уже добавлен в keystore, пропускаем."
-        else
-          echo "Добавляем client_secret..."
-          cat /secrets/client-secret | /usr/share/elasticsearch/bin/elasticsearch-keystore add \
-            xpack.security.authc.realms.oidc.oidc1.rp.client_secret \
-            --stdin --force --ks "$ES_KEYSTORE"
-        fi
-    env:
-      - name: ES_PATH_CONF
-        value: "/config-writable"
-    volumeMounts:
-      - name: config-writable
-        mountPath: /config-writable
-      - name: oidc-secret-volume
-        mountPath: /secrets
-        readOnly: true
-
-
 extraEnvs:
-  - name: ES_PATH_CONF
-    value: "/config-writable"
+  - name: OIDC_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: oidc-client-secret
+        key: client-secret
 
 esConfig:
   elasticsearch.yml: |
@@ -69,12 +14,15 @@ esConfig:
         oidc1:
           order: 0
           rp.client_id: "myKeycloakClientId"
+          rp.client_secret: "${OIDC_CLIENT_SECRET}"  # Используем переменную среды
           rp.response_type: "code"
           rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
           rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
+
           op.issuer: "http://192.168.1.35:32080/realms/Chatter"
           op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
           op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
           op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
+
           claims.principal: "sub"
           claims.groups: groups
