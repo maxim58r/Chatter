@@ -1,7 +1,3 @@
-volumes:
-  - name: keystore-volume
-    emptyDir: {}
-
 extraInitContainers:
   - name: inject-keystore-secret
     image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
@@ -10,10 +6,15 @@ extraInitContainers:
       - -c
       - |
         # Создание keystore, если он еще не существует
-        if [ ! -f /usr/share/elasticsearch/config/elasticsearch.keystore ]; then
-          /usr/share/elasticsearch/bin/elasticsearch-keystore create
-        fi
+        if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list \
+        | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+
+        echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
         echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
+        else
+        echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
+        fi
+
     env:
       - name: CLIENT_SECRET
         valueFrom:
@@ -24,11 +25,15 @@ extraInitContainers:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/
 
-keystore:
-  - secretName: oidc-client-secret  # Имя секрета
-    items:
-      - key: client-secret  # Ключ внутри секрета
-        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
+#keystore:
+#  - secretName: oidc-client-secret  # Имя секрета
+#    items:
+#      - key: client-secret  # Ключ внутри секрета
+#        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
+
+volumes:
+  - name: keystore
+    emptyDir: {}
 
 esConfig:
   elasticsearch.yml: |
