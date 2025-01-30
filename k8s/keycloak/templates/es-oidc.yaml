@@ -1,39 +1,22 @@
-extraInitContainers:
-  - name: inject-keystore-secret
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
-    command:
-      - sh
-      - -c
-      - |
-        # Создание keystore, если он еще не существует
-        if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list \
-        | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+initScripts:
+  add-client-secret.sh: |
+    #!/bin/sh
+    set -e
 
-        echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
-        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
-        else
-        echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
-        fi
+    # Проверяем, существует ли ключ в keystore
+    if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+      echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
+      echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
+    else
+      echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
+    fi
 
-    env:
-      - name: CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: oidc-client-secret
-            key: client-secret
-    volumeMounts:
-      - name: keystore
-        mountPath: /usr/share/elasticsearch/config/
-
-#keystore:
-#  - secretName: oidc-client-secret  # Имя секрета
-#    items:
-#      - key: client-secret  # Ключ внутри секрета
-#        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
-
-extraVolumes:
-  - name: keystore
-    emptyDir: {}
+extraEnvVars:
+  - name: CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: oidc-client-secret
+        key: client-secret
 
 esConfig:
   elasticsearch.yml: |
