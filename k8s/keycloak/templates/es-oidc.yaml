@@ -1,3 +1,29 @@
+extraInitContainers:
+  - name: inject-keystore-secret
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+    command:
+      - sh
+      - -c
+      - |
+        # Создание keystore, если он еще не существует
+        if [ ! -f /usr/share/elasticsearch/config/elasticsearch.keystore ]; then
+          /usr/share/elasticsearch/bin/elasticsearch-keystore create
+        fi
+        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
+    env:
+      - name: CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oidc-client-secret
+            key: client-secret
+    volumeMounts:
+      - name: keystore-volume
+        mountPath: /usr/share/elasticsearch/config/
+
+volumes:
+  - name: keystore-volume
+    emptyDir: {}
+
 keystore:
   - secretName: oidc-client-secret  # Имя секрета
     items:
