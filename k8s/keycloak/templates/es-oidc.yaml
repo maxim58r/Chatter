@@ -31,7 +31,7 @@ extraInitContainers:
 #      - key: client-secret  # Ключ внутри секрета
 #        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
 
-volumes:
+extraVolumes:
   - name: keystore
     emptyDir: {}
 
