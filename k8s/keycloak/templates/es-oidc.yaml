@@ -3,13 +3,20 @@ initScripts:
     #!/bin/sh
     set -e
 
+    echo "Список ключей в keystore до добавления:"
+    /usr/share/elasticsearch/bin/elasticsearch-keystore list
+
     # Проверяем, существует ли ключ в keystore
     if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
       echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
       echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
+      echo "Ключ добавлен."
     else
       echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
     fi
+
+    echo "Список ключей в keystore после добавления:"
+    /usr/share/elasticsearch/bin/elasticsearch-keystore list
 
 extraEnvVars:
   - name: CLIENT_SECRET
