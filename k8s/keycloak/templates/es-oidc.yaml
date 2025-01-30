@@ -21,7 +21,7 @@ extraInitContainers:
             name: oidc-client-secret
             key: client-secret
     volumeMounts:
-      - name: keystore-volume
+      - name: keystore
         mountPath: /usr/share/elasticsearch/config/
 
 keystore:
