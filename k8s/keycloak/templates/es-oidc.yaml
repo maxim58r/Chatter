@@ -7,26 +7,24 @@ extraInitContainers:
       - -c
       - |
         # Проверяем права доступа к директории
-        echo "Проверка прав доступа к /usr/share/elasticsearch/config/"
-        ls -ld /usr/share/elasticsearch/config/
+        echo "Проверка прав доступа к /tmp/"
+        ls -ld /tmp/
 
-        # Удаляем существующий keystore, если он есть
-        if [ -f /usr/share/elasticsearch/config/elasticsearch.keystore ]; then
-          echo "Удаляем существующий keystore"
-          rm -f /usr/share/elasticsearch/config/elasticsearch.keystore
-        fi
-
-        # Создаем новый keystore
-        echo "Создаем keystore"
-        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent || { echo "Ошибка при создании keystore"; exit 1; }
+        # Создаем временный keystore
+        echo "Создаем временный keystore"
+        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent -p /tmp/elasticsearch.keystore || { echo "Ошибка при создании keystore"; exit 1; }
 
         # Добавляем ключ в keystore
         echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
-        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force || { echo "Ошибка при добавлении ключа в keystore"; exit 1; }
+        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force -p /tmp/elasticsearch.keystore || { echo "Ошибка при добавлении ключа в keystore"; exit 1; }
+
+        # Копируем keystore в общую директорию
+        echo "Копируем keystore в общую директорию"
+        cp /tmp/elasticsearch.keystore /usr/share/elasticsearch/config/elasticsearch.keystore || { echo "Ошибка при копировании keystore"; exit 1; }
 
         # Проверяем содержимое keystore
         echo "Содержимое keystore:"
-        /usr/share/elasticsearch/bin/elasticsearch-keystore list || { echo "Ошибка при чтении keystore"; exit 1; }
+        /usr/share/elasticsearch/bin/elasticsearch-keystore list -p /usr/share/elasticsearch/config/elasticsearch.keystore || { echo "Ошибка при чтении keystore"; exit 1; }
     env:
       - name: CLIENT_SECRET
         valueFrom:
@@ -36,10 +34,15 @@ extraInitContainers:
     volumeMounts:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/
+      - name: temp-keystore
+        mountPath: /tmp/elasticsearch.keystore
+        subPath: elasticsearch.keystore
 
 # Определение дополнительных томов
 extraVolumes:
   - name: keystore
+    emptyDir: {}
+  - name: temp-keystore
     emptyDir: {}
 
 # Конфигурация Elasticsearch
