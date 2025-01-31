@@ -6,9 +6,15 @@ extraInitContainers:
       - sh
       - -c
       - |
-        # Создаем временный keystore
+        # Удаляем существующий keystore, если он есть
+        if [ -f /tmp/elasticsearch.keystore ]; then
+          echo "Удаляем существующий временный keystore"
+          rm -f /tmp/elasticsearch.keystore
+        fi
+
+        # Создаем новый keystore без интерактивного подтверждения
         echo "Создаем временный keystore"
-        /usr/share/elasticsearch/bin/elasticsearch-keystore create
+        yes | /usr/share/elasticsearch/bin/elasticsearch-keystore create
 
         # Проверяем, существует ли ключ
         if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
