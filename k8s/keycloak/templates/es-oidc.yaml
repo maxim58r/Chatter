@@ -1,29 +1,28 @@
+replicas: 2
+minimumMasterNodes: 1
+
 # es-oidc.yaml
 
-replicaCount: 3
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.security.authc.token.enabled: true
+    xpack.security.authc.realms:
+      oidc:
+        oidc1:
+          order: 0
+          rp.client_id: "myKeycloakClientId"
+          rp.response_type: "code"
+          rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
+          rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
+          op.issuer: "http://192.168.1.35:32080/realms/Chatter"
+          op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
+          op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
+          op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
+          claims.principal: "sub"
+          claims.groups: "groups"
 
-image:
-  repository: docker.elastic.co/elasticsearch/elasticsearch
-  tag: "8.5.1"
-  pullPolicy: IfNotPresent
-
-service:
-  type: ClusterIP
-  ports:
-    - port: 9200
-      name: http
-    - port: 9300
-      name: transport
-
-resources:
-  requests:
-    memory: "2Gi"
-    cpu: "1"
-  limits:
-    memory: "2Gi"
-    cpu: "1"
-
-# Настройка Keystore через Init Containers
+# Настройки `keystore`
 extraInitContainers:
   - name: inject-keystore-secret
     image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
@@ -49,40 +48,18 @@ extraInitContainers:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/
 
-# Монтирование Secrets в Keystore
+# Подключение `keystore`
 keystore:
   - secretName: oidc-client-secret
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
-# Конфигурация Elasticsearch
-esConfig:
-  elasticsearch.yml: |
-    cluster.name: elasticsearch
-    node.name: ${HOSTNAME}
-    network.host: 0.0.0.0
-    discovery.seed_hosts: ["elasticsearch-master-headless"]
-    cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1", "elasticsearch-master-2"]
-
-    xpack.security.enabled: true
-    xpack.security.authc.token.enabled: true
-    xpack.security.authc.realms:
-      oidc:
-        oidc1:
-          order: 0
-          rp.client_id: "myKeycloakClientId"
-          rp.response_type: "code"
-          rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
-          rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
-          op.issuer: "http://192.168.1.35:32080/realms/Chatter"
-          op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
-          op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
-          op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
-          claims.principal: "sub"
-          claims.groups: "groups"
-
-# Volume для Keystore
-volumes:
+extraVolumes:
   - name: keystore
     emptyDir: {}
+
+extraVolumeMounts:
+  - name: keystore
+    mountPath: /usr/share/elasticsearch/config/
+
