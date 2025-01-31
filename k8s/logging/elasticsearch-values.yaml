@@ -1,0 +1,44 @@
+# values.yaml
+
+# Отключаем ingest-узлы (опционально)
+ingest:
+  enabled: false
+
+# Настройки для master-узлов
+master:
+  replicas: 1  # Уменьшаем количество мастер-узлов
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  persistence:
+    size: 1Gi  # Размер диска
+
+# Настройки для data-узлов
+data:
+  replicas: 1  # Один data-узел
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  persistence:
+    size: 1Gi
+
+# Настройки JVM для Elasticsearch (важно!)
+esJavaOpts: "-Xmx512m -Xms512m"  # Ограничиваем JVM Heap до 512 MiB
+
+# Координирующие узлы (опционально)
+coordinating:
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 500m
