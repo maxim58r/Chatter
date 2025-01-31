@@ -1,25 +1,6 @@
-replicas: 2
+# values.yaml
 
-esConfig:
-  elasticsearch.yml: |
-    xpack.security.enabled: true
-    xpack.security.authc.token.enabled: true
-    xpack.security.authc.realms:
-      oidc:
-        oidc1:
-          order: 0
-          rp.client_id: "myKeycloakClientId"
-          rp.response_type: "code"
-          rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
-          rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
-          op.issuer: "http://192.168.1.35:32080/realms/Chatter"
-          op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
-          op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
-          op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
-          claims.principal: "sub"
-          claims.groups: "groups"
-
-# Настройки `keystore`
+# Дополнительные Init Containers для инъекции client_secret в keystore
 extraInitContainers:
   - name: inject-keystore-secret
     image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
@@ -27,48 +8,68 @@ extraInitContainers:
       - sh
       - -c
       - |
-        set -e
-        echo "Checking if keystore exists..."
-        if [ ! -f /usr/share/elasticsearch/config/elasticsearch.keystore ]; then
-          echo "Creating keystore..."
-          /usr/share/elasticsearch/bin/elasticsearch-keystore create
+        # Создание keystore, если он еще не существует
+        if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+          echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
+          echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force
+        else
+          echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
         fi
-        echo "Adding OIDC client_secret..."
-        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force
     env:
       - name: CLIENT_SECRET
         valueFrom:
           secretKeyRef:
-            name: oidc-client-secret
-            key: client-secret
+            name: oidc-client-secret   # Имя вашего Kubernetes Secret
+            key: client-secret         # Ключ внутри секрета
     volumeMounts:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/
 
-# Подключение `keystore`
-#keystore:
-#  - secretName: oidc-client-secret
-#    items:
-#      - key: client-secret
-#        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
-
-# Определение Volumes (если еще не определены)
-volumes:
+# Определение дополнительных томов
+extraVolumes:
   - name: keystore
     emptyDir: {}
 
-# Определение Основного Контейнера Elasticsearch (пример)
-containers:
-  - name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
-    env:
-      - name: discovery.type
-        value: "single-node"
-    volumeMounts:
-      - name: keystore
-        mountPath: /usr/share/elasticsearch/config/
-    ports:
-      - containerPort: 9200
-        name: http
-      - containerPort: 9300
-        name: transport
+# Конфигурация Elasticsearch
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.security.authc.token.enabled: true
+    xpack.security.authc.realms:
+      oidc:
+        oidc1:
+          type: openid
+          order: 0
+          rp.client_id: "myKeycloakClientId"
+          rp.response_type: "code"
+          rp.redirect_uri: "https://<your-elasticsearch-domain>/api/security/v1/oidc" # Используйте HTTPS для безопасности
+          rp.post_logout_redirect_uri: "https://<your-elasticsearch-domain>/"
+          op.issuer: "https://<keycloak-domain>/realms/Chatter" # Используйте HTTPS
+          op.authorization_endpoint: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/auth"
+          op.token_endpoint: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/token"
+          op.jwkset_path: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/certs"
+          claims.principal: "sub"
+          claims.groups: "groups"
+          # Указываем, что client_secret берется из keystore
+          rp.client_secret: "${xpack.security.authc.realms.oidc.oidc1.rp.client_secret}"
+
+# Дополнительные настройки окружения
+extraEnvs:
+  - name: CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: oidc-client-secret   # Имя вашего Kubernetes Secret
+        key: client-secret         # Ключ внутри секрета
+
+# Настройка VolumeMounts для контейнера Elasticsearch
+extraVolumeMounts:
+  - name: keystore
+    mountPath: /usr/share/elasticsearch/config/
+    readOnly: true
+
+# (Опционально) Если ранее были комментарии для keystore, их можно удалить или оставить закомментированными
+# keystore:
+#   - secretName: oidc-client-secret  # Имя секрета
+#     items:
+#       - key: client-secret          # Ключ внутри секрета
+#         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
