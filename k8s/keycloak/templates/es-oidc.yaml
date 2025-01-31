@@ -46,13 +46,29 @@ extraInitContainers:
         mountPath: /usr/share/elasticsearch/config/
 
 # Подключение `keystore`
-keystore:
-  - secretName: oidc-client-secret
-    items:
-      - key: client-secret
-        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+#keystore:
+#  - secretName: oidc-client-secret
+#    items:
+#      - key: client-secret
+#        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
 # Определение Volumes (если еще не определены)
 volumes:
   - name: keystore
     emptyDir: {}
+
+# Определение Основного Контейнера Elasticsearch (пример)
+containers:
+  - name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+    env:
+      - name: discovery.type
+        value: "single-node"
+    volumeMounts:
+      - name: keystore
+        mountPath: /usr/share/elasticsearch/config/
+    ports:
+      - containerPort: 9200
+        name: http
+      - containerPort: 9300
+        name: transport
