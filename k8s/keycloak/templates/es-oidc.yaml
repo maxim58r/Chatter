@@ -14,12 +14,12 @@ extraInitContainers:
 
         # Создаем новый keystore без интерактивного подтверждения
         echo "Создаем временный keystore"
-        yes | /usr/share/elasticsearch/bin/elasticsearch-keystore create
+        yes | /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent -p /tmp/elasticsearch.keystore
 
         # Проверяем, существует ли ключ
-        if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
+        if ! /usr/share/elasticsearch/bin/elasticsearch-keystore list -p /tmp/elasticsearch.keystore | grep -q "xpack.security.authc.realms.oidc.oidc1.rp.client_secret"; then
           echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
-          echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force
+          echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force -p /tmp/elasticsearch.keystore
         else
           echo "Ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret уже существует, пропускаем добавление"
         fi
