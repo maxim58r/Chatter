@@ -34,7 +34,7 @@ extraInitContainers:
           /usr/share/elasticsearch/bin/elasticsearch-keystore create
         fi
         echo "Adding OIDC client_secret..."
-        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret -x
+        echo "$CLIENT_SECRET" | /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.authc.realms.oidc.oidc1.rp.client_secret --stdin --force
     env:
       - name: CLIENT_SECRET
         valueFrom:
@@ -51,3 +51,8 @@ keystore:
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+
+# Определение Volumes (если еще не определены)
+volumes:
+  - name: keystore
+    emptyDir: {}
