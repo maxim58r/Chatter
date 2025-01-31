@@ -29,17 +29,18 @@ esConfig:
   elasticsearch.yml: |
     xpack.security.enabled: true
     xpack.security.authc.token.enabled: true
-    xpack.security.authc.realms:
-      oidc:
-        oidc1:
-          order: 0
-          rp.client_id: "myKeycloakClientId"
-          rp.response_type: "code"
-          rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
-          rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
-          op.issuer: "http://192.168.1.35:32080/realms/Chatter"
-          op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
-          op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
-          op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
-          claims.principal: "sub"
-          claims.groups: groups
+    # OIDC-аутентификация временно отключена для отладки
+    # xpack.security.authc.realms:
+    #   oidc:
+    #     oidc1:
+    #       order: 0
+    #       rp.client_id: "myKeycloakClientId"
+    #       rp.response_type: "code"
+    #       rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
+    #       rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
+    #       op.issuer: "http://192.168.1.35:32080/realms/Chatter"
+    #       op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
+    #       op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
+    #       op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
+    #       claims.principal: "sub"
+    #       claims.groups: groups
