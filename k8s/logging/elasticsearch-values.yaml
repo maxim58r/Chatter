@@ -35,6 +35,7 @@ esJavaOpts: "-Xmx512m -Xms512m"  # Ограничиваем JVM Heap до 512 Mi
 
 # Координирующие узлы (опционально)
 coordinating:
+  replicas: 1
   resources:
     requests:
       memory: 1Gi
