@@ -1,7 +1,4 @@
 replicas: 2
-minimumMasterNodes: 1
-
-# es-oidc.yaml
 
 esConfig:
   elasticsearch.yml: |
@@ -54,12 +51,3 @@ keystore:
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
-
-extraVolumes:
-  - name: keystore
-    emptyDir: {}
-
-extraVolumeMounts:
-  - name: keystore
-    mountPath: /usr/share/elasticsearch/config/
-
