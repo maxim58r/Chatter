@@ -24,6 +24,7 @@ extraInitContainers:
     volumeMounts:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/
+        subPath: elasticsearch.keystore
 
 # Определение дополнительных томов
 extraVolumes:
@@ -38,16 +39,16 @@ esConfig:
     xpack.security.authc.realms:
       oidc:
         oidc1:
-          type: openid
           order: 0
+          type: openid
           rp.client_id: "myKeycloakClientId"
           rp.response_type: "code"
-          rp.redirect_uri: "https://<your-elasticsearch-domain>/api/security/v1/oidc" # Используйте HTTPS для безопасности
-          rp.post_logout_redirect_uri: "https://<your-elasticsearch-domain>/"
-          op.issuer: "https://<keycloak-domain>/realms/Chatter" # Используйте HTTPS
-          op.authorization_endpoint: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/auth"
-          op.token_endpoint: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/token"
-          op.jwkset_path: "https://<keycloak-domain>/realms/Chatter/protocol/openid-connect/certs"
+          rp.redirect_uri: "http://192.168.1.35:31864/api/security/v1/oidc"
+          rp.post_logout_redirect_uri: "http://192.168.1.35:31864/"
+          op.issuer: "http://192.168.1.35:32080/realms/Chatter"
+          op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
+          op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
+          op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
           claims.principal: "sub"
           claims.groups: "groups"
           # Указываем, что client_secret берется из keystore
@@ -64,12 +65,6 @@ extraEnvs:
 # Настройка VolumeMounts для контейнера Elasticsearch
 extraVolumeMounts:
   - name: keystore
-    mountPath: /usr/share/elasticsearch/config/
+    mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
+    subPath: elasticsearch.keystore
     readOnly: true
-
-# (Опционально) Если ранее были комментарии для keystore, их можно удалить или оставить закомментированными
-# keystore:
-#   - secretName: oidc-client-secret  # Имя секрета
-#     items:
-#       - key: client-secret          # Ключ внутри секрета
-#         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret  # Путь в keystore
