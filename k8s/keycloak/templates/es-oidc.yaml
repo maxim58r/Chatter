@@ -23,7 +23,7 @@ extraInitContainers:
             key: client-secret         # Ключ внутри секрета
     volumeMounts:
       - name: keystore
-        mountPath: /usr/share/elasticsearch/config/
+        mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
         subPath: elasticsearch.keystore
 
 # Определение дополнительных томов
@@ -52,7 +52,8 @@ esConfig:
           claims.principal: "sub"
           claims.groups: "groups"
           # Указываем, что client_secret берется из keystore
-          rp.client_secret: "${xpack.security.authc.realms.oidc.oidc1.rp.client_secret}"
+          # НЕ ИСПОЛЬЗУЙТЕ ${} здесь! Elasticsearch автоматически возьмет значение из keystore.
+          rp.client_secret: ""
 
 # Дополнительные настройки окружения
 extraEnvs:
