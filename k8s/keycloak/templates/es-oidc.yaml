@@ -10,9 +10,15 @@ extraInitContainers:
         echo "Проверка прав доступа к /tmp/"
         ls -ld /tmp/
 
-        # Создаем временный keystore
+        # Создаем временный keystore без запроса пароля
         echo "Создаем временный keystore"
-        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent -p /tmp/elasticsearch.keystore || { echo "Ошибка при создании keystore"; exit 1; }
+        /usr/share/elasticsearch/bin/elasticsearch-keystore create --silent --force -p /tmp/elasticsearch.keystore || { echo "Ошибка при создании keystore"; exit 1; }
+
+        # Проверяем, существует ли временный keystore
+        if [ ! -f /tmp/elasticsearch.keystore ]; then
+          echo "Ошибка: временный keystore не создан"
+          exit 1
+        fi
 
         # Добавляем ключ в keystore
         echo "Добавляем ключ xpack.security.authc.realms.oidc.oidc1.rp.client_secret"
@@ -36,7 +42,6 @@ extraInitContainers:
         mountPath: /usr/share/elasticsearch/config/
       - name: temp-keystore
         mountPath: /tmp/elasticsearch.keystore
-        subPath: elasticsearch.keystore
 
 # Определение дополнительных томов
 extraVolumes:
@@ -72,5 +77,4 @@ esConfig:
 extraVolumeMounts:
   - name: keystore
     mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
-    subPath: elasticsearch.keystore
     readOnly: false
