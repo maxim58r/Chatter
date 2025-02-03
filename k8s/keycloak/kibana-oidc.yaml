@@ -57,6 +57,18 @@ kibana:
             secretKeyRef:
               name: kibana-oidc-client-secret
               key: client-secret
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 5601
+      scheme: HTTP
+    initialDelaySeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    periodSeconds: 10
+    successThreshold: 1
+
 secrets:
   kibana-oidc-client-secret:
     client-secret: "Y0PZTBYI8XTNRQ8XIfoj9ZmcTVlFbIdG"
