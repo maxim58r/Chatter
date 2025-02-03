@@ -1,6 +1,6 @@
 # Общие настройки Kibana values.yaml
 kibana:
-  elasticsearchHosts: "http://elasticsearch-master.logging.svc.cluster.local:9200"
+  elasticsearchHosts: "https://elasticsearch-master.logging.svc.cluster.local:9200"
   elasticsearchUsername: "elastic"
   elasticsearchPassword: "QJaWS1Bi7ULkaWfJc*Hi"
   elasticsearchTLS:

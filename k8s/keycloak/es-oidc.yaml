@@ -1,6 +1,4 @@
 # Elasticsearch values.yaml
-
-# Общие настройки Elasticsearch
 elasticsearch:
   # Включение безопасности Elasticsearch
   security:
@@ -51,6 +49,8 @@ elasticsearch:
             rules:
               field:
                 groups: "admin-group" # Группа в Keycloak, которая будет маппиться на роль admin
+    cluster.initial_master_nodes: ["elasticsearch-master-0"]
+
 
 # Настройка секретов для OIDC
 secrets:
