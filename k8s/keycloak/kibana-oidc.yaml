@@ -50,6 +50,15 @@ kibana:
               field:
                 groups: "admin-group" # Группа в Keycloak, которая будет маппиться на роль admin
 
+      # Добавление ключей шифрования для безопасности
+      encryptionKey: "568PJpfrh1BgK4j7d8t2Tk9H/oa/x3xvucOe4cgUd9E=" # Замените на случайную строку (например, 32 символа)
+      reporting:
+        encryptionKey: "L/Z2YhKd1WRTWws6LmIEkymGdg4Cl+b/C5ZS5L9OVDY=" # Замените на случайную строку (например, 32 символа)
+        kibanaServer:
+          hostname: "localhost" # Убедитесь, что это соответствует вашему домену или localhost
+      encryptedSavedObjects:
+        encryptionKey: "C8s7XMvoyO8zJITGrpSUnecKUq25CP97S4goJmt2dDg=" # Замените на случайную строку (например, 32 символа)
+
   # Настройка keystore для хранения секретов
   keystoreSecrets:
     - name: kibana-keystore
@@ -67,8 +76,7 @@ secrets:
 
 # Настройка сервисов и ингрессов
 service:
-  type: ClusterIP
-  annotations: {}
+  type: NodePort
   ports:
     http: 5601
 
@@ -77,14 +85,14 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
   hosts:
-    - host: kibana.example.com # Замените на ваш домен для Kibana
+    - host: ""
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: kibana-tls
       hosts:
-        - kibana.example.com # Замените на ваш домен для Kibana
+        - ""
 
 # Ресурсы и масштабирование
 resources:
