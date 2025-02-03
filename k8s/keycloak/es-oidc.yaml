@@ -1,4 +1,4 @@
-# values.yaml
+# Elasticsearch values.yaml
 
 # Общие настройки Elasticsearch
 elasticsearch:
