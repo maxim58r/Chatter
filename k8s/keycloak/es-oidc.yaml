@@ -70,15 +70,14 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
   hosts:
-    - host: your-elasticsearch-domain.com
+    - host: "elasticsearch.chatter.com"
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: elasticsearch-tls
       hosts:
-        - your-elasticsearch-domain.com
-
+        - "elasticsearch.chatter.com"
 # Ресурсы и масштабирование
 resources:
   requests:
