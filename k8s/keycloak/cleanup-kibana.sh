@@ -40,8 +40,8 @@ kubectl delete serviceaccount pre-install-kibana-kibana -n $NAMESPACE --ignore-n
 kubectl delete serviceaccount post-delete-kibana-kibana -n $NAMESPACE --ignore-not-found=true
 
 # 8. Удаление секретов Kibana
-echo "Удаляем секреты Kibana..."
-kubectl delete secrets -l app=kibana -n $NAMESPACE --ignore-not-found=true
+#echo "Удаляем секреты Kibana..."
+#kubectl delete secrets -l app=kibana -n $NAMESPACE --ignore-not-found=true
 
 # 9. Финальная проверка оставшихся ресурсов
 echo "Проверяем оставшиеся ресурсы Kibana..."

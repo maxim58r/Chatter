@@ -24,8 +24,8 @@ echo "Удаляем конфигмэпы Elasticsearch..."
 kubectl delete configmaps -l app=elasticsearch -n $NAMESPACE --ignore-not-found=true
 
 # 6. Удаление секретов Elasticsearch
-echo "Удаляем секреты Elasticsearch..."
-kubectl delete secrets -l app=elasticsearch -n $NAMESPACE --ignore-not-found=true
+#echo "Удаляем секреты Elasticsearch..."
+#kubectl delete secrets -l app=elasticsearch -n $NAMESPACE --ignore-not-found=true
 
 # 7. Удаление служебных компонентов Elasticsearch
 echo "Удаляем служебные компоненты Elasticsearch..."
