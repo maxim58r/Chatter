@@ -99,6 +99,6 @@ resources:
     memory: "512mi"
   limits:
     cpu: "500m"
-    memory: "2Gi"
+    memory: "1Gi"
 
 replicas: 1
