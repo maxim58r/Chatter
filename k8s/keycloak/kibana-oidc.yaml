@@ -88,8 +88,8 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: kibana-tls
-      hosts:
+#    - secretName: kibana-tls
+    - hosts:
         - "kibana.chatter.com"
 
 resources:

@@ -51,19 +51,20 @@ elasticsearch:
                 groups: "admin-group" # Группа в Keycloak, которая будет маппиться на роль admin
     cluster.initial_master_nodes: ["elasticsearch-master-0"]
 
-  readinessProbe:
-    httpGet:
-      path: /
-      port: 9200
-      scheme: HTTPS
-    initialDelaySeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
-    periodSeconds: 10
-    successThreshold: 1
-    headers:
-      - name: "Authorization"
-        value: "Basic ZWxhc3RpYzpRSmFXUzFCaTdVTGthV2ZKYypIaQ=="
+  master:
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 9200
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      headers:
+        - name: "Authorization"
+          value: "Basic ZWxhc3RpYzpRSmFXUzFCaTdVTGthV2ZKYypIaQ=="
 
 
 # Настройка секретов для OIDC
@@ -89,8 +90,8 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: elasticsearch-tls
-      hosts:
+#    - secretName: elasticsearch-tls
+    - hosts:
         - "elasticsearch.chatter.com"
 # Ресурсы и масштабирование
 resources:
