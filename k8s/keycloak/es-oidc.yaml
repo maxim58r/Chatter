@@ -19,8 +19,12 @@ elasticsearch:
     # Удалён параметр cluster.initial_master_nodes, чтобы избежать предупреждений о блокировке cluster UUID
     # cluster.initial_master_nodes: ["elasticsearch-master-0"]
     discovery.type: single-node  # Одиночный узел
+    network.host: 0.0.0.0
     xpack:
       security:
+        enabled: true
+        http.ssl.enabled: true
+        transport.ssl.enabled: true
         authc:
           realms:
             native:
