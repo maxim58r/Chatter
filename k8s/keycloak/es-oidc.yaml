@@ -18,7 +18,10 @@ elasticsearch:
   config:
     # Удалён параметр cluster.initial_master_nodes, чтобы избежать предупреждений о блокировке cluster UUID
     # cluster.initial_master_nodes: ["elasticsearch-master-0"]
-    discovery.type: single-node  # Одиночный узел
+    discovery:
+      type: single-node  # Одиночный узел
+      seed_hosts: {}
+    cluster.name: "docker-cluster"
     network.host: 0.0.0.0
     xpack:
       security:
