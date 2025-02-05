@@ -26,9 +26,12 @@ elasticsearch:
       security:
         authc:
           realms:
+            native:
+              native1:
+                order: 0   # Для встроенных пользователей (elastic) используется native realm
             oidc:
               oidc1:
-                order: 2  # Изменён порядок OIDC-реалма с 0 на 2, чтобы встроенные пользователи (elastic) аутентифицировались через native/reserved realm
+                order: 10  # OIDC realm обрабатывает остальных пользователей
                 rp:
                   client_id: "myKeycloakClientId"  # ID клиента в Keycloak
                   client_secret: "${xpack.security.authc.realms.oidc.oidc1.rp.client_secret}"  # Ссылка на секрет
@@ -54,17 +57,7 @@ elasticsearch:
 
   master:
     readinessProbe:
-      enabled: false   # Для тестирования можно временно отключить probe
-      httpGet:
-        path: /
-        port: 9200
-        scheme: HTTPS
-      initialDelaySeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 3
-      periodSeconds: 10
-      successThreshold: 1
-      # Удалён заголовок Authorization, чтобы не использовались неверные учётные данные
+      enabled: false  # Временно отключено для устранения проблем на старте
 
 # Настройка секретов для OIDC
 secrets:
