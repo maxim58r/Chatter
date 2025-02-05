@@ -54,6 +54,7 @@ elasticsearch:
 
   master:
     readinessProbe:
+      enabled: false
       httpGet:
         path: /
         port: 9200
