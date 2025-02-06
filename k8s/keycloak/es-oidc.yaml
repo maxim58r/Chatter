@@ -1,9 +1,6 @@
-# Общие параметры
-clusterName: "elasticsearch"
-nodeGroup: "master"
-
 # Репликация
-replicaCount: 1
+replicas: 1
+minimumMasterNodes: 1
 
 # Настройки безопасности
 security:
@@ -21,14 +18,14 @@ keystoreSecrets:
             name: oidc-client-secret
             key: client-secret
 
+protocol: https
+
 esConfig:
   elasticsearch.yml: |
-    cluster.name: "elasticsearch"  # Исправлено имя кластера
-    network.host: 0.0.0.0
-    discovery.type: single-node
     xpack.security.enabled: true
     xpack.security.http.ssl.enabled: true
     xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.verification_mode: certificate
     xpack.security.authc.realms.native.native1.order: 0   # Для встроенных пользователей (elastic) используем native realm
     xpack.security.authc.realms.oidc.oidc1.order: 10      # OIDC realm для остальных пользователей
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "myKeycloakClientId"  # ID клиента в Keycloak
@@ -41,44 +38,25 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.authentication.request.response_mode: form_post
     xpack.security.authc.realms.oidc.oidc1.logout.type: backchannel
 
-# Role mapping
-xpack:
-  security:
-    role_mapping:
-      oidc_mapping:
-        roles:
-          - "admin"
-        rules:
-          field:
-            groups: "admin-group"  # Группа в Keycloak для маппинга на роль admin
-
 # Master node configuration
-master:
-  readinessProbe:
-    enabled: true
-    httpGet:
-      path: /
-      port: 9200
-      scheme: HTTPS
-    initialDelaySeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
-    periodSeconds: 10
-    successThreshold: 1
-    headers:
-      - name: "Authorization"
-        value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="  # Base64 учетных данных elastic
-  persistence:
-    enabled: true
-    size: 1Gi
-    storageClass: "local-path"
-
-# Data node configuration
-data:
-  persistence:
-    enabled: true
-    size: 1Gi
-    storageClass: "local-path"
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 9200
+    scheme: HTTPS
+  initialDelaySeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+  headers:
+    - name: "Authorization"
+      value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="  # Base64 учетных данных elastic
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: "local-path"
 
 # Secrets
 secrets:
