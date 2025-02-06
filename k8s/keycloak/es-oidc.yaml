@@ -16,6 +16,10 @@ keystore:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
+# Отключение автоматического создания Secret
+secret:
+  enabled: false
+
 protocol: https
 
 esConfig:
@@ -56,10 +60,10 @@ persistence:
   size: 1Gi
   storageClass: "local-path"
 
-# Secrets
-secrets:
-  oidc-client-secret:
-    client-secret: "Y0PZTBYI8XTNRQ8XIfoj9ZmcTVlFbIdG"  # Используйте реальный client_secret из Keycloak
+## Secrets
+#secrets:
+#  oidc-client-secret:
+#    client-secret: "Y0PZTBYI8XTNRQ8XIfoj9ZmcTVlFbIdG"  # Используйте реальный client_secret из Keycloak
 
 # Service configuration
 service:
