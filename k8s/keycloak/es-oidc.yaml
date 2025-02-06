@@ -106,6 +106,12 @@ ingress:
     - hosts:
         - "elasticsearch.chatter.com"
 
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+
 # Resource limits and requests
 resources:
   requests:
