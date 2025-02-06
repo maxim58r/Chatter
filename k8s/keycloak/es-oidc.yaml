@@ -16,12 +16,12 @@ security:
 #      - key: client-secret
 #        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
-extraEnvs:
-  - name: ELASTIC_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: oidc-client-secret
-        key: client-secret
+# Использование keystore для импорта client_secret
+keystore:
+  - secretName: oidc-client-secret
+    items:
+      - key: client-secret
+        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
 # Отключение автоматического создания Secret
 secret:
@@ -37,15 +37,12 @@ esConfig:
     xpack.security.transport.ssl.verification_mode: certificate
     xpack.security.authc.realms.native.native1.order: 0   # Для встроенных пользователей (elastic) используем native realm
     xpack.security.authc.realms.oidc.oidc1.order: 10      # OIDC realm для остальных пользователей
-    xpack.security.authc.realms.oidc.oidc1.rp.client_secret: ${ELASTIC_PASSWORD}
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "myKeycloakClientId"  # ID клиента в Keycloak
     xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "https://elasticsearch.chatter.com/api/security/v1/oidc"
     xpack.security.authc.realms.oidc.oidc1.rp.post_logout_redirect_uri: "https://elasticsearch.chatter.com/"
     xpack.security.authc.realms.oidc.oidc1.op.issuer: "http://192.168.1.35:32080/realms/Chatter"  # URL Keycloak реалма
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
     xpack.security.authc.realms.oidc.oidc1.claims.groups: groups
-    xpack.security.authc.realms.oidc.oidc1.authentication.request.response_mode: form_post
-    xpack.security.authc.realms.oidc.oidc1.logout.type: backchannel
 
 # Master node configuration
 master:
@@ -67,11 +64,6 @@ persistence:
   enabled: true
   size: 1Gi
   storageClass: "local-path"
-
-## Secrets
-#secrets:
-#  oidc-client-secret:
-#    client-secret: "Y0PZTBYI8XTNRQ8XIfoj9ZmcTVlFbIdG"  # Используйте реальный client_secret из Keycloak
 
 # Service configuration
 service:
