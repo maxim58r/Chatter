@@ -39,20 +39,21 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.logout.type: backchannel
 
 # Master node configuration
-readinessProbe:
-  enabled: true
-  httpGet:
-    path: /
-    port: 9200
-    scheme: HTTPS
-  initialDelaySeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
-  periodSeconds: 10
-  successThreshold: 1
-  headers:
-    - name: "Authorization"
-      value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="  # Base64 учетных данных elastic
+master:
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 9200
+      scheme: HTTPS
+      httpHeaders:
+        - name: "Authorization"
+          value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="
+    initialDelaySeconds: 10
+    timeoutSeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
 persistence:
   enabled: true
   size: 1Gi
