@@ -36,6 +36,9 @@ esConfig:
     xpack.security.transport.ssl.enabled: true
     xpack.security.transport.ssl.verification_mode: certificate
     
+    # Отключаем параметры обнаружения для одиночного узла
+    discovery.type: single-node
+    
     # Realm для встроенных пользователей
     xpack.security.authc.realms.native.native1.order: 0
     
