@@ -68,6 +68,15 @@ elasticsearch:
       headers:
         - name: "Authorization"
           value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="  # Base64 учетных данных elastic
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: "local-path"
+  data:
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: "local-path"
   secrets:
     oidc-client-secret:
       client-secret: "Y0PZTBYI8XTNRQ8XIfoj9ZmcTVlFbIdG"  # Используйте реальный client_secret из Keycloak
