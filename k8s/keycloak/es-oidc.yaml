@@ -1,6 +1,6 @@
 # Общие параметры
 clusterName: "elasticsearch"
-nodeGroup: "data"
+nodeGroup: "master"
 
 # Репликация
 replicaCount: 1
