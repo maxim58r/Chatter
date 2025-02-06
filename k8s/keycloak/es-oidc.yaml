@@ -45,6 +45,7 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.rp.response_type: "code"  # Добавлен недостающий параметр
     xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "https://elasticsearch.chatter.com/api/security/v1/oidc"
     xpack.security.authc.realms.oidc.oidc1.rp.post_logout_redirect_uri: "https://elasticsearch.chatter.com/"
+    xpack.security.authc.realms.oidc.oidc1.op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
     xpack.security.authc.realms.oidc.oidc1.op.issuer: "http://192.168.1.35:32080/realms/Chatter"  
     xpack.security.authc.realms.oidc.oidc1.op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
