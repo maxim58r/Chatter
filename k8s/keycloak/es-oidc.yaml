@@ -21,7 +21,7 @@ extraEnvs:
     valueFrom:
       secretKeyRef:
         name: oidc-client-secret
-        key: client-secre
+        key: client-secret
 
 # Отключение автоматического создания Secret
 secret:
