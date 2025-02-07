@@ -34,6 +34,8 @@ extraEnvs:
     value: single-node
   - name: node.roles
     value: master,data,data_content,data_hot,data_warm,data_cold,ingest,ml,remote_cluster_client,transform
+  - name: cluster.initial_master_nodes
+    value: ""
 
 esConfig:
   elasticsearch.yml: |
