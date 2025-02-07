@@ -29,6 +29,10 @@ secret:
 
 protocol: https
 
+discovery:
+  seedHosts: [] # Пустой список для отключения discovery.seed_hosts
+  initialMasterNodes: []
+
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
