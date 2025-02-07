@@ -1,6 +1,5 @@
 # Репликация
 replicas: 1
-minimumMasterNodes: 1
 
 # Настройки безопасности
 security:
@@ -29,15 +28,10 @@ secret:
 
 protocol: https
 
-discovery:
-  seedHosts: [] # Пустой список для отключения discovery.seed_hosts
-  initialMasterNodes: []
-  type: single-node
-
 esConfig:
   elasticsearch.yml: |
-    cluster.name: "elasticsearch"
-    node.name: "elasticsearch-master-0"
+    cluster.name: "elasticsearchS"
+    node.name: "elasticsearch-master-0S"
     network.host: 0.0.0.0
 
     # Режим одиночного узла
