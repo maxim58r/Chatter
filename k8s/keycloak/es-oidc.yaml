@@ -69,7 +69,7 @@ readinessProbe:
   httpGet:
     path: /
     port: 9200
-    scheme: HTTPS
+    scheme: HTTP
 #      httpHeaders:
 #        - name: "Authorization"
 #          value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="
