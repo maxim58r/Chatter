@@ -19,6 +19,12 @@ keystore:
 extraEnvs:
   - name: ELASTIC_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
+  - name: cluster.initial_master_nodes
+    value: ""
+
+env:
+  - name: cluster.initial_master_nodes
+    value: ""
 
 # Отключение автоматического создания Secret
 secret:
