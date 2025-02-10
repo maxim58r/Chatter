@@ -20,13 +20,10 @@ extraEnvs:
   - name: ELASTIC_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
   - name: cluster.initial_master_nodes
-    value: []
+    value: ""
 
-# Отключение автоматического создания Secret
-secret:
-  enabled: false
 
-protocol: https
+protocol: http
 
 esConfig:
   elasticsearch.yml: |
@@ -64,7 +61,7 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.op.jwkset_path: "https://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
     xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
-    xpack.security.authc.realms.oidc.oidc1.claims.groups: groups
+    #xpack.security.authc.realms.oidc.oidc1.claims.groups: groups
 
 # Master node configuration
 #readinessProbe:
