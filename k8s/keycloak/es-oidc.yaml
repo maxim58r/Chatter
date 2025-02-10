@@ -35,7 +35,7 @@ esConfig:
     network.host: 0.0.0.0
     discovery.type: single-node
     node.roles: ["master", "data", "ingest"]
-    cluster.initial_master_nodes: []
+    #cluster.initial_master_nodes: []
 
     # Безопасность
     xpack.security.enabled: false
