@@ -65,19 +65,19 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.claims.groups: groups
 
 # Master node configuration
-readinessProbe:
-  httpGet:
-    path: /
-    port: 9200
-    scheme: HTTP
-#      httpHeaders:
-#        - name: "Authorization"
-#          value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="
-  initialDelaySeconds: 60
-  timeoutSeconds: 6
-  periodSeconds: 11
-  successThreshold: 2
-  failureThreshold: 4
+#readinessProbe:
+#  httpGet:
+#    path: /
+#    port: 9200
+#    scheme: HTTP
+##      httpHeaders:
+##        - name: "Authorization"
+##          value: "Basic ZWxhc3RpYzpTaUZpVFR1cFNIaHExNEdaWlxiVFM="
+#  initialDelaySeconds: 60
+#  timeoutSeconds: 6
+#  periodSeconds: 11
+#  successThreshold: 2
+#  failureThreshold: 4
 
 persistence:
   enabled: true
