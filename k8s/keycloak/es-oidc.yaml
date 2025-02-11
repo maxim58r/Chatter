@@ -4,6 +4,8 @@ replicas: 2
 # Минимальное количество master-нод для кворума
 minimumMasterNodes: 2  # (master_eligible_nodes / 2) + 1 → (2 / 2) + 1 = 2
 
+antiAffinity: "soft"
+
 # Роли для узлов
 roles:
   - master
