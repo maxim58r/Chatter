@@ -1,28 +1,39 @@
-# Пример values.yaml
-replicas: 1
-minimumMasterNodes: 1
+# Количество реплик (два узла в кластере)
+replicas: 2
+
+# Минимальное количество master-нод для кворума
+minimumMasterNodes: 2  # (master_eligible_nodes / 2) + 1 → (2 / 2) + 1 = 2
+
+# Роли для узлов
 roles:
-  - data  # Пустая строка (или пустой массив), чтобы не матчился "master"
-# ...
+  - master
+  - data
+  - ingest
 
-# Важно: xpack.security включим, чтобы OIDC работал
+# Включаем безопасность, но TLS отключаем
 security:
-  enabled: false        # Имеется в виду TLS-часть
+  enabled: true  # Оставляем security включённым для OIDC
   tls:
-    enabled: false
+    enabled: false  # Отключаем TLS
 
+# Keystore для OIDC client_secret
 keystore:
   - secretName: oidc-client-secret
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
+# Основная конфигурация Elasticsearch
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
-    node.name: "es-single-node"
+    node.name: ${HOSTNAME}
 
-    discovery.type: single-node
+    # Убираем single-node и делаем полноценный кластер
+    discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
+    cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
+
+    # Роли ноды
     node.roles: ["master", "data", "ingest"]
 
     # Включаем безопасность (OIDC требует xpack.security.enabled=true)
@@ -30,7 +41,7 @@ esConfig:
     xpack.security.http.ssl.enabled: false
     xpack.security.transport.ssl.enabled: false
 
-    # Настройки OIDC (пример)
+    # OIDC конфигурация
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "myKeycloakClientId"
@@ -43,21 +54,23 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
 
+# Переменные окружения
 extraEnvs:
   - name: ELASTIC_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
 
-# Остальные секции:
+# Хранилище для данных Elasticsearch
 volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 1Gi
+      storage: 5Gi  # Увеличил с 1Gi, так как кластерная работа требует больше места
 
+# Ресурсы для каждого пода
 resources:
   requests:
     cpu: "1"
-    memory: "1Gi"
+    memory: "2Gi"  # Увеличил память до 2ГБ, чтобы кластер работал стабильнее
   limits:
-    cpu: "1"
-    memory: "1Gi"
+    cpu: "2"
+    memory: "2Gi"
