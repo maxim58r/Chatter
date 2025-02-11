@@ -1,34 +1,38 @@
-# Количество реплик Kibana
+# kibana-oidc.yaml
+
 replicaCount: 1
 
-# Подключение к Elasticsearch
-# Укажем URL вашего Elasticsearch + базовую авторизацию
-elasticsearchHosts: "https://192.168.1.35:30080"
-elasticsearch.username: "kibana_custom_user"
-elasticsearch.password: "QJaWS1Bi7ULkaWfJc*Hi"
-# Если хотите указывать внутри кластера, можете взять Service (https://elasticsearch-master.logging.svc:9200)
-# Но тогда Kibana будет работать только внутри кластера, либо придётся раздавать Kibana наружу.
+# Подключение к Elasticsearch внутри кластера (HTTP, без TLS)
+elasticsearchHosts: "http://elasticsearch-master:9200"
 
-# Тип сервиса: NodePort, чтобы был доступен извне
+# Убедись, что такой пользователь есть.
+# Или просто используем "elastic" — его точно знаем.
+elasticsearch:
+  username: "elastic"
+  password: "QJaWS1Bi7ULkaWfJc*Hi"
+
 service:
   type: NodePort
   port: 5601
-  nodePort: 30081  # Выберите свободный порт из диапазона 30000-32767
+  nodePort: 30081  # Kibana будет доступна извне на http://192.168.1.35:30081
 
+# Дополнительные переменные окружения (дублирует логин/пароль elastic):
 extraEnvs:
-  # Логин/пароль пользователя elastic (тот же что у ES)
   - name: ELASTICSEARCH_USERNAME
     value: "elastic"
   - name: ELASTICSEARCH_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
 
-# Отключим проверку сертификата, если у вас самоподписанный
+# Дополнительная конфигурация Kibana
 kibanaConfig:
   kibana.yml: |
+    # Адрес Kibana извне
     server.publicBaseUrl: "http://192.168.1.35:30081"
+
+    # Если нет HTTPS на Elasticsearch, нет смысла проверять сертификат
+    # (Но это строка не повредит, если где-то включится TLS)
     elasticsearch.ssl.verificationMode: none
 
-# Ресурсы (минимальные)
 resources:
   requests:
     cpu: "500m"
