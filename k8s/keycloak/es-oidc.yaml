@@ -1,5 +1,6 @@
 # Пример values.yaml
 replicas: 1
+minimumMasterNodes: 1
 roles:
   - data  # Пустая строка (или пустой массив), чтобы не матчился "master"
 # ...
