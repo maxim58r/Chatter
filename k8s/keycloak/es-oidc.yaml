@@ -86,12 +86,12 @@ resources:
 ########################################################################
 # Дополнительные volume/volumeMounts, чтобы смонтировать секрет в /certs
 ########################################################################
-extraVolumes:
-  - name: elasticsearch-certs
-    secret:
-      secretName: elasticsearch-master-certs   # Имя секрета с сертификатами
-
-extraVolumeMounts:
-  - name: elasticsearch-certs
-    mountPath: /usr/share/elasticsearch/config/certs
-    readOnly: true
+#extraVolumes:
+#  - name: elasticsearch-certs
+#    secret:
+#      secretName: elasticsearch-master-certs   # Имя секрета с сертификатами
+#
+#extraVolumeMounts:
+#  - name: elasticsearch-certs
+#    mountPath: /usr/share/elasticsearch/config/certs
+#    readOnly: true
