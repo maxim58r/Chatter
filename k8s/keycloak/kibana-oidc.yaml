@@ -1,17 +1,19 @@
 # Количество реплик Kibana
 replicaCount: 1
 
+# Подключение к Elasticsearch
+# Укажем URL вашего Elasticsearch + базовую авторизацию
+elasticsearchHosts: ["https://elasticsearch-master.logging.svc.cluster.local:9200", "https://192.168.1.35:30080"]
+elasticsearch.username: "kibana_custom_user"
+elasticsearch.password: "QJaWS1Bi7ULkaWfJc*Hi"
+# Если хотите указывать внутри кластера, можете взять Service (https://elasticsearch-master.logging.svc:9200)
+# Но тогда Kibana будет работать только внутри кластера, либо придётся раздавать Kibana наружу.
+
 # Тип сервиса: NodePort, чтобы был доступен извне
 service:
   type: NodePort
   port: 5601
   nodePort: 30081  # Выберите свободный порт из диапазона 30000-32767
-
-# Подключение к Elasticsearch
-# Укажем URL вашего Elasticsearch + базовую авторизацию
-elasticsearchHosts: ["https://192.168.1.35:30080"]  # NodePort вашего Elasticsearch
-# Если хотите указывать внутри кластера, можете взять Service (https://elasticsearch-master.logging.svc:9200)
-# Но тогда Kibana будет работать только внутри кластера, либо придётся раздавать Kibana наружу.
 
 extraEnvs:
   # Логин/пароль пользователя elastic (тот же что у ES)
