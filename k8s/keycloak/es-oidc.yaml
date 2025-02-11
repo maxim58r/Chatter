@@ -10,6 +10,12 @@ security:
   tls:
     enabled: false
 
+keystore:
+  - secretName: oidc-client-secret
+    items:
+      - key: client-secret
+        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
