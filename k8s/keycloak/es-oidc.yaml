@@ -12,38 +12,44 @@ roles:
   - data
   - ingest
 
-# Включаем безопасность, но TLS отключаем
+# Блок Security. Здесь security.enabled = true включает xpack.security
+# а tls.enabled = false означает, что HTTPS/HTTPs-трафик не поднимаем,
+# однако в esConfig далее включаем именно transport-SSL.
 security:
-  enabled: true  # Оставляем security включённым для OIDC
+  enabled: true
   tls:
-    enabled: false  # Отключаем TLS
+    enabled: false
 
-# Keystore для OIDC client_secret
+# Keystore для OIDC (секрет с client_secret)
 keystore:
   - secretName: oidc-client-secret
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
-# Основная конфигурация Elasticsearch
+# Основная конфигурация Elasticsearch (xpack, OIDC, discovery и т.д.)
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
     node.name: ${HOSTNAME}
 
-    # Убираем single-node и делаем полноценный кластер
     discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
     cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
 
     # Роли ноды
     node.roles: ["master", "data", "ingest"]
 
-    # Включаем безопасность (OIDC требует xpack.security.enabled=true)
+    # Включаем xpack.security
     xpack.security.enabled: true
-    xpack.security.http.ssl.enabled: false
-    xpack.security.transport.ssl.enabled: false
 
-    # OIDC конфигурация
+    # Настройка transport TLS (то, что требует сертификаты)
+    xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.verification_mode: certificate
+    xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+    xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/elasticsearch.key
+    xpack.security.transport.ssl.certificate_authorities: [ "/usr/share/elasticsearch/config/certs/ca.crt" ]
+
+    # Настройки OIDC
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "myKeycloakClientId"
@@ -56,23 +62,36 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
 
-# Переменные окружения
+# Переменные окружения (пароль суперпользователя elastic)
 extraEnvs:
   - name: ELASTIC_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
 
-# Хранилище для данных Elasticsearch
+# Хранилище для данных Elasticsearch (PVC)
 volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 5Gi  # Увеличил с 1Gi, так как кластерная работа требует больше места
+      storage: 5Gi
 
-# Ресурсы для каждого пода
+# Ресурсы для подов
 resources:
   requests:
     cpu: "250m"
-    memory: "1Gi"  # Увеличил память до 2ГБ, чтобы кластер работал стабильнее
+    memory: "1Gi"
   limits:
     cpu: "500m"
     memory: "2Gi"
+
+########################################################################
+# Дополнительные volume/volumeMounts, чтобы смонтировать секрет в /certs
+########################################################################
+extraVolumes:
+  - name: elasticsearch-certs
+    secret:
+      secretName: elasticsearch-master-certs   # Имя секрета с сертификатами
+
+extraVolumeMounts:
+  - name: elasticsearch-certs
+    mountPath: /usr/share/elasticsearch/config/certs
+    readOnly: true
