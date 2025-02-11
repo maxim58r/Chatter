@@ -3,7 +3,9 @@ replicaCount: 1
 
 # Подключение к Elasticsearch
 # Укажем URL вашего Elasticsearch + базовую авторизацию
-elasticsearchHosts: ["https://elasticsearch-master.logging.svc.cluster.local:9200", "https://192.168.1.35:30080"]
+elasticsearchHosts:
+  - "https://elasticsearch-master.logging.svc.cluster.local:9200"
+  - "https://192.168.1.35:30080"
 elasticsearch.username: "kibana_custom_user"
 elasticsearch.password: "QJaWS1Bi7ULkaWfJc*Hi"
 # Если хотите указывать внутри кластера, можете взять Service (https://elasticsearch-master.logging.svc:9200)
