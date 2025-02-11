@@ -2,11 +2,10 @@
 
 replicaCount: 1
 
-# Подключение к Elasticsearch внутри кластера (HTTP, без TLS)
+# Указываем адрес Elasticsearch по HTTP внутри кластера:
 elasticsearchHosts: "http://elasticsearch-master:9200"
 
-# Убедись, что такой пользователь есть.
-# Или просто используем "elastic" — его точно знаем.
+# Логин/пароль
 elasticsearch:
   username: "elastic"
   password: "QJaWS1Bi7ULkaWfJc*Hi"
@@ -14,23 +13,22 @@ elasticsearch:
 service:
   type: NodePort
   port: 5601
-  nodePort: 30081  # Kibana будет доступна извне на http://192.168.1.35:30081
+  nodePort: 30081
 
-# Дополнительные переменные окружения (дублирует логин/пароль elastic):
-extraEnvs:
-  - name: ELASTICSEARCH_USERNAME
-    value: "elastic"
-  - name: ELASTICSEARCH_PASSWORD
-    value: "QJaWS1Bi7ULkaWfJc*Hi"
+# Снимаем SSL-настройки и отключаем автоматический монтаж сертификатов
+preInstallTokenCreation:
+  automountElasticsearchCerts: false
+  # Параметр enabled: true по умолчанию, пусть будет true
+  # Токен всё равно будет пытаться создаваться, но уже без лишнего SSL
 
-# Дополнительная конфигурация Kibana
+# Или вообще можно отключить pre-install Job, если ты не пользуешься security token в Kibana:
+# preInstallTokenCreation:
+#   enabled: false
+
+# Отключим проверку TLS на случай, если где-то внезапно включен https
 kibanaConfig:
   kibana.yml: |
-    # Адрес Kibana извне
     server.publicBaseUrl: "http://192.168.1.35:30081"
-
-    # Если нет HTTPS на Elasticsearch, нет смысла проверять сертификат
-    # (Но это строка не повредит, если где-то включится TLS)
     elasticsearch.ssl.verificationMode: none
 
 resources:
