@@ -29,18 +29,13 @@ kibanaConfig:
     elasticsearch.ssl.verificationMode: certificate
     
     # Настройка OIDC
-    xpack.security.authc.providers:
-      oidc.oidc1:
-        order: 0
-        realm: oidc1
-      basic.basic1:
-        order: 1
-    
-    # OIDC параметры
-    xpack.security.authc.oidc.oidc1.op.issuer: "http://192.168.1.35:32080/realms/Chatter"
-    xpack.security.authc.oidc.oidc1.op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
-    xpack.security.authc.oidc.oidc1.op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
-    xpack.security.authc.oidc.oidc1.op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
+    xpack.security.authc:
+      providers:
+        basic.basic1:
+          order: 0
+        oidc.oidc1:
+          order: 1
+          realm: "oidc1"
 
 resources:
   requests:
