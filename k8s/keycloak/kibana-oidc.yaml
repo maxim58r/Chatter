@@ -19,23 +19,28 @@ service:
 ##########################################################
 kibanaConfig:
   kibana.yml: |
-    # Если хотите открыть Kibana наружу
-    server.publicBaseUrl: "https://192.168.1.35:30081"
-    
-    # Указываем CA, чтобы Kibana доверяла сертификату ES
+    server.publicBaseUrl: "https://kibana.chatter.com"
+
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
-    
-    # Проверяем сертификат (можно заменить на "full" для более строгой проверки)
     elasticsearch.ssl.verificationMode: certificate
-    
-    # Настройка OIDC
-    xpack.security.authc:
-      providers:
-        basic.basic1:
-          order: 0
-        oidc.oidc1:
-          order: 1
-          realm: "oidc1"
+
+    xpack.security.authc.providers:
+      basic.basic1:
+        order: 0
+      oidc.oidc1:
+        order: 1
+        realm: "oidc1"
+
+    xpack.security.authc.oidc.oidc1:
+      order: 1
+      realm: "oidc1"
+      authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
+      token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
+      userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
+      jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
+      client_id: "kibana-client"
+      client_secret: "your-client-secret"
+      redirect_uri: "https://kibana.chatter.com/api/security/v1/oidc"
 
 resources:
   requests:
