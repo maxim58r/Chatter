@@ -21,12 +21,26 @@ kibanaConfig:
   kibana.yml: |
     # Если хотите открыть Kibana наружу
     server.publicBaseUrl: "https://192.168.1.35:30081"
-
+    
     # Указываем CA, чтобы Kibana доверяла сертификату ES
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     
     # Проверяем сертификат (можно заменить на "full" для более строгой проверки)
     elasticsearch.ssl.verificationMode: certificate
+    
+    # Настройка OIDC
+    xpack.security.authc.providers:
+      oidc.oidc1:
+        order: 0
+        realm: oidc1
+      basic.basic1:
+        order: 1
+    
+    # OIDC параметры
+    xpack.security.authc.oidc.oidc1.op.issuer: "http://192.168.1.35:32080/realms/Chatter"
+    xpack.security.authc.oidc.oidc1.op.authorization_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/auth"
+    xpack.security.authc.oidc.oidc1.op.token_endpoint: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
+    xpack.security.authc.oidc.oidc1.op.jwkset_path: "http://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/certs"
 
 resources:
   requests:
@@ -43,4 +57,3 @@ resources:
 preInstallTokenCreation:
   enabled: false
   automountElasticsearchCerts: true
-
