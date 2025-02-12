@@ -22,7 +22,7 @@ kibanaConfig:
     server.publicBaseUrl: "https://kibana.chatter.com"
 
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
-    elasticsearch.ssl.verificationMode: certificate
+    elasticsearch.ssl.verificationMode: full
 
     xpack.security.authc.providers:
       basic.basic1:
@@ -32,15 +32,15 @@ kibanaConfig:
         realm: "oidc1"
 
     xpack.security.authc.oidc.oidc1:
-      order: 1
       realm: "oidc1"
+      client_id: "kibana-client"
+      client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
       authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
       token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
       userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
       jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
-      client_id: "kibana-client"
-      client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
-      redirect_uri: "https://kibana.chatter.com/api/security/v1/oidc"
+      logout_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/logout"
+      redirect_uri: "https://kibana.chatter.com/api/security/oidc/callback"
 
 resources:
   requests:
