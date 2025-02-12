@@ -39,7 +39,7 @@ kibanaConfig:
       userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
       jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
       client_id: "kibana-client"
-      client_secret: "your-client-secret"
+      client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
       redirect_uri: "https://kibana.chatter.com/api/security/v1/oidc"
 
 resources:
