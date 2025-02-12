@@ -41,5 +41,5 @@ resources:
 # и разрешаем чарту сам монтировать CA (или сделаем вручную).
 ########################################################################
 preInstallTokenCreation:
-  enabled: true
+  enabled: false
   automountElasticsearchCerts: true
