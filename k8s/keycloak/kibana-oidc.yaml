@@ -28,17 +28,6 @@ kibanaConfig:
     # Проверяем сертификат (можно заменить на "full" для более строгой проверки)
     elasticsearch.ssl.verificationMode: certificate
 
-extraVolumes:
-  - name: kibana-certs
-    secret:
-      # Используем тот же секрет, где лежит ca.crt
-      secretName: elasticsearch-master-certs
-
-extraVolumeMounts:
-  - name: kibana-certs
-    mountPath: /usr/share/kibana/config/certs
-    readOnly: true
-
 resources:
   requests:
     cpu: "500m"
