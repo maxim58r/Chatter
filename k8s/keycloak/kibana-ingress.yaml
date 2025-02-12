@@ -5,7 +5,7 @@ metadata:
   namespace: logging
 spec:
   rules:
-    - host: kibana.yourdomain.com
+    - host: kibana.chatter.com
       http:
         paths:
           - path: /

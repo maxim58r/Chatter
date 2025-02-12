@@ -1,11 +1,10 @@
-# kibana-oidc.yaml
-
 replicaCount: 1
 
-# Указываем адрес Elasticsearch по HTTP внутри кластера:
-elasticsearchHosts: "http://elasticsearch-master:9200"
+##########################################################
+# Подключаемся к ES по HTTPS
+##########################################################
+elasticsearchHosts: "https://elasticsearch-master:9200"
 
-# Логин/пароль
 elasticsearch:
   username: "elastic"
   password: "QJaWS1Bi7ULkaWfJc*Hi"
@@ -13,23 +12,32 @@ elasticsearch:
 service:
   type: NodePort
   port: 5601
-  nodePort: 30081
+  nodePort: 30081  # наружный порт, если нужно внешнее подключение
 
-# Снимаем SSL-настройки и отключаем автоматический монтаж сертификатов
-preInstallTokenCreation:
-  automountElasticsearchCerts: false
-  # Параметр enabled: true по умолчанию, пусть будет true
-  # Токен всё равно будет пытаться создаваться, но уже без лишнего SSL
-
-# Или вообще можно отключить pre-install Job, если ты не пользуешься security token в Kibana:
-# preInstallTokenCreation:
-#   enabled: false
-
-# Отключим проверку TLS на случай, если где-то внезапно включен https
+##########################################################
+# Конфигурация kibana.yml
+##########################################################
 kibanaConfig:
   kibana.yml: |
-    server.publicBaseUrl: "http://192.168.1.35:30081"
-    elasticsearch.ssl.verificationMode: none
+    # Если хотите открыть Kibana наружу
+    server.publicBaseUrl: "https://192.168.1.35:30081"
+
+    # Указываем CA, чтобы Kibana доверяла сертификату ES
+    elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
+    
+    # Проверяем сертификат (можно заменить на "full" для более строгой проверки)
+    elasticsearch.ssl.verificationMode: certificate
+
+extraVolumes:
+  - name: kibana-certs
+    secret:
+      # Используем тот же секрет, где лежит ca.crt
+      secretName: elasticsearch-master-certs
+
+extraVolumeMounts:
+  - name: kibana-certs
+    mountPath: /usr/share/kibana/config/certs
+    readOnly: true
 
 resources:
   requests:
@@ -37,4 +45,12 @@ resources:
     memory: "1Gi"
   limits:
     cpu: "1"
-    memory: "2Gi"
+    memory: "1Gi"
+
+########################################################################
+# Включаем pre-install Token Creation (по умолчанию включён),
+# и разрешаем чарту сам монтировать CA (или сделаем вручную).
+########################################################################
+preInstallTokenCreation:
+  enabled: true
+  automountElasticsearchCerts: true

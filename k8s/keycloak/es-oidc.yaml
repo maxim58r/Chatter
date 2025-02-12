@@ -1,55 +1,58 @@
-# Количество реплик (два узла в кластере)
+# Количество реплик и прочие базовые настройки
 replicas: 2
-
-# Минимальное количество master-нод для кворума
-minimumMasterNodes: 2  # (master_eligible_nodes / 2) + 1 → (2 / 2) + 1 = 2
-
+minimumMasterNodes: 2
 antiAffinity: "soft"
-
-# Роли для узлов
 roles:
   - master
   - data
   - ingest
 
-# Блок Security. Здесь security.enabled = true включает xpack.security
-# а tls.enabled = false означает, что HTTPS/HTTPs-трафик не поднимаем,
-# однако в esConfig далее включаем именно transport-SSL.
+# Включаем security и HTTP TLS
 security:
   enabled: true
   tls:
-    enabled: false
+    enabled: true
 
-# Keystore для OIDC (секрет с client_secret)
+# Keystore для OIDC (пример)
 keystore:
   - secretName: oidc-client-secret
     items:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
-# Основная конфигурация Elasticsearch (xpack, OIDC, discovery и т.д.)
+# Основная конфигурация Elasticsearch
 esConfig:
   elasticsearch.yml: |
     cluster.name: "elasticsearch"
     node.name: ${HOSTNAME}
-
+    node.roles: ["master", "data", "ingest"]
+    
     discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
     cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
 
-    # Роли ноды
-    node.roles: ["master", "data", "ingest"]
-
-    # Включаем xpack.security
     xpack.security.enabled: true
 
-    # Настройка transport TLS (то, что требует сертификаты)
+    ####################################################
+    # TRANSPORT SSL (порт 9300)
+    ####################################################
     xpack.security.transport.ssl.enabled: true
     xpack.security.transport.ssl.verification_mode: certificate
     xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/elasticsearch.crt
     xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/elasticsearch.key
     xpack.security.transport.ssl.certificate_authorities: [ "/usr/share/elasticsearch/config/certs/ca.crt" ]
 
-    # Настройки OIDC
+    ####################################################
+    # HTTP SSL (порт 9200) HTTPS
+    ####################################################
+    xpack.security.http.ssl.enabled: true
+    xpack.security.http.ssl.verification_mode: certificate
+    xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+    xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/elasticsearch.key
+    xpack.security.http.ssl.certificate_authorities: [ "/usr/share/elasticsearch/config/certs/ca.crt" ]
+
+    ####################################################
+    # ODIC
+    ####################################################
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "myKeycloakClientId"
@@ -62,36 +65,36 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://192.168.1.35:32080/realms/Chatter/protocol/openid-connect/token"
     xpack.security.authc.realms.oidc.oidc1.claims.principal: sub
 
-# Переменные окружения (пароль суперпользователя elastic)
+# Пароль суперпользователя elastic
 extraEnvs:
   - name: ELASTIC_PASSWORD
     value: "QJaWS1Bi7ULkaWfJc*Hi"
 
-# Хранилище для данных Elasticsearch (PVC)
+# PVC для данных
 volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
 
-# Ресурсы для подов
+# Ресурсы
 resources:
   requests:
     cpu: "250m"
     memory: "1Gi"
   limits:
     cpu: "500m"
-    memory: "2Gi"
+    memory: "1Gi"
 
 ########################################################################
-# Дополнительные volume/volumeMounts, чтобы смонтировать секрет в /certs
+# Подключаем наш секрет с сертификатами, чтобы ES видел файлы
 ########################################################################
-#extraVolumes:
-#  - name: elasticsearch-certs
-#    secret:
-#      secretName: elasticsearch-master-certs   # Имя секрета с сертификатами
-#
-#extraVolumeMounts:
-#  - name: elasticsearch-certs
-#    mountPath: /usr/share/elasticsearch/config/certs
-#    readOnly: true
+extraVolumes:
+  - name: elasticsearch-certs
+    secret:
+      secretName: elasticsearch-master-certs
+
+extraVolumeMounts:
+  - name: elasticsearch-certs
+    mountPath: /usr/share/elasticsearch/config/certs
+    readOnly: true
