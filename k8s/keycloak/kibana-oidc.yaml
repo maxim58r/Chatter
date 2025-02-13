@@ -4,7 +4,6 @@ replicaCount: 1
 # Подключаемся к ES по HTTPS
 ##########################################################
 elasticsearchHosts: "https://elasticsearch-master:9200"
-
 elasticsearch:
   username: "kibana_system"
   password: "dRwff7gKMCTzvOKOYY4S"
@@ -20,17 +19,14 @@ service:
 kibanaConfig:
   kibana.yml: |
     server.publicBaseUrl: "https://kibana.chatter.com"
-
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
-
     xpack.security.authc.providers:
       basic.basic1:
         order: 0
       oidc.oidc1:
         order: 1
         realm: "oidc1"
-
     xpack.security.authc.oidc.oidc1:
       realm: "oidc1"
       client_id: "kibana-client"
@@ -56,4 +52,10 @@ resources:
 ########################################################################
 preInstallTokenCreation:
   enabled: false
-  automountElasticsearchCerts: true
+  automountElasticsearchCerts: false
+
+########################################################################
+# Настройка аутентификации через существующий секрет
+########################################################################
+auth:
+  existingSecret: "678b8efb97a0251cffcf3b419f0eaa21"
