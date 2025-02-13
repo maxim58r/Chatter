@@ -7,7 +7,7 @@ elasticsearchHosts: "https://elasticsearch-master:9200"
 
 elasticsearch:
   username: "elastic"
-  password: "QJaWS1Bi7ULkaWfJc*Hi"
+  password: "dRwff7gKMCTzvOKOYY4S"
 
 service:
   type: NodePort
