@@ -6,7 +6,7 @@ replicaCount: 1
 elasticsearchHosts: "https://elasticsearch-master:9200"
 
 elasticsearch:
-  username: "elastic"
+  username: "kibana_system"
   password: "dRwff7gKMCTzvOKOYY4S"
 
 service:
