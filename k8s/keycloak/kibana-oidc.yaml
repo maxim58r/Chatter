@@ -58,4 +58,4 @@ preInstallTokenCreation:
 # Настройка аутентификации через существующий секрет
 ########################################################################
 auth:
-  existingSecret: "678b8efb97a0251cffcf3b419f0eaa21"
+  existingSecret: "kibana-token-secret"
