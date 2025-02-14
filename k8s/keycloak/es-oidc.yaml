@@ -69,7 +69,7 @@ esConfig:
 # Пароль суперпользователя elastic
 extraEnvs:
   - name: ELASTIC_PASSWORD
-    value: "dRwff7gKMCTzvOKOYY4S"
+    value: "HJpZsxOvmLIZm6ih+V-m"
 
 # PVC для данных
 volumeClaimTemplate:
