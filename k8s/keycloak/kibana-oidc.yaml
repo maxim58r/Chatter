@@ -24,6 +24,7 @@ kibanaConfig:
     
     xpack.security.authc.providers:
       - oidc.oidc1:
+          enabled: true
           order: 0
           realm: "oidc-realm"
           client_id: "kibana-client"
