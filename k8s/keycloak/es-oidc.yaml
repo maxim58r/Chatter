@@ -58,8 +58,8 @@ esConfig:
     
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "elasticsearch-client"
     xpack.security.authc.realms.oidc.oidc1.rp.response_type: "code"
-    xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "http://192.168.1.35:30081/api/security/oidc/callbac"
-    xpack.security.authc.realms.oidc.oidc1.rp.post_logout_redirect_uri: "https://elasticsearch.chatter.com/"
+    xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "http://192.168.1.35:30081/api/security/oidc/callback"
+    xpack.security.authc.realms.oidc.oidc1.rp.post_logout_redirect_uri: "http://192.168.1.35:30081/"
     xpack.security.authc.realms.oidc.oidc1.rp.requested_scopes: ["openid", "profile", "email"]
     
     xpack.security.authc.realms.oidc.oidc1.op.authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"

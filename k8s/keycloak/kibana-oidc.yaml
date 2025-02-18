@@ -20,7 +20,7 @@ service:
 ##########################################################
 kibanaConfig:
   kibana.yml: |
-    server.publicBaseUrl: "https://kibana.chatter.com"
+    server.publicBaseUrl: "http://192.168.1.35:30081"
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
