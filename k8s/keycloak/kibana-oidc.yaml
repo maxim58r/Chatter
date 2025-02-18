@@ -23,9 +23,11 @@ kibanaConfig:
     elasticsearch.ssl.verificationMode: full
     xpack.security.authc:
       providers:
-        "basic.basic1":
+        - type: basic
+          name: basic1
           order: 0
-        "oidc.oidc1":
+        - type: oidc
+          name: oidc1
           order: 1
           config:
             realm: "oidc1"
