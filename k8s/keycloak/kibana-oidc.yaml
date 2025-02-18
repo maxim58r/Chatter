@@ -22,21 +22,18 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
-    # Конфигурация провайдеров аутентификации
-    xpack.security.authc.providers:
-      oidc.oidc1:
-        order: 0
-        realm: "oidc1"
+    xpack.security.authc.oidc:
+      order: 0
+      oidc1:
+        client_id: "kibana-client"
+        client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
+        authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
+        token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
+        userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
+        jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
+        logout_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/logout"
+        redirect_uri: "https://kibana.chatter.com/api/security/oidc/callback"
 
-    # Настройки OIDC-провайдера с идентификатором "oidc1"
-    xpack.security.authc.oidc.oidc1.client_id: "kibana-client"
-    xpack.security.authc.oidc.oidc1.client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
-    xpack.security.authc.oidc.oidc1.authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
-    xpack.security.authc.oidc.oidc1.token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
-    xpack.security.authc.oidc.oidc1.userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
-    xpack.security.authc.oidc.oidc1.jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
-    xpack.security.authc.oidc.oidc1.logout_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/logout"
-    xpack.security.authc.oidc.oidc1.redirect_uri: "https://kibana.chatter.com/api/security/oidc/callback"
 
 resources:
   requests:
