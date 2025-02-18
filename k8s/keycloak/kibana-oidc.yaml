@@ -28,10 +28,6 @@ kibanaConfig:
       oidc.oidc1:
         order: 0
         realm: "oidc1"
-        description: "Login with Keycloak"
-        client_id: "elasticsearch-client"
-        redirect_uri: "http://192.168.1.35:30081/api/security/oidc/callback"
-
 
 resources:
   requests:
