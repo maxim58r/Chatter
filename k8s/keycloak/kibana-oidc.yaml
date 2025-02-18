@@ -22,9 +22,9 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
-    xpack.security.authc.oidc:
-      order: 0
+    xpack.security.authc.realms.oidc:
       oidc1:
+        order: 0
         client_id: "kibana-client"
         client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
         authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
