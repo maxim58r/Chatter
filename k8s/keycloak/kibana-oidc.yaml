@@ -22,20 +22,20 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
-    # Указываем только OIDC-провайдер
-    xpack.security.authc.providers: ["oidc1"]
+    # Используем только OIDC-провайдер
+    xpack.security.authc.providers: ["oidc"]
 
-    # Настройка OIDC-провайдера с идентификатором "oidc1"
-    xpack.security.authc.oidc1.order: 1
-    xpack.security.authc.oidc1.realm: "oidc1"
-    xpack.security.authc.oidc1.client_id: "kibana-client"
-    xpack.security.authc.oidc1.client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
-    xpack.security.authc.oidc1.authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
-    xpack.security.authc.oidc1.token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
-    xpack.security.authc.oidc1.userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
-    xpack.security.authc.oidc1.jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
-    xpack.security.authc.oidc1.logout_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/logout"
-    xpack.security.authc.oidc1.redirect_uri: "https://kibana.chatter.com/api/security/oidc/callback"
+    # Конфигурация OIDC-провайдера
+    xpack.security.authc.oidc.order: 1
+    xpack.security.authc.oidc.realm: "oidc1"
+    xpack.security.authc.oidc.client_id: "kibana-client"
+    xpack.security.authc.oidc.client_secret: "sAcCHLav7Q891svS8SmE27KLFNL2hwvr"
+    xpack.security.authc.oidc.authorization_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/auth"
+    xpack.security.authc.oidc.token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
+    xpack.security.authc.oidc.userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
+    xpack.security.authc.oidc.jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
+    xpack.security.authc.oidc.logout_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/logout"
+    xpack.security.authc.oidc.redirect_uri: "https://kibana.chatter.com/api/security/oidc/callback"
 
 resources:
   requests:
