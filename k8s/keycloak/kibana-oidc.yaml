@@ -22,7 +22,7 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
     xpack.security.authc.providers:
-     "basic.basic1":
+      "basic.basic1":
         order: 0
       "oidc.oidc1":
         order: 1
