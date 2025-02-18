@@ -8,6 +8,8 @@ elasticsearch:
   username: "kibana_system"
   password: "HJpZsxOvmLIZm6ih+V-m"
 
+logging.verbose: true
+
 service:
   type: NodePort
   port: 5601
