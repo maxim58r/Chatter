@@ -22,11 +22,8 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
-    # Список провайдеров: базовый и OIDC
-    xpack.security.authc.providers: ["basic", "oidc1"]
-
-    # Настройка базового провайдера (basic) – если требуется дополнительная конфигурация
-    xpack.security.authc.basic.order: 0
+    # Указываем только OIDC-провайдер
+    xpack.security.authc.providers: ["oidc1"]
 
     # Настройка OIDC-провайдера с идентификатором "oidc1"
     xpack.security.authc.oidc1.order: 1
