@@ -22,7 +22,7 @@ kibanaConfig:
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 
-    xpack.security.authc.realms.oidc:
+    xpack.security.authc.providers.oidc:
       oidc1:
         order: 0
         client_id: "kibana-client"
