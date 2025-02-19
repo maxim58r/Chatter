@@ -63,11 +63,11 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.rp.requested_scopes: ["openid", "profile", "email"]
     
     xpack.security.authc.realms.oidc.oidc1.op.authorization_endpoint: "http://192.168.1.35:30221/realms/Chatter/protocol/openid-connect/auth"
-    xpack.security.authc.realms.oidc.oidc1.op.issuer: "http://192.168.1.35:30221/Chatter"
-    xpack.security.authc.realms.oidc.oidc1.op.jwkset_path: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/certs"
-    xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/token"
-    xpack.security.authc.realms.oidc.oidc1.op.userinfo_endpoint: "https://keycloak.chatter.com/realms/Chatter/protocol/openid-connect/userinfo"
-    
+    xpack.security.authc.realms.oidc.oidc1.op.issuer: "http://192.168.1.35:30221/realms/Chatter"
+    xpack.security.authc.realms.oidc.oidc1.op.jwkset_path: "http://192.168.1.35:30221/realms/Chatter/protocol/openid-connect/certs"
+    xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "http://192.168.1.35:30221/realms/Chatter/protocol/openid-connect/token"
+    xpack.security.authc.realms.oidc.oidc1.op.userinfo_endpoint: "http://192.168.1.35:30221/realms/Chatter/protocol/openid-connect/userinfo"
+
     xpack.security.authc.realms.oidc.oidc1.claims.principal: "sub"
 
 # Пароль суперпользователя elastic
