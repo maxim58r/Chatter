@@ -1,0 +1,30 @@
+service:
+  type: NodePort
+  ports:
+    http: 80
+    https: 443
+  nodePorts:
+    http: 30221
+    https: 30443
+
+ingress:
+  enabled: true
+  hostname: keycloak.chatter.com
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  extraTls:
+    - hosts:
+        - keycloak.chatter.com
+      secretName: keycloak-tls-secret
+
+extraEnvVars:
+  - name: KC_HTTPS_CERTIFICATE_FILE
+    value: /opt/keycloak/certs/tls.crt
+  - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+    value: /opt/keycloak/certs/tls.key
+  - name: KC_HTTPS_PORT
+    value: "443"
+
