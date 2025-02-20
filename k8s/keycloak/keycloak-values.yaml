@@ -20,6 +20,16 @@ ingress:
         - keycloak.chatter.com
       secretName: keycloak-tls-secret
 
+extraVolumes:
+  - name: keycloak-tls-secret
+    secret:
+      secretName: keycloak-tls-secret
+
+extraVolumeMounts:
+  - name: keycloak-tls-secret
+    mountPath: /opt/keycloak/certs
+    readOnly: true
+
 extraEnvVars:
   - name: KC_HTTPS_CERTIFICATE_FILE
     value: /opt/keycloak/certs/tls.crt
@@ -27,4 +37,3 @@ extraEnvVars:
     value: /opt/keycloak/certs/tls.key
   - name: KC_HTTPS_PORT
     value: "443"
-
