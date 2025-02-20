@@ -2,7 +2,7 @@ service:
   type: NodePort
   ports:
     http: 80
-    https: 443
+    https: 8443
   nodePorts:
     http: 30221
     https: 30443
@@ -12,13 +12,20 @@ ingress:
   hostname: keycloak.chatter.com
   tls: true
   annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
     traefik.ingress.kubernetes.io/router.tls: "true"
-  extraTls:
-    - hosts:
-        - keycloak.chatter.com
-      secretName: keycloak-tls-secret
+  rules:
+    - host: keycloak.chatter.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 80  # Ingress работает с HTTP-портом Keycloak
 
 extraVolumes:
   - name: keycloak-tls-secret
@@ -31,9 +38,19 @@ extraVolumeMounts:
     readOnly: true
 
 extraEnvVars:
-  - name: KC_HTTPS_CERTIFICATE_FILE
-    value: /opt/keycloak/certs/tls.crt
-  - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-    value: /opt/keycloak/certs/tls.key
+  - name: KC_PROXY
+    value: "edge"
+  - name: KC_HOSTNAME
+    value: "keycloak.chatter.com"
+  - name: KC_HOSTNAME_STRICT
+    value: "false"
+  - name: KC_HOSTNAME_STRICT_HTTPS
+    value: "true"
+  - name: KC_HTTP_ENABLED
+    value: "true"  # Должен быть включен для работы через Ingress
   - name: KC_HTTPS_PORT
-    value: "443"
+    value: "8443"
+  - name: KC_HTTPS_CERTIFICATE_FILE
+    value: "/opt/keycloak/certs/tls.crt"
+  - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+    value: "/opt/keycloak/certs/tls.key"
