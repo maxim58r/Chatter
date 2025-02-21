@@ -42,6 +42,8 @@ ingress:
                 port:
                   number: 80  # Используем HTTP, так как Traefik сам занимается TLS
 
+customCaExistingSecret: keycloak-secret-stores
+
 extraVolumes:
   - name: keycloak-tls-secret
     secret:
