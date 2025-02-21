@@ -48,9 +48,9 @@ extraVolumes:
   - name: keycloak-tls-secret
     secret:
       secretName: keycloak-tls-secret
-  - name: keycloak-truststore
-    secret:
-      secretName: keycloak-secret-stores
+#  - name: keycloak-truststore
+#    secret:
+#      secretName: keycloak-secret-stores
 
 extraVolumeMounts:
   - name: keycloak-tls-secret
@@ -79,8 +79,8 @@ extraEnvVars:
     value: "/opt/keycloak/certs/tls.key"
   - name: KC_HTTP_RELATIVE_PATH
     value: "/auth"
-  - name: KC_TRUSTSTORE_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: keycloak-secret-stores-passwords
-        key: KEYCLOAK_TRUSTSTORE_PASSWORD
+#  - name: KC_TRUSTSTORE_PASSWORD
+#    valueFrom:
+#      secretKeyRef:
+#        name: keycloak-secret-stores-passwords
+#        key: KEYCLOAK_TRUSTSTORE_PASSWORD
