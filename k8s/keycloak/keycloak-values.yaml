@@ -73,15 +73,17 @@ extraEnvVars:
     value: "/auth"
   - name: KC_LOG_LEVEL
     value: "DEBUG"
-  - name: KC_TRUSTSTORE_FILE
-    value: "/opt/bitnami/keycloak/certs/truststore/keycloak.truststore.jks"
+  - name: BITNAMI_DEBUG
+    value: "true"
   - name: KC_TRUSTSTORE_PASSWORD
     valueFrom:
       secretKeyRef:
         name: keycloak-secret-stores-passwords
         key: KEYCLOAK_TRUSTSTORE_PASSWORD
-  - name: KC_KEYSTORE_PASSWORD
+  - name: KEYCLOAK_HTTPS_TRUST_STORE_FILE
+    value: "/opt/bitnami/keycloak/certs/truststore/keycloak.truststore.jks"
+  - name: KEYCLOAK_HTTPS_TRUST_STORE_PASSWORD
     valueFrom:
       secretKeyRef:
         name: keycloak-secret-stores-passwords
-        key: tls-keystore-password
+        key: tls-truststore-password
