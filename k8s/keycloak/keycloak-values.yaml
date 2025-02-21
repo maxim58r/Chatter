@@ -20,7 +20,10 @@ tls:
   existingSecret: keycloak-secret-stores
   usePem: false
   truststorePassword: "maxim58r"
+  keystorePassword: "maxim58r"
   passwordsSecret: "keycloak-secret-stores-passwords"
+
+customCaExistingSecret: ""
 
 ingress:
   enabled: true
