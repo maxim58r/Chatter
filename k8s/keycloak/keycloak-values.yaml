@@ -80,3 +80,8 @@ extraEnvVars:
       secretKeyRef:
         name: keycloak-secret-stores-passwords
         key: KEYCLOAK_TRUSTSTORE_PASSWORD
+  - name: KC_KEYSTORE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-secret-stores-passwords
+        key: tls-keystore-password
