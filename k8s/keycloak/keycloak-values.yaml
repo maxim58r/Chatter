@@ -9,6 +9,7 @@ service:
 
 image:
   debug: true
+
 logging:
   output: default
   level: DEBUG
@@ -72,8 +73,15 @@ extraEnvVars:
   - name: KC_HTTPS_PORT
     value: "8443"
   - name: KC_HTTPS_CERTIFICATE_FILE
-    value: "/opt/keycloak/certs/tls.crt"
+    value: "/opt/bitnami/keycloak/certs/tls.crt"
   - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-    value: "/opt/keycloak/certs/tls.key"
+    value: "/opt/bitnami/keycloak/certs/tls.key"
   - name: KC_HTTP_RELATIVE_PATH
     value: "/auth"
+  - name: KC_TRUSTSTORE_FILE
+    value: "/opt/bitnami/keycloak/certs/truststore/keycloak.truststore.jks"
+  - name: KC_TRUSTSTORE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-secret-stores-passwords
+        key: tls-truststore-password
