@@ -79,7 +79,7 @@ extraEnvVars:
   - name: KC_HTTP_RELATIVE_PATH
     value: "/auth"
   - name: KC_TRUSTSTORE_FILE
-    value: "/opt/bitnami/keycloak/certs/truststore/keycloak.truststore.jks"
+    value: "/opt/bitnami/keycloak/certs/keycloak.truststore.jks"
   - name: KC_TRUSTSTORE_PASSWORD
     valueFrom:
       secretKeyRef:
