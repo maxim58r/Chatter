@@ -25,7 +25,12 @@ ingress:
               service:
                 name: keycloak
                 port:
-                  number: 80  # Ingress работает с HTTP-портом Keycloak
+                  number: 8443  # Теперь Ingress направляет трафик на HTTPS Keycloak
+
+tls:
+  - hosts:
+      - keycloak.chatter.com
+    secretName: keycloak-tls-secret
 
 extraVolumes:
   - name: keycloak-tls-secret
@@ -34,7 +39,7 @@ extraVolumes:
 
 extraVolumeMounts:
   - name: keycloak-tls-secret
-    mountPath: /opt/keycloak/certs
+    mountPath: /etc/x509/https
     readOnly: true
 
 extraEnvVars:
@@ -47,10 +52,10 @@ extraEnvVars:
   - name: KC_HOSTNAME_STRICT_HTTPS
     value: "true"
   - name: KC_HTTP_ENABLED
-    value: "true"  # Должен быть включен для работы через Ingress
+    value: "false"
   - name: KC_HTTPS_PORT
     value: "8443"
   - name: KC_HTTPS_CERTIFICATE_FILE
-    value: "/opt/keycloak/certs/tls.crt"
+    value: "/etc/x509/https/tls.crt"
   - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-    value: "/opt/keycloak/certs/tls.key"
+    value: "/etc/x509/https/tls.key"
