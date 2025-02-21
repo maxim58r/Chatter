@@ -46,10 +46,10 @@ extraVolumes:
 
 extraVolumeMounts:
   - name: keycloak-tls-secret
-    mountPath: /opt/keycloak/certs
+    mountPath: /opt/bitnami/keycloak/certs
     readOnly: true
   - name: keycloak-truststore
-    mountPath: /opt/keycloak/certs/truststore
+    mountPath: /opt/bitnami/keycloak/certs/truststore
     readOnly: true
 
 extraEnvVars:
@@ -74,7 +74,7 @@ extraEnvVars:
   - name: KC_LOG_LEVEL
     value: "DEBUG"
   - name: KC_TRUSTSTORE_FILE
-    value: "/opt/keycloak/certs/truststore/keycloak.truststore.jks"
+    value: "/opt/bitnami/keycloak/certs/truststore/keycloak.truststore.jks"
   - name: KC_TRUSTSTORE_PASSWORD
     valueFrom:
       secretKeyRef:
