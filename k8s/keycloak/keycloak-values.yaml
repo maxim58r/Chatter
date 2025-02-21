@@ -59,3 +59,5 @@ extraEnvVars:
     value: "/etc/x509/https/tls.crt"
   - name: KC_HTTPS_CERTIFICATE_KEY_FILE
     value: "/etc/x509/https/tls.key"
+  - name: KEYCLOAK_TLS_TRUSTSTORE
+    value: ""
