@@ -25,22 +25,13 @@ tls:
 ingress:
   enabled: true
   hostname: keycloak.chatter.com
+  path: /
+  pathType: Prefix
   tls: true
   annotations:
     kubernetes.io/ingress.class: "traefik"
     traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
     traefik.ingress.kubernetes.io/router.tls: "true"
-  rules:
-    - host: keycloak.chatter.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  number: 80  # Используем HTTP, так как Traefik сам занимается TLS
 
 extraVolumes:
   - name: keycloak-tls-secret
