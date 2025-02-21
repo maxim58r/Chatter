@@ -43,16 +43,16 @@ extraVolumeMounts:
     readOnly: true
 
 extraEnvVars:
-  - name: KUBERNETES_NAMESPACE
-    value: "keycloak"
-  - name: BITNAMI_DEBUG
-    value: "false"
-  - name: KC_BOOTSTRAP_ADMIN_PASSWORD
-    value: "admin"  # Укажи правильный пароль
-  - name: KEYCLOAK_DATABASE_PASSWORD
-    value: "your-db-password"  # Укажи правильный пароль БД
-  - name: KC_SPI_ADMIN_REALM
-    value: "keycloak"
+#  - name: KUBERNETES_NAMESPACE
+#    value: "keycloak"
+#  - name: BITNAMI_DEBUG
+#    value: "false"
+#  - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+#    value: "admin"  # Укажи правильный пароль
+#  - name: KEYCLOAK_DATABASE_PASSWORD
+#    value: "your-db-password"  # Укажи правильный пароль БД
+#  - name: KC_SPI_ADMIN_REALM
+#    value: "keycloak"
   - name: KC_PROXY
     value: "edge"
   - name: KC_HOSTNAME
