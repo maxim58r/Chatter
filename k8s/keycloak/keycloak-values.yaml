@@ -13,7 +13,7 @@ tls:
   existingSecret: keycloak-tls-secret
   usePem: false
   truststoreFilename: "keycloak.truststore.jks"
-  truststorePassword: ""
+  truststorePassword: "maxim58r"
   passwordsSecret: "keycloak-secret-stores-passwords"
 
 ingress:
