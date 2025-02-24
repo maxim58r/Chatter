@@ -23,23 +23,13 @@ tls:
   keystorePassword: "maxim58r"
   passwordsSecret: "keycloak-secret-stores-passwords"
 
-ingress:
-  enabled: true
-  hostname: keycloak.chatter.com
-  path: /
-  pathType: Prefix
-#  tls: true
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-    traefik.ingress.kubernetes.io/router.tls: "true"
-
-extraVolumes:
-  - name: certificates
-    secret:
-      defaultMode: 420
-      secretName: keycloak-secret-stores
-extraVolumeMounts:
-  - mountPath: /opt/bitnami/keycloak/certs
-    name: certificates
-    readOnly: true
+#ingress:
+#  enabled: true
+#  hostname: keycloak.chatter.com
+#  path: /
+#  pathType: Prefix
+##  tls: true
+#  annotations:
+#    kubernetes.io/ingress.class: "traefik"
+#    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+#    traefik.ingress.kubernetes.io/router.tls: "true"
