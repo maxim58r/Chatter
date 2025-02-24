@@ -23,31 +23,13 @@ tls:
   keystorePassword: "maxim58r"
   passwordsSecret: "keycloak-secret-stores-passwords"
 
-customCaExistingSecret: "keycloak-secret-stores"
-
 ingress:
   enabled: true
   hostname: keycloak.chatter.com
   path: /
   pathType: Prefix
-  tls: true
+#  tls: true
   annotations:
     kubernetes.io/ingress.class: "traefik"
     traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
     traefik.ingress.kubernetes.io/router.tls: "true"
-
-extraVolumes:
-  - name: keycloak-tls-secret
-    secret:
-      secretName: keycloak-tls-secret
-  - name: keycloak-truststore
-    secret:
-      secretName: keycloak-secret-stores
-
-extraVolumeMounts:
-  - name: keycloak-tls-secret
-    mountPath: /opt/bitnami/keycloak/certs
-    readOnly: true
-  - name: keycloak-truststore
-    mountPath: /opt/bitnami/keycloak/certs
-    readOnly: true
