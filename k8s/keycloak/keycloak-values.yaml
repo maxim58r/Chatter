@@ -23,7 +23,7 @@ tls:
   keystorePassword: "maxim58r"
   passwordsSecret: "keycloak-secret-stores-passwords"
 
-customCaExistingSecret: ""
+customCaExistingSecret: "keycloak-tls-secret"
 
 ingress:
   enabled: true
