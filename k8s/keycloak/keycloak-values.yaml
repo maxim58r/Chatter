@@ -39,7 +39,7 @@ extraVolumes:
     secret:
       defaultMode: 420
       secretName: keycloak-secret-stores
-initContainers:
+extraVolumeMounts:
   - mountPath: /opt/bitnami/keycloak/certs
     name: certificates
     readOnly: true
