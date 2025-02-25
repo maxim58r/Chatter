@@ -24,7 +24,7 @@ spec:
               service:
                 name: cm-acme-http-solver-96wsm  # Подставь правильное имя сервиса
                 port:
-                  number: 80
+                  number: 8080
   tls:
     - hosts:
         - msv-tech.ru
