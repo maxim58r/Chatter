@@ -51,6 +51,22 @@ kubectl delete services -l app=keycloak -n $NAMESPACE --ignore-not-found=true
 echo "Проверяем оставшиеся ресурсы keycloak..."
 kubectl get all -n $NAMESPACE | grep keycloak
 
+echo "Получение списка PVC в namespace $NAMESPACE..."
+PVC_LIST=$(kubectl get pvc -n $NAMESPACE --no-headers -o custom-columns=":metadata.name")
+
+if [ -z "$PVC_LIST" ]; then
+  echo "Нет PVC для удаления в namespace $NAMESPACE."
+  exit 0
+fi
+
+echo "Удаление PVC в namespace $NAMESPACE..."
+for PVC in $PVC_LIST; do
+  echo "Удаляем PVC: $PVC"
+  kubectl delete pvc $PVC -n $NAMESPACE
+done
+
+echo "Все PVC удалены."
+
 echo "Очистка keycloak завершена."
 # chmod +x cleanup-keycloak.sh
 # ./cleanup-keycloak.sh
