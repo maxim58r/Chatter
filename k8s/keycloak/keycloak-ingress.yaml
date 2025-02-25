@@ -4,18 +4,25 @@ metadata:
   name: keycloak
   namespace: keycloak
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt  # Используем Let's Encrypt
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
 spec:
-  ingressClassName: nginx
   rules:
     - host: msv-tech.ru
       http:
         paths:
-          - path: /
+          - path: "/"
             pathType: Prefix
             backend:
               service:
                 name: keycloak
+                port:
+                  number: 80
+          - path: "/.well-known/acme-challenge/"
+            pathType: Prefix
+            backend:
+              service:
+                name: cm-acme-http-solver-pfcs6  # Подставь правильное имя challenge-сервиса
                 port:
                   number: 80
   tls:
