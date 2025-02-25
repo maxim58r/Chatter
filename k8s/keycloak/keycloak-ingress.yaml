@@ -19,10 +19,10 @@ spec:
                 port:
                   number: 80
           - path: "/.well-known/acme-challenge/"
-            pathType: Prefix
+            pathType: Exact
             backend:
               service:
-                name: cm-acme-http-solver-mh98l  # Подставь правильное имя challenge-сервиса
+                name: cm-acme-http-solver-96wsm  # Подставь правильное имя сервиса
                 port:
                   number: 80
   tls:
