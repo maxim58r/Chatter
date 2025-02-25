@@ -4,8 +4,6 @@ replicaCount: 1
 leaderElection:
   namespace: kube-system
 
-clusterResourceNamespace: ""
-
 controller:
   image:
     registry: docker.io
@@ -13,9 +11,6 @@ controller:
     tag: 1.17.1-debian-12-r2
     pullPolicy: IfNotPresent
   resourcesPreset: "nano"
-  nodeSelector: {}
-  affinity: {}
-  tolerations: []
   podSecurityContext:
     enabled: true
     fsGroup: 1001
@@ -26,8 +21,6 @@ controller:
     runAsNonRoot: true
   serviceAccount:
     create: true
-    name: ""
-    annotations: {}
 
 webhook:
   enabled: true
