@@ -22,7 +22,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: cm-acme-http-solver-pfcs6  # Подставь правильное имя challenge-сервиса
+                name: cm-acme-http-solver-mh98l  # Подставь правильное имя challenge-сервиса
                 port:
                   number: 80
   tls:
