@@ -40,8 +40,8 @@ kubectl delete serviceaccount pre-install-keycloak-keycloak -n $NAMESPACE --igno
 kubectl delete serviceaccount post-delete-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
 
 # 8. Удаление секретов keycloak
-echo "Удаляем секреты keycloak..."
-kubectl delete secrets -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+#echo "Удаляем секреты keycloak..."
+#kubectl delete secrets -l app=keycloak -n $NAMESPACE --ignore-not-found=true
 
 # 9. Удаление служебных сервисов keycloak
 echo "Удаляем службы keycloak..."
@@ -52,3 +52,5 @@ echo "Проверяем оставшиеся ресурсы keycloak..."
 kubectl get all -n $NAMESPACE | grep keycloak
 
 echo "Очистка keycloak завершена."
+# chmod +x cleanup-keycloak.sh
+# ./cleanup-keycloak.sh
