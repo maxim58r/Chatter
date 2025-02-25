@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Установка пространства имен
+NAMESPACE="keycloak"
+
+# 1. Удаление Helm релиза keycloak
+echo "Удаляем Helm релиз keycloak..."
+helm uninstall keycloak -n $NAMESPACE --no-hooks
+
+# 2. Удаление подов keycloak
+echo "Удаляем поды keycloak..."
+kubectl delete pods -l app=keycloak -n $NAMESPACE --ignore-not-found=true --force --grace-period=0
+
+# 3. Удаление джобов keycloak
+echo "Удаляем джобы keycloak..."
+kubectl delete jobs -l app=keycloak -n $NAMESPACE --ignore-not-found=true --force --grace-period=0
+kubectl delete job pre-install-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true --force --grace-period=0
+
+# 4. Удаление конфигмэпов keycloak
+echo "Удаляем конфигмэпы keycloak..."
+kubectl delete configmaps -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 5. Удаление PersistentVolumeClaims (PVC) keycloak
+echo "Удаляем PVC keycloak..."
+kubectl delete pvc -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 6. Удаление ролей и rolebindings keycloak
+echo "Удаляем роли и rolebindings keycloak..."
+kubectl delete roles -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete rolebindings -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete role pre-install-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete role post-delete-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete rolebinding pre-install-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete rolebinding post-delete-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 7. Удаление сервисных аккаунтов keycloak
+echo "Удаляем сервисные аккаунты keycloak..."
+kubectl delete serviceaccounts -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete serviceaccount pre-install-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete serviceaccount post-delete-keycloak-keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 8. Удаление секретов keycloak
+echo "Удаляем секреты keycloak..."
+kubectl delete secrets -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 9. Удаление служебных сервисов keycloak
+echo "Удаляем службы keycloak..."
+kubectl delete services -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+
+# 10. Финальная проверка оставшихся ресурсов
+echo "Проверяем оставшиеся ресурсы keycloak..."
+kubectl get all -n $NAMESPACE | grep keycloak
+
+echo "Очистка keycloak завершена."
