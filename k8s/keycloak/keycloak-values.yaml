@@ -18,6 +18,17 @@ ingress:
     - hosts:
         - msv-tech.ru
       secretName: keycloak-tls  # Имя секрета для сертификата
+  extraRules:
+    - host: msv-tech.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: https
+                port:
+                  number: 8443
 
 service:
   type: ClusterIP
