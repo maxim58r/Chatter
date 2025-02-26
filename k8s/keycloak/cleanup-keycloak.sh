@@ -46,6 +46,7 @@ kubectl delete serviceaccount post-delete-keycloak-keycloak -n $NAMESPACE --igno
 # 9. Удаление служебных сервисов keycloak
 echo "Удаляем службы keycloak..."
 kubectl delete services -l app=keycloak -n $NAMESPACE --ignore-not-found=true
+kubectl delete ingress -l app=keycloak -n $NAMESPACE --ignore-not-found=true
 
 # 10. Финальная проверка оставшихся ресурсов
 echo "Проверяем оставшиеся ресурсы keycloak..."
