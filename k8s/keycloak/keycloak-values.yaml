@@ -19,6 +19,17 @@ ingress:
         - msv-tech.ru
       secretName: keycloak-tls  # Имя секрета для сертификата
 
+service:
+  type: ClusterIP
+  http:
+    enabled: true
+  ports:
+    http: 80
+    https: 443
+  nodePorts:
+    http: "8080"
+    https: "8443"
+
 image:
   debug: true
 
