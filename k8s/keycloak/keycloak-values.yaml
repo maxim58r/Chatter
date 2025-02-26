@@ -17,3 +17,19 @@ ingress:
     - hosts:
         - msv-tech.ru
       secretName: keycloak-tls  # Имя секрета для сертификата
+
+service:
+  type: NodePort
+  ports:
+    http: 80
+    https: 8443
+  nodePorts:
+    http: 30221
+    https: 30443
+
+image:
+  debug: true
+
+logging:
+  output: default
+  level: DEBUG
