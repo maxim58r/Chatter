@@ -6,7 +6,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   ingressClassName: nginx
   rules:
@@ -19,10 +19,10 @@ spec:
               service:
                 name: keycloak
                 port:
-                  number: 8080
+                  number: 8443
   tls:
     - hosts:
         - msv-tech.ru
-      secretName: keycloak-tls
+      secretName: msv-tech.ru-tls
 
 # kubectl apply -f keycloak-ingress.yaml -n keycloak
