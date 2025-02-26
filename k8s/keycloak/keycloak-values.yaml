@@ -37,9 +37,6 @@ service:
   ports:
     http: 80
     https: 443
-  nodePorts:
-    http: "8080"
-    https: "8443"
 
 image:
   debug: true
