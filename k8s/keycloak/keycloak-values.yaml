@@ -33,3 +33,7 @@ image:
 logging:
   output: default
   level: DEBUG
+
+auth:
+  adminUser: "admin"
+  adminPassword: "admin123"
