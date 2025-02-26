@@ -3,6 +3,4 @@ logging:
   level: DEBUG
 
 existingSecret: keycloak-secret
-
-tls:
-  enabled: true
+proxy: "edge"
