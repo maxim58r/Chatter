@@ -11,9 +11,6 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt  # Настраиваем Let's Encrypt для автоматического получения сертификатов
-    kubernetes.io/managed-by: Helm
-    meta.helm.sh/release-name: keycloak
-    meta.helm.sh/release-namespace: keycloak
   tls: true  # Включаем TLS для HTTPS
   selfSigned: false
   extraTls:
@@ -22,7 +19,7 @@ ingress:
       secretName: keycloak-tls  # Имя секрета для сертификата
 
 service:
-  type: NodePort
+  type: ClusterIP
   ports:
     http: 80
     https: 8443
@@ -37,6 +34,4 @@ logging:
   output: default
   level: DEBUG
 
-auth:
-  adminUser: "admin"
-  adminPassword: "admin123"
+existingSecret: keycloak-secret
