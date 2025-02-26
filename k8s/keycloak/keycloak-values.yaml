@@ -3,5 +3,6 @@ logging:
   level: DEBUG
 
 existingSecret: keycloak-secret
+
 tls:
-  enabled: false
+  enabled: true
