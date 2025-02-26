@@ -18,16 +18,6 @@ ingress:
     - hosts:
         - msv-tech.ru
       secretName: keycloak-tls  # Имя секрета для сертификата
-  extraRules:
-    - host: msv-tech.ru
-      http:
-       path: /
-       pathType: Prefix
-       backend:
-         service:
-           name: keycloak
-           port:
-             number: 8080
 
 image:
   debug: true
