@@ -11,6 +11,9 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt  # Настраиваем Let's Encrypt для автоматического получения сертификатов
+    kubernetes.io/managed-by: Helm
+    meta.helm.sh/release-name: keycloak
+    meta.helm.sh/release-namespace: keycloak
   tls: true  # Включаем TLS для HTTPS
   selfSigned: false
   extraTls:
