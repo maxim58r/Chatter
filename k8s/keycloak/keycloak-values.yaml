@@ -11,21 +11,23 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt  # Настраиваем Let's Encrypt для автоматического получения сертификатов
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
   tls: true  # Включаем TLS для HTTPS
   selfSigned: false
   extraTls:
     - hosts:
         - msv-tech.ru
       secretName: keycloak-tls  # Имя секрета для сертификата
-
-service:
-  type: ClusterIP
-  ports:
-    http: 80
-    https: 8443
-  nodePorts:
-    http: 30221
-    https: 30443
+  extraRules:
+    - host: msv-tech.ru
+      http:
+       path: /
+       pathType: Prefix
+       backend:
+         service:
+           name: keycloak
+           port:
+             number: 8080
 
 image:
   debug: true
