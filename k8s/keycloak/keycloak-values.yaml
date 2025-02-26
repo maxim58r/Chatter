@@ -26,9 +26,9 @@ ingress:
             pathType: Prefix
             backend:
               service:
-                name: https
+                name: keycloak
                 port:
-                  number: 8443
+                  number: 8080
 
 service:
   type: ClusterIP
