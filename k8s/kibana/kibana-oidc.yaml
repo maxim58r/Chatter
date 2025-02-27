@@ -20,7 +20,7 @@ service:
 ##########################################################
 kibanaConfig:
   kibana.yml: |
-    server.publicBaseUrl: "http://192.168.1.35:30081"
+    server.publicBaseUrl: "https://msv-tech.ru"
     elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt
     elasticsearch.ssl.verificationMode: full
 

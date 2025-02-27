@@ -6,7 +6,6 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt
-#    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
@@ -14,6 +13,15 @@ spec:
     - host: msv-tech.ru
       http:
         paths:
+          # Разрешаем доступ к .well-known без перенаправления
+          - path: /.well-known/acme-challenge
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+          # Все остальные запросы перенаправляем на HTTPS
           - path: /
             pathType: Prefix
             backend:
