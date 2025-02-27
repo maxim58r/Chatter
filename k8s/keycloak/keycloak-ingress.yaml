@@ -13,15 +13,6 @@ spec:
     - host: msv-tech.ru
       http:
         paths:
-          # Разрешаем доступ к .well-known без перенаправления
-          - path: /.well-known/acme-challenge
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  number: 8080
-          # Все остальные запросы перенаправляем на HTTPS
           - path: /
             pathType: Prefix
             backend:
