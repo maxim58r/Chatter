@@ -4,3 +4,8 @@ logging:
 
 existingSecret: keycloak-secret
 proxy: "edge"
+
+auth:
+  adminUser: admin
+  existingSecret: keycloak-secret
+  passwordSecretKey: admin-password
