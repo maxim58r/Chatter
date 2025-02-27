@@ -9,6 +9,7 @@ elasticsearch:
   port: 9200
   security:
     auth:
+      enabled: true
       existingSecret: "kibana-token-secret"
       passwordSecretKey: password
 
