@@ -12,7 +12,8 @@ elasticsearch:
       enabled: true
       existingSecret: "kibana-token-secret"
       passwordSecretKey: password
-
+      createSystemUser: true
+      elasticsearchPasswordSecret: "elasticsearch-password"
 logging.verbose: true
 
 service:
