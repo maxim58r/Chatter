@@ -3,8 +3,9 @@ replicaCount: 1
 ##########################################################
 # Подключаемся к ES по HTTPS
 ##########################################################
-elasticsearchHosts: "https://elasticsearch-master:9200"
 elasticsearch:
+  hosts:
+    - "https://elasticsearch-master:9200"
   security:
     auth:
       existingSecret: "kibana-token-secret"
