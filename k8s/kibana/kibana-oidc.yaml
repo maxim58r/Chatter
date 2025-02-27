@@ -5,8 +5,10 @@ replicaCount: 1
 ##########################################################
 elasticsearchHosts: "https://elasticsearch-master:9200"
 elasticsearch:
-  username: "kibana_system"
-  password: "HJpZsxOvmLIZm6ih+V-m"
+  security:
+    auth:
+      existingSecret: "kibana-token-secret"
+      passwordSecretKey: password
 
 logging.verbose: true
 
@@ -36,17 +38,3 @@ resources:
   limits:
     cpu: "1"
     memory: "1Gi"
-
-########################################################################
-# Включаем pre-install Token Creation (по умолчанию включён),
-# и разрешаем чарту сам монтировать CA (или сделаем вручную).
-########################################################################
-preInstallTokenCreation:
-  enabled: false
-  automountElasticsearchCerts: false
-
-########################################################################
-# Настройка аутентификации через существующий секрет
-########################################################################
-auth:
-  existingSecret: "kibana-token-secret"
