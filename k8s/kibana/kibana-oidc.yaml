@@ -17,8 +17,10 @@ logging.verbose: true
 
 service:
   type: NodePort
-  port: 5601
-  nodePort: 30081  # наружный порт, если нужно внешнее подключение
+  ports:
+    http: 5601
+  nodePorts:
+    http: 30081
 
 ##########################################################
 # Конфигурация kibana.yml
