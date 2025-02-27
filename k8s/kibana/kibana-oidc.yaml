@@ -5,7 +5,8 @@ replicaCount: 1
 ##########################################################
 elasticsearch:
   hosts:
-    - "https://elasticsearch-master:9200"
+    - "https://elasticsearch-master"
+  port: 9200
   security:
     auth:
       existingSecret: "kibana-token-secret"
