@@ -56,9 +56,9 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
     
-    xpack.security.authc.realms.oidc.oidc1.rp.client_id: "elasticsearch-client"
+    xpack.security.authc.realms.oidc.oidc1.rp.client_id: "kibana"
     xpack.security.authc.realms.oidc.oidc1.rp.response_type: "code"
-    xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "https://msv-tech.ru/api/security/oidc/callback"
+    xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "https://kibana.msv-tech.ru/oauth2/callback"
     xpack.security.authc.realms.oidc.oidc1.rp.post_logout_redirect_uri: "https://msv-tech.ru/"
     xpack.security.authc.realms.oidc.oidc1.rp.requested_scopes: ["openid", "profile", "email"]
     

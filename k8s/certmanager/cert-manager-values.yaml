@@ -7,8 +7,11 @@ spec:
     email: "maxim558r@gmail.com"  # Укажи свою почту для уведомлений
     server: "https://acme-v02.api.letsencrypt.org/directory"
     privateKeySecretRef:
-      name: letsencrypt-account-key
+      name: letsencrypt-prod
     solvers:
       - http01:
           ingress:
             class: nginx
+
+#helm repo add jetstack https://charts.jetstack.io
+#helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
