@@ -10,10 +10,8 @@ elasticsearch:
   security:
     auth:
       enabled: true
-      existingSecret: "kibana-token-secret"
-      passwordSecretKey: password
-      createSystemUser: true
-      elasticsearchPasswordSecret: "elasticsearch-password"
+      existingSecret: "elasticsearch-master-credentials"
+      elasticsearchPasswordSecret: "elasticsearch-master-credentials"
 logging.verbose: true
 
 service:
