@@ -70,11 +70,6 @@ esConfig:
 
     xpack.security.authc.realms.oidc.oidc1.claims.principal: "sub"
 
-# Пароль суперпользователя elastic
-#extraEnvs:
-#  - name: ELASTIC_PASSWORD
-#    value: "HJpZsxOvmLIZm6ih+V-m"
-
 # PVC для данных
 volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]

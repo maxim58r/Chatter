@@ -15,3 +15,5 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
+
+# kubectl apply -f network-policy.yaml
