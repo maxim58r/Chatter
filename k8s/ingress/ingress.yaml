@@ -13,7 +13,7 @@ spec:
         - msv-tech.ru
         - keycloak.msv-tech.ru
         - kibana.msv-tech.ru
-      secretName: msv-tech.ru-tls
+      secretName: msv-tech-tls
   rules:
     - host: msv-tech.ru
       http:

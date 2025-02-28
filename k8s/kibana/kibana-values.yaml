@@ -1,0 +1,41 @@
+replicaCount: 1
+
+# Подключаемся к ES по HTTP
+elasticsearch:
+  hosts:
+    - "http://elasticsearch-master.logging.svc.cluster.local"
+  port: 9200
+  security:
+    auth:
+      enabled: false # Отключаем аутентификацию, если security в ES выключена
+logging.verbose: true
+
+service:
+  type: ClusterIP # Используем ClusterIP для внутреннего доступа через Ingress
+  ports:
+    http: 5601
+
+# Конфигурация kibana.yml
+kibanaConfig:
+  kibana.yml: |
+    server.publicBaseUrl: "https://kibana.msv-tech.ru" # Внешний URL через Ingress
+    # Убираем SSL, так как внутри HTTP
+    elasticsearch.ssl.verificationMode: none
+
+    # Если OIDC нужен для внешнего доступа через Kibana, оставляем
+    xpack.security.authc.providers:
+      oidc.oidc1:
+        order: 0
+        realm: "oidc1"
+        client_id: "kibana"
+        client_secret: kibana-oidc-secret
+        redirect_uri: "https://kibana.msv-tech.ru/oauth2/callback"
+        base_uri: "https://msv-tech.ru/realms/Chatter"
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"

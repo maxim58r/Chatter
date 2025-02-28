@@ -4,7 +4,7 @@ metadata:
   name: letsencrypt
 spec:
   acme:
-    email: "maxim558r@gmail.com"  # Укажи свою почту для уведомлений
+    email: "maxim558r@gmail.com"
     server: "https://acme-v02.api.letsencrypt.org/directory"
     privateKeySecretRef:
       name: letsencrypt-prod

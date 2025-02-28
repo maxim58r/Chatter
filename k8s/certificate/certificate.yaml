@@ -7,7 +7,11 @@ spec:
   secretName: msv-tech-tls
   dnsNames:
     - msv-tech.ru
-    - "*.msv-tech.ru"
+    - keycloak.msv-tech.ru
+    - kibana.msv-tech.ru
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
+
+# kubectl apply -f certificate.yaml
+# kubectl get certificate -n keycloak

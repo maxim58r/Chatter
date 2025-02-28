@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-kibana
+  namespace: logging
+spec:
+  ports:
+    - port: 5601
+      targetPort: 5601
+      protocol: TCP
+  selector:
+    app: kibana # Замените на реальные метки вашего Kibana-пода
