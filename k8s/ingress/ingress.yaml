@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: msv-tech-ingress
-  namespace: keycloak # или другой namespace, если нужно
+  namespace: keycloak
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
@@ -22,9 +22,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: keycloak-service # замените на имя сервиса Keycloak
+                name: keycloak
                 port:
-                  number: 8080
+                  number: 80
     - host: keycloak.msv-tech.ru
       http:
         paths:
@@ -32,9 +32,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: keycloak-service
+                name: keycloak
                 port:
-                  number: 8080
+                  number: 80
     - host: kibana.msv-tech.ru
       http:
         paths:
@@ -42,8 +42,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: kibana-kibana # замените на имя сервиса Kibana
+                name: kibana
                 port:
                   number: 5601
-
-# kubectl apply -f ingress.yaml
