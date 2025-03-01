@@ -5,7 +5,7 @@ metadata:
   namespace: keycloak
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
   tls:
@@ -15,16 +15,6 @@ spec:
         - kibana.msv-tech.ru
       secretName: msv-tech-tls
   rules:
-    - host: msv-tech.ru
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  number: 80
     - host: keycloak.msv-tech.ru
       http:
         paths:
