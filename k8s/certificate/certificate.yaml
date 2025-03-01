@@ -6,7 +6,7 @@ metadata:
 spec:
   secretName: msv-tech-tls
   issuerRef:
-    name: letsencrypt
+    name: letsencrypt-prod
     kind: ClusterIssuer
     group: cert-manager.io
   dnsNames:
