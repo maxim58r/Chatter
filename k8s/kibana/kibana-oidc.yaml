@@ -11,7 +11,7 @@ elasticsearch:
     auth:
       enabled: true
       existingSecret: "elasticsearch-master-credentials"
-      elasticsearchPasswordSecret: "elasticsearch-master-credentials"
+
 logging.verbose: true
 
 service:

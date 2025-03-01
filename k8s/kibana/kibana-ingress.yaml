@@ -5,13 +5,13 @@ metadata:
   namespace: logging
 spec:
   rules:
-    - host: kibana.chatter.com
+    - host: kibana.msv-tech.ru
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: kibana-kibana
+                name: kibana
                 port:
                   number: 5601
