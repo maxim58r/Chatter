@@ -1,32 +1,31 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: msv-tech-ingress
+  name: combined-ingress
   namespace: keycloak
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false" # Отключаем перенаправление на HTTPS для ACME challenge
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - msv-tech.ru
         - keycloak.msv-tech.ru
-        - kibana.msv-tech.ru
       secretName: msv-tech-tls
   rules:
     - host: msv-tech.ru
       http:
         paths:
-          - path: /.well-known/acme-challenge
-            pathType: ImplementationSpecific
+          - path: /
+            pathType: Prefix
             backend:
               service:
-                name: nginx
+                name: keycloak
                 port:
-                  number: 80
+                  number: 8080
     - host: keycloak.msv-tech.ru
       http:
         paths:
@@ -37,13 +36,5 @@ spec:
                 name: keycloak
                 port:
                   number: 80
-    - host: kibana.msv-tech.ru
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: kibana
-                port:
-                  number: 5601
+
+# kubectl apply -f keycloak-msv-tech-ingress.yaml -n keycloak
