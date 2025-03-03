@@ -18,6 +18,8 @@ kubectl delete pods -l app=elasticsearch -n $NAMESPACE --ignore-not-found=true -
 # 4. Удаление PersistentVolumeClaims (PVC) Elasticsearch
 echo "Удаляем PVC Elasticsearch..."
 kubectl delete pvc -l app=elasticsearch -n $NAMESPACE --ignore-not-found=true
+kubectl delete pvc elasticsearch-master-elasticsearch-master-0 -n $NAMESPACE
+kubectl delete pvc elasticsearch-master-elasticsearch-master-1 -n $NAMESPACE
 
 # 5. Удаление конфигмэпов Elasticsearch
 echo "Удаляем конфигмэпы Elasticsearch..."
