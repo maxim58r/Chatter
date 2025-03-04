@@ -108,11 +108,12 @@ extraInitContainers:
       - -c
       - |
         set -euo pipefail
-        elasticsearch-keystore create -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
-        elasticsearch-keystore add-file xpack.security.authc.realms.oidc.oidc1.rp.client_secret /usr/share/elasticsearch/config/keystore-secrets/client-secret -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+        mkdir -p /usr/share/elasticsearch/config/keystore
+        echo "" | elasticsearch-keystore create
+        elasticsearch-keystore add-file xpack.security.authc.realms.oidc.oidc1.rp.client_secret /usr/share/elasticsearch/config/keystore-secrets/client-secret
         if [ ! -z "${ELASTIC_PASSWORD+x}" ]; then
           echo "Adding ELASTIC_PASSWORD to keystore as bootstrap.password"
-          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password
         fi
     volumeMounts:
       - name: keystore
