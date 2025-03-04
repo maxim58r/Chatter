@@ -13,13 +13,7 @@ security:
   tls:
     enabled: true
 
-# Убираем keystore из values, так как он будет монтироваться через Secret
-# keystore:
-#   - secretName: oidc-client-secret
-#     items:
-#       - key: client-secret
-#         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
-
+# Переменные окружения
 env:
   - name: CLIENT_SECRET
     valueFrom:
@@ -29,8 +23,10 @@ env:
   - name: ELASTIC_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: elasticsearch-master-credentials # Убедитесь, что этот секрет существует
+        name: elasticsearch-master-credentials
         key: password
+  - name: ELASTIC_KEYSTORE_PATH
+    value: /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
 
 # Основная конфигурация Elasticsearch
 esConfig:
@@ -92,15 +88,42 @@ resources:
     cpu: "500m"
     memory: "1Gi"
 
-# Добавляем монтирование elasticsearch.keystore из Secret
+# Добавляем том для keystore
 extraVolumes:
-  - name: elasticsearch-keystore
+  - name: keystore
+    emptyDir: {}
+  - name: keystore-oidc-client-secret
     secret:
-      secretName: elasticsearch-keystore
-extraVolumeMounts:
-  - name: elasticsearch-keystore
-    mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
-    subPath: elasticsearch.keystore
+      secretName: oidc-client-secret
+      items:
+        - key: client-secret
+          path: client-secret
 
-# Убираем initContainer для keystore
-extraInitContainers: []
+# Добавляем initContainer для создания keystore
+extraInitContainers:
+  - name: keystore
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+    command:
+      - bash
+      - -c
+      - |
+        set -euo pipefail
+        elasticsearch-keystore create -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+        elasticsearch-keystore add-file xpack.security.authc.realms.oidc.oidc1.rp.client_secret /usr/share/elasticsearch/config/keystore-secrets/client-secret -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+        if [ ! -z "${ELASTIC_PASSWORD+x}" ]; then
+          echo "Adding ELASTIC_PASSWORD to keystore as bootstrap.password"
+          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+        fi
+    volumeMounts:
+      - name: keystore
+        mountPath: /usr/share/elasticsearch/config/keystore
+      - name: keystore-oidc-client-secret
+        mountPath: /usr/share/elasticsearch/config/keystore-secrets
+    securityContext:
+      runAsUser: 1000
+      runAsNonRoot: true
+
+# Монтируем keystore в основной контейнер
+extraVolumeMounts:
+  - name: keystore
+    mountPath: /usr/share/elasticsearch/config/keystore
