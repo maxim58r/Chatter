@@ -13,12 +13,24 @@ security:
   tls:
     enabled: true
 
-# Keystore для OIDC (пример)
-keystore:
-  - secretName: oidc-client-secret
-    items:
-      - key: client-secret
-        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+# Убираем keystore из values, так как он будет монтироваться через Secret
+# keystore:
+#   - secretName: oidc-client-secret
+#     items:
+#       - key: client-secret
+#         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+
+env:
+  - name: CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: oidc-client-secret
+        key: client-secret
+  - name: ELASTIC_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-master-credentials # Убедитесь, что этот секрет существует
+        key: password
 
 # Основная конфигурация Elasticsearch
 esConfig:
@@ -27,32 +39,26 @@ esConfig:
     node.name: ${HOSTNAME}
     node.roles: ["master", "data", "ingest"]
     
-    discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
+    discovery.seed_hosts: ["elasticsearch-master-0.elasticsearch-master-headless", "elasticsearch-master-1.elasticsearch-master-headless"]
     cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
 
     xpack.security.enabled: true
 
-    ####################################################
     # TRANSPORT SSL (порт 9300)
-    ####################################################
     xpack.security.transport.ssl.enabled: true
     xpack.security.transport.ssl.verification_mode: certificate
     xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/tls.key
     xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/tls.crt
     xpack.security.transport.ssl.certificate_authorities: [ "/usr/share/elasticsearch/config/certs/ca.crt" ]
 
-    ####################################################
     # HTTP SSL (порт 9200) HTTPS
-    ####################################################
     xpack.security.http.ssl.enabled: true
     xpack.security.http.ssl.verification_mode: certificate
     xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/tls.key
     xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certs/tls.crt
     xpack.security.http.ssl.certificate_authorities: [ "/usr/share/elasticsearch/config/certs/ca.crt" ]
 
-    ####################################################
     # OIDC
-    ####################################################
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
     
@@ -85,3 +91,16 @@ resources:
   limits:
     cpu: "500m"
     memory: "1Gi"
+
+# Добавляем монтирование elasticsearch.keystore из Secret
+extraVolumes:
+  - name: elasticsearch-keystore
+    secret:
+      secretName: elasticsearch-keystore
+extraVolumeMounts:
+  - name: elasticsearch-keystore
+    mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
+    subPath: elasticsearch.keystore
+
+# Убираем initContainer для keystore
+extraInitContainers: []
