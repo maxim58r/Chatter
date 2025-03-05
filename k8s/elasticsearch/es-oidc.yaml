@@ -11,12 +11,12 @@ security:
   tls:
     enabled: true
 
-# Keystore для OIDC (пример)
-#keystore:
-#  - secretName: oidc-client-secret
-#    items:
-#      - key: client-secret
-#        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+keystore:
+  - secretName: oidc-client-secret
+    items:
+      - key: client-secret
+        path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
+
 
 
 esConfig:
@@ -43,7 +43,6 @@ esConfig:
     
     xpack.security.authc.realms.oidc.oidc1.enabled: true
     xpack.security.authc.realms.oidc.oidc1.order: 10
-    
     xpack.security.authc.realms.oidc.oidc1.rp.client_id: "kibana"
     xpack.security.authc.realms.oidc.oidc1.rp.response_type: "code"
     xpack.security.authc.realms.oidc.oidc1.rp.redirect_uri: "https://kibana.msv-tech.ru/oauth2/callback"
