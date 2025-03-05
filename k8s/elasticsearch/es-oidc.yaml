@@ -35,7 +35,7 @@ esConfig:
     node.name: ${HOSTNAME}
     node.roles: ["master", "data", "ingest"]
     
-    discovery.seed_hosts: ["elasticsearch-master-0.elasticsearch-master-headless", "elasticsearch-master-1.elasticsearch-master-headless"]
+    discovery.seed_hosts: ["elasticsearch-master-0.elasticsearch-master-headless.logging.svc.cluster.local", "elasticsearch-master-1.elasticsearch-master-headless.logging.svc.cluster.local"]
     cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
 
     xpack.security.enabled: true
@@ -69,7 +69,6 @@ esConfig:
     xpack.security.authc.realms.oidc.oidc1.op.jwkset_path: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/certs"
     xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/token"
     xpack.security.authc.realms.oidc.oidc1.op.userinfo_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
-
     xpack.security.authc.realms.oidc.oidc1.claims.principal: "sub"
 
 # PVC для данных
@@ -88,7 +87,7 @@ resources:
     cpu: "500m"
     memory: "1Gi"
 
-# Добавляем том для keystore
+# Добавляем тома
 extraVolumes:
   - name: keystore
     emptyDir: {}
@@ -98,8 +97,11 @@ extraVolumes:
       items:
         - key: client-secret
           path: client-secret
+  - name: elasticsearch-certs
+    secret:
+      secretName: elasticsearch-master-certs
 
-# Добавляем initContainer для создания keystore
+# Обновленный initContainer
 extraInitContainers:
   - name: keystore
     image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
@@ -109,12 +111,14 @@ extraInitContainers:
       - |
         set -euo pipefail
         mkdir -p /usr/share/elasticsearch/config/keystore
-        echo "" | elasticsearch-keystore create
-        elasticsearch-keystore add-file xpack.security.authc.realms.oidc.oidc1.rp.client_secret /usr/share/elasticsearch/config/keystore-secrets/client-secret
+        echo "" | elasticsearch-keystore create -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
+        elasticsearch-keystore add-file xpack.security.authc.realms.oidc.oidc1.rp.client_secret /usr/share/elasticsearch/config/keystore-secrets/client-secret -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
         if [ ! -z "${ELASTIC_PASSWORD+x}" ]; then
           echo "Adding ELASTIC_PASSWORD to keystore as bootstrap.password"
-          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password
+          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
         fi
+        # Для отладки: вывести содержимое keystore
+        elasticsearch-keystore list -p /usr/share/elasticsearch/config/keystore/elasticsearch.keystore
     volumeMounts:
       - name: keystore
         mountPath: /usr/share/elasticsearch/config/keystore
@@ -124,7 +128,9 @@ extraInitContainers:
       runAsUser: 1000
       runAsNonRoot: true
 
-# Монтируем keystore в основной контейнер
+# Монтируем keystore и сертификаты в основной контейнер
 extraVolumeMounts:
   - name: keystore
     mountPath: /usr/share/elasticsearch/config/keystore
+  - name: elasticsearch-certs
+    mountPath: /usr/share/elasticsearch/config/certs
