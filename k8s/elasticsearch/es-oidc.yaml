@@ -97,9 +97,9 @@ extraVolumes:
       items:
         - key: client-secret
           path: client-secret
-  - name: elasticsearch-certs
-    secret:
-      secretName: elasticsearch-master-certs
+#  - name: elasticsearch-certs
+#    secret:
+#      secretName: elasticsearch-master-certs
 
 # Обновленный initContainer
 extraInitContainers:
