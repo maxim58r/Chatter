@@ -77,11 +77,6 @@ resources:
     cpu: "500m"
     memory: "1Gi"
 
-secretMounts:
-  - name: elasticsearch-certs
-    secretName: elasticsearch-master-certs
-    path: /usr/share/elasticsearch/config/certs
-
 extraVolumes:
   - name: keystore
     emptyDir: {}
