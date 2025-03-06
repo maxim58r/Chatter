@@ -17,6 +17,34 @@ keystore:
       - key: client-secret
         path: xpack.security.authc.realms.oidc.oidc1.rp.client_secret
 
+initContainers:
+  - name: keystore
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+    command:
+      - bash
+      - '-c'
+      - >
+        set -euo pipefail
+
+        if [ ! -f "/usr/share/elasticsearch/config/elasticsearch.keystore" ]; then
+          elasticsearch-keystore create
+        fi
+
+        for i in /tmp/keystoreSecrets/*/*; do
+          key=$(basename $i)
+          echo "Adding file $i to keystore key $key"
+          elasticsearch-keystore add-file "$key" "$i"
+        done
+
+        if [ ! -z ${ELASTIC_PASSWORD+x} ]; then
+          echo 'Adding env $ELASTIC_PASSWORD to keystore as key bootstrap.password'
+          echo "$ELASTIC_PASSWORD" | elasticsearch-keystore add -x bootstrap.password
+        fi
+
+        cp -a /usr/share/elasticsearch/config/elasticsearch.keystore /tmp/keystore/
+    volumeMounts:
+      - name: keystore
+        mountPath: /usr/share/elasticsearch/config
 
 
 esConfig:
