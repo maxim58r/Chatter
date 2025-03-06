@@ -6,8 +6,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    # Авто-редирект с HTTP на HTTPS
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Если стоит force-ssl-redirect, временно отключи для http-01
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   tls:
