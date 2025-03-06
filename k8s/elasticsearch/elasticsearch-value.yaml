@@ -8,13 +8,35 @@ spec:
   nodeSets:
     - name: default
       count: 2
-#      config:
-#        node.store.allow_mmap: false
-#        xpack.security.authc.realms.openid.my-oidc-realm:
-#          type: openid
-#          order: 0
-#          client_id: "kibana"
-#          client_secret: "MCbDEJvVwr2gHf669ah2i5vr7fCIgQ4z"
-#          openid_connect_url: "https://keycloak.msv-tech.ru//realms/Chatter/protocol/openid-connect/certs"
+      config:
+        node.roles: ["master", "data", "ingest"]
+        cluster.name: "elasticsearch"
+        discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
+        cluster.initial_master_nodes: ["elasticsearch-master-0", "elasticsearch-master-1"]
+
+        xpack.security.enabled: true
+        xpack.security.authc.realms.oidc.oidc1:
+          enabled: true
+          order: 10
+          rp.client_id: "kibana"
+          rp.response_type: "code"
+          rp.redirect_uri: "https://kibana.msv-tech.ru/oauth2/callback"
+          rp.post_logout_redirect_uri: "https://msv-tech.ru/"
+          rp.requested_scopes: ["openid", "profile", "email"]
+          op.authorization_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/auth"
+          op.issuer: "https://msv-tech.ru/realms/Chatter"
+          op.jwkset_path: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/certs"
+          op.token_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/token"
+          op.userinfo_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
+          claims.principal: "sub"
+
+  volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
 
 # kubectl apply -f elasticsearch-value.yaml
