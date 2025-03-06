@@ -12,8 +12,6 @@ spec:
       config:
         cluster.name: "elasticsearch"
         node.roles: ["master", "data", "ingest"]
-        discovery.seed_hosts: ["elasticsearch-master-0", "elasticsearch-master-1"]
-        # ...
 
         xpack.security.enabled: true
         xpack.security.transport.ssl.enabled: true
