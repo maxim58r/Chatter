@@ -8,3 +8,5 @@ spec:
   count: 1
   elasticsearchRef:
     name: elastic-cluster
+
+# kubectl apply -f kibana-value.yaml
