@@ -2,11 +2,11 @@ apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
   name: kibana
-  namespace: elastic-system
+  namespace: logging
 spec:
   version: 8.5.1
   count: 1
   elasticsearchRef:
-    name: elastic-cluster
+    name: elastic
 
 # kubectl apply -f kibana-value.yaml
