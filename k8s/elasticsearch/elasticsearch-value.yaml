@@ -21,6 +21,7 @@ spec:
         xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/tls.key
         xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/tls.crt
         xpack.security.transport.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca.crt"]
+
         xpack.security.http.ssl.enabled: true
         xpack.security.http.ssl.verification_mode: certificate
         xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/tls.key
@@ -39,6 +40,23 @@ spec:
         xpack.security.authc.realms.oidc.oidc1.op.token_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/token"
         xpack.security.authc.realms.oidc.oidc1.op.userinfo_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
         xpack.security.authc.realms.oidc.oidc1.claims.principal: "sub"
+
+      podTemplate:
+        spec:
+          containers:
+            - name: elasticsearch
+              volumeMounts:
+                - name: elastic-ca
+                  mountPath: /usr/share/elasticsearch/config/certs
+                - name: elastic-tls
+                  mountPath: /usr/share/elasticsearch/config/certs
+          volumes:
+            - name: elastic-ca
+              secret:
+                secretName: elastic-ca-secret
+            - name: elastic-tls
+              secret:
+                secretName: elastic-tls-secret
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
