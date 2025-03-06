@@ -7,6 +7,37 @@ spec:
   version: 8.5.1
   count: 1
   elasticsearchRef:
-    name: elastic
+    name: elastic             # Указывает, к какому Elasticsearch подключаться
 
-# kubectl apply -f kibana-value.yaml
+  # Для HTTPS (собственный сертификат) можно воспользоваться spec.http.tls.certificate.secretName
+  # Если не указывать, ECK сгенерирует автогенерацию TLS или оставит HTTP:
+  # http:
+  #   tls:
+  #     certificate:
+  #       secretName: kibana-tls-secret   # (tls.crt, tls.key)
+
+  # Для дополнительных настроек (например, Config, SecureSettings):
+  # config:
+  #   server.publicBaseUrl: "https://kibana.msv-tech.ru"
+  #   server.ssl.enabled: true
+  #   server.ssl.certificate: /usr/share/kibana/config/certs/tls.crt
+  #   server.ssl.key: /usr/share/kibana/config/certs/tls.key
+  #   xpack.security.public:
+  #     protocol: https
+  #     hostname: kibana.msv-tech.ru
+  #
+  # secureSettings:
+  #   - secretName: kibana-oidc-secret
+
+  # Настройка volumes/podTemplate, если нужно монтировать секреты вручную:
+  # podTemplate:
+  #   spec:
+  #     containers:
+  #       - name: kibana
+  #         volumeMounts:
+  #           - name: kibana-cert
+  #             mountPath: /usr/share/kibana/config/certs
+  #     volumes:
+  #       - name: kibana-cert
+  #         secret:
+  #           secretName: kibana-tls-secret

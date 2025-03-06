@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana-ingress
+  namespace: logging
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Авто-редирект с HTTP на HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - kibana.msv-tech.ru
+      # В этот секрет cert-manager запишет выпущенный сертификат
+      secretName: kibana-msv-tech-tls
+  rules:
+    - host: kibana.msv-tech.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Сервис Kibana, созданный ECK
+                name: kibana-kb-http
+                port:
+                  number: 5601
