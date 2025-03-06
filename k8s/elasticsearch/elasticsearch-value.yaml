@@ -13,6 +13,10 @@ spec:
         secretName: elastic-tls-secret
         # В этом секрете: tls.key + tls.crt (+ ca.crt при необходимости)
 
+  # Подключаем секреты к Elasticsearch keystore
+  secureSettings:
+    - secretName: oidc-secret
+
   # 2. Transport TLS (опционально, если нужен свой сертификат)
   # По умолчанию ECK генерирует self-signed для transport.
   # Если хочешь свой:
