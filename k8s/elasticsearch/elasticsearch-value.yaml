@@ -8,13 +8,13 @@ spec:
   nodeSets:
     - name: default
       count: 2
-      config:
-        node.store.allow_mmap: false
-        xpack.security.authc.realms.openid.my-oidc-realm:
-          type: openid
-          order: 0
-          client_id: "kibana"
-          client_secret: "MCbDEJvVwr2gHf669ah2i5vr7fCIgQ4z"
-          openid_connect_url: "https://keycloak.msv-tech.ru//realms/Chatter/protocol/openid-connect/certs"
+#      config:
+#        node.store.allow_mmap: false
+#        xpack.security.authc.realms.openid.my-oidc-realm:
+#          type: openid
+#          order: 0
+#          client_id: "kibana"
+#          client_secret: "MCbDEJvVwr2gHf669ah2i5vr7fCIgQ4z"
+#          openid_connect_url: "https://keycloak.msv-tech.ru//realms/Chatter/protocol/openid-connect/certs"
 
 # kubectl apply -f elasticsearch-value.yaml
