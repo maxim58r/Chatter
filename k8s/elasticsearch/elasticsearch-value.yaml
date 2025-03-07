@@ -30,7 +30,7 @@ spec:
 
   nodeSets:
     - name: default
-      count: 2
+      count: 1
       config:
         # Если хочешь OIDC, добавь:
         xpack.security.authc.token.enabled: true
@@ -49,22 +49,6 @@ spec:
           op.jwkset_path: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/certs"
           op.userinfo_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
           claims.principal: "sub"
-
-      podTemplate:
-        spec:
-          containers:
-            - name: elasticsearch
-              # При использовании http.tls.certificate.secretName,
-              # ECK автоматически монтирует секрет в нужное место.
-              # Если нужен OIDC с кастомным CA:
-              #   volumeMounts:
-              #     - name: oidc-ca
-              #       mountPath: /usr/share/elasticsearch/config/oidc-ca
-          volumes:
-          # Только если надо смонтировать кастомный CA для OIDC
-          # - name: oidc-ca
-          #   secret:
-          #     secretName: elastic-ca-secret
 
       volumeClaimTemplates:
         - metadata:

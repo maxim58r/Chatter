@@ -7,37 +7,32 @@ spec:
   version: 8.5.1
   count: 1
   elasticsearchRef:
-    name: elastic             # Указывает, к какому Elasticsearch подключаться
-
-  # Для HTTPS (собственный сертификат) можно воспользоваться spec.http.tls.certificate.secretName
-  # Если не указывать, ECK сгенерирует автогенерацию TLS или оставит HTTP:
-  # http:
-  #   tls:
-  #     certificate:
-  #       secretName: kibana-tls-secret   # (tls.crt, tls.key)
-
-  # Для дополнительных настроек (например, Config, SecureSettings):
-  # config:
-  #   server.publicBaseUrl: "https://kibana.msv-tech.ru"
-  #   server.ssl.enabled: true
-  #   server.ssl.certificate: /usr/share/kibana/config/certs/tls.crt
-  #   server.ssl.key: /usr/share/kibana/config/certs/tls.key
-  #   xpack.security.public:
-  #     protocol: https
-  #     hostname: kibana.msv-tech.ru
-  #
-  # secureSettings:
-  #   - secretName: kibana-oidc-secret
-
-  # Настройка volumes/podTemplate, если нужно монтировать секреты вручную:
-  # podTemplate:
-  #   spec:
-  #     containers:
-  #       - name: kibana
-  #         volumeMounts:
-  #           - name: kibana-cert
-  #             mountPath: /usr/share/kibana/config/certs
-  #     volumes:
-  #       - name: kibana-cert
-  #         secret:
-  #           secretName: kibana-tls-secret
+    name: elastic
+  secureSettings:
+    - secretName: kibana-oidc-secure-settings
+  config:
+    # Указываем, что для подключения к ES используется HTTPS и доверенный CA
+    elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca.crt"]
+    elasticsearch.ssl.verificationMode: full
+    # Настройка OIDC-реалма для Kibana
+    xpack.security.authc.oidc.oidc1:
+      client_id: "kibana"
+      base_redirect_url: "https://kibana.msv-tech.ru"
+      response_type: "code"
+      requested_scopes: ["openid", "profile", "email"]
+      authorization_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/auth"
+      token_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/token"
+      userinfo_endpoint: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
+      jwkset_path: "https://msv-tech.ru/realms/Chatter/protocol/openid-connect/certs"
+      post_logout_redirect_uri: "https://msv-tech.ru/"
+  podTemplate:
+    spec:
+      containers:
+        - name: kibana
+          volumeMounts:
+            - name: es-ca
+              mountPath: /usr/share/kibana/config/certs
+      volumes:
+        - name: es-ca
+          secret:
+            secretName: elastic-tls-secret
