@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: internal-selfsigned
+spec:
+  selfSigned: {}
+
+
+# kubectl apply -f keycloak-certificate.yaml
+# kubectl get certificate -n keycloak
