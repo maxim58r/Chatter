@@ -9,6 +9,7 @@ spec:
   renewBefore: 360h
   commonName: msv-tech.ru
   dnsNames:
+    - msv-tech.ru
     - elastic-es-http.logging.svc
   issuerRef:
     name: letsencrypt-prod
