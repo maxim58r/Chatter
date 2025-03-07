@@ -5,16 +5,15 @@ metadata:
   namespace: logging
 spec:
   secretName: elastic-tls-secret
-  duration: 8760h # 1 год
+  duration: 8760h
   renewBefore: 360h
   commonName: msv-tech.ru
   dnsNames:
     - msv-tech.ru
     - elastic-es-http.logging.svc
   issuerRef:
-    name: letsencrypt-prod
+    name: internal-selfsigned
     kind: ClusterIssuer
-
 
 # kubectl apply -f keycloak-certificate.yaml
 # kubectl get certificate -n keycloak
