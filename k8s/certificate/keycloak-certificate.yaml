@@ -8,11 +8,9 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-    group: cert-manager.io
   dnsNames:
     - msv-tech.ru
     - keycloak.msv-tech.ru
-    - kibana.msv-tech.ru
 
-# kubectl apply -f certificate.yaml
+# kubectl apply -f keycloak-certificate.yaml
 # kubectl get certificate -n keycloak
