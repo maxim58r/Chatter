@@ -11,6 +11,8 @@ spec:
     tls:
       certificate:
         secretName: elastic-tls-secret
+      selfSignedCertificate:
+        disabled: true
         # В этом секрете: tls.key + tls.crt (+ ca.crt при необходимости)
 
   # Подключаем секреты к Elasticsearch keystore
