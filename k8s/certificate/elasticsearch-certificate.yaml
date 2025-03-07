@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: elastic-tls
+  namespace: logging
+spec:
+  secretName: elastic-tls-secret
+  duration: 8760h # 1 год
+  renewBefore: 360h
+  commonName: msv-tech.ru
+  dnsNames:
+    - elastic-es-http.logging.svc
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+
+# kubectl apply -f keycloak-certificate.yaml
+# kubectl get certificate -n keycloak

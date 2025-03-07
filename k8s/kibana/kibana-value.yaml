@@ -12,6 +12,7 @@ spec:
     - secretName: kibana-oidc-secure-settings
   config:
     # Указываем, что для подключения к ES используется HTTPS и доверенный CA
+    elasticsearch.hosts: ["https://msv-tech.ru:9200"]
     elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca.crt"]
     elasticsearch.ssl.verificationMode: full
     # Настройка OIDC-реалма для Kibana
