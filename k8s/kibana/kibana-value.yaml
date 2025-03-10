@@ -11,11 +11,14 @@ spec:
   secureSettings:
     - secretName: kibana-oidc-secure-settings
   config:
-    # Указываем, что для подключения к ES используется HTTPS и доверенный CA
     elasticsearch.hosts: ["https://msv-tech.ru:9200"]
     elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca.crt"]
     elasticsearch.ssl.verificationMode: full
-    # Настройка OIDC-реалма для Kibana
+    xpack.reporting.kibanaServer.hostname: localhost
+    server.ssl.enabled: true
+    server.ssl.certificate: /usr/share/kibana/config/certs/tls.crt
+    server.ssl.key: /usr/share/kibana/config/certs/tls.key
+
   podTemplate:
     spec:
       containers:
@@ -23,7 +26,12 @@ spec:
           volumeMounts:
             - name: es-ca
               mountPath: /usr/share/kibana/config/certs
+            - name: kibana-cert
+              mountPath: /usr/share/kibana/config/certs
       volumes:
         - name: es-ca
           secret:
             secretName: elastic-tls-secret
+        - name: kibana-cert
+          secret:
+            secretName: kibana-msv-tech-tls
