@@ -1,20 +1,16 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: elastic-tls
+  name: kibana-msv-tech-tls
   namespace: logging
 spec:
-  secretName: elastic-tls-secret
-  duration: 8760h
-  renewBefore: 360h
-  commonName: msv-tech.ru
-  dnsNames:
-    - msv-tech.ru
-    - elastic-es-http.logging.svc
+  secretName: kibana-msv-tech-tls
   issuerRef:
-    name: internal-selfsigned
+    name: letsencrypt-prod
     kind: ClusterIssuer
-
+  commonName: kibana.msv-tech.ru
+  dnsNames:
+    - kibana.msv-tech.ru
 
 # kubectl apply -f keycloak-certificate.yaml
 # kubectl get certificate -n keycloak
