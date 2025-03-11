@@ -5,6 +5,7 @@ metadata:
   namespace: logging
   annotations:
     kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
 spec:
@@ -12,7 +13,7 @@ spec:
   tls:
     - hosts:
         - kibana.msv-tech.ru
-      # В этот секрет cert-manager запишет выпущенный выпущенный сертификат
+      secretName: kibana-msv-tech-tls
   rules:
     - host: kibana.msv-tech.ru
       http:
@@ -24,4 +25,3 @@ spec:
                 name: kibana-kb-http
                 port:
                   number: 5601
-
