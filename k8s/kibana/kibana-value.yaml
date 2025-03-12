@@ -33,7 +33,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kibana-service-token
-                  key: token
+                  key: serviceAccountToken
           volumeMounts:
             - name: es-ca
               mountPath: /usr/share/kibana/config/es-certs
