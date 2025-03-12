@@ -9,24 +9,16 @@ spec:
   elasticsearchRef:
     name: elastic
   secureSettings:
-    - secretName: kibana-oidc-secure-settings
+    - secretName: kibana-service-token
   config:
-#    elasticsearch.username: "elastic"
-#    elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
-    elasticsearch.serviceAccountToken: ${ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN}
     elasticsearch.hosts: ["https://elastic-es-http.logging.svc:9200"]
+    elasticsearch.serviceAccountToken: ${ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN}
     elasticsearch.ssl.verificationMode: full
     xpack.reporting.kibanaServer.hostname: localhost
     server.ssl.enabled: true
     elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/es-certs/ca.crt"]
-    server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt"
-    server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key"
-
-    # Минимальный набор настроек OIDC для Kibana
-#    xpack.security.authc.providers:
-#      oidc.oidc1:
-#        order: 0
-#        realm: oidc1
+    server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt
+    server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key
 
     xpack.security.authc.providers:
       basic.basic1:
@@ -37,15 +29,10 @@ spec:
       containers:
         - name: kibana
           env:
-            - name: ELASTICSEARCH_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: elastic-es-elastic-user
-                  key: elastic
             - name: ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: elasticsearch-service-token
+                  name: kibana-service-token
                   key: token
           volumeMounts:
             - name: es-ca
