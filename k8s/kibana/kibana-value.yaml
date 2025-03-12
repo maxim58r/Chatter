@@ -1,43 +1,27 @@
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
-  name: kibana
+  name: logging-kibana              # имя Kibana
   namespace: logging
 spec:
   version: 8.5.1
   count: 1
-  elasticsearchRef:
-    name: elastic
-  serviceAccountRef:
-    name: kibana-sa  # Название сервисного аккаунта для Kibana
-
   config:
-    elasticsearch.hosts: ["https://elastic-es-http.logging.svc:9200"]
-    elasticsearch.ssl.verificationMode: full
-    xpack.reporting.kibanaServer.hostname: localhost
-    server.ssl.enabled: true
-    elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/es-certs/ca.crt"]
-    server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt
-    server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key
-
-    xpack.security.authc.providers:
-      basic.basic1:
-        order: 0
-
+    elasticsearch.hosts:
+      - "https://elasticsearch-es-http:9200"   # URL сервиса Elasticsearch (кластер "elasticsearch")
+    elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca.crt  # путь до CA
+    # Примечание: elasticsearch.serviceAccountToken не указываем в явном виде – он будет загружен из secureSettings.
+  secureSettings:
+    - secretName: kibana-service-token           # секрет с токеном сервис-аккаунта (elasticsearch.serviceAccountToken)
   podTemplate:
     spec:
-      serviceAccountName: kibana-sa  # Используем созданный сервисный аккаунт
       containers:
         - name: kibana
           volumeMounts:
-            - name: es-ca
-              mountPath: /usr/share/kibana/config/es-certs
-            - name: kibana-cert
-              mountPath: /usr/share/kibana/config/kibana-certs
+            - name: elasticsearch-ca
+              mountPath: /usr/share/kibana/config/certs   # монтируем папку с сертификатом CA
+              readOnly: true
       volumes:
-        - name: es-ca
+        - name: elasticsearch-ca
           secret:
-            secretName: elastic-tls-secret
-        - name: kibana-cert
-          secret:
-            secretName: kibana-msv-tech-tls
+            secretName: elasticsearch-es-http-certs-public  # секрет с CA Elasticsearch (сгенерирован ECK)
