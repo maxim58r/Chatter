@@ -20,6 +20,11 @@ spec:
     server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt
     server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key
 
+    # Минимальный набор настроек OIDC для Kibana
+    xpack.security.authc.providers:
+      oidc.oidc1:
+        order: 0
+        realm: oidc1
 
   podTemplate:
     spec:
