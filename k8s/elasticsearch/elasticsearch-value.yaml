@@ -49,7 +49,7 @@ spec:
           op.jwkset_path: "https://keycloak.msv-tech.ru/realms/Chatter/protocol/openid-connect/certs"
           op.userinfo_endpoint: "https://keycloak.msv-tech.ru/realms/Chatter/protocol/openid-connect/userinfo"
           claims.principal: "sub"
-
+          claims.groups: "groups"
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
