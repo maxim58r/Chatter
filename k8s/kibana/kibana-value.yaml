@@ -11,14 +11,15 @@ spec:
   secureSettings:
     - secretName: kibana-oidc-secure-settings
   config:
+    elasticsearch.username: "elastic"  # <-- добавлено
     elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
     elasticsearch.hosts: ["https://elastic-es-http.logging.svc:9200"]
     elasticsearch.ssl.verificationMode: full
     xpack.reporting.kibanaServer.hostname: localhost
     server.ssl.enabled: true
     elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/es-certs/ca.crt"]
-    server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt
-    server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key
+    server.ssl.certificate: /usr/share/kibana/config/kibana-certs/tls.crt"
+    server.ssl.key: /usr/share/kibana/config/kibana-certs/tls.key"
 
     # Минимальный набор настроек OIDC для Kibana
 #    xpack.security.authc.providers:
@@ -29,7 +30,6 @@ spec:
     xpack.security.authc.providers:
       basic.basic1:
         order: 0
-
 
   podTemplate:
     spec:
