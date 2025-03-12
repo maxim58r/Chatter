@@ -36,7 +36,7 @@ spec:
         xpack.security.authc.token.enabled: true
 
         xpack.security.authc.realms.oidc.oidc1:
-          enabled: true
+          enabled: false
           order: 10
           rp.client_id: "kibana"
           rp.response_type: "code"
