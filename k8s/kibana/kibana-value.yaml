@@ -8,11 +8,11 @@ spec:
   count: 1
   elasticsearchRef:
     name: elastic
-  secureSettings:
-    - secretName: kibana-service-token
+  serviceAccountRef:
+    name: kibana-sa  # Название сервисного аккаунта для Kibana
+
   config:
     elasticsearch.hosts: ["https://elastic-es-http.logging.svc:9200"]
-    elasticsearch.serviceAccountToken: ${ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN}
     elasticsearch.ssl.verificationMode: full
     xpack.reporting.kibanaServer.hostname: localhost
     server.ssl.enabled: true
@@ -26,14 +26,9 @@ spec:
 
   podTemplate:
     spec:
+      serviceAccountName: kibana-sa  # Используем созданный сервисный аккаунт
       containers:
         - name: kibana
-          env:
-            - name: ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: kibana-service-token
-                  key: serviceAccountToken
           volumeMounts:
             - name: es-ca
               mountPath: /usr/share/kibana/config/es-certs
