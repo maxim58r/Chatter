@@ -9,12 +9,12 @@ spec:
   config:
     elasticsearch.hosts:
       - "https://elastic-es-http.logging.svc:9200"
-    elasticsearch.username: "adminuser"            # Имя пользователя для подключения Kibana к Elasticsearch
-    elasticsearch.ssl.verificationMode: "full"     # Включаем полную проверку сертификата Elasticsearch
+    elasticsearch.username: "adminuser"
+    elasticsearch.ssl.verificationMode: "full"
     elasticsearch.ssl.certificateAuthorities:
-      - "/usr/share/kibana/config/certs/tls.crt"   # Подключаем сертификат CA Elasticsearch (самоподписанный)
+      - "/usr/share/kibana/config/certs/tls.crt"
   secureSettings:
-    - secretName: kibana-elasticsearch-credentials # Secret с паролем для подключения к Elasticsearch
+    - secretName: kibana-elasticsearch-credentials
   podTemplate:
     spec:
       containers:
