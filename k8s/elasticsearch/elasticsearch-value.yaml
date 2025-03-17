@@ -5,18 +5,21 @@ metadata:
   namespace: logging
 spec:
   version: 8.5.1
-  secureSettings: []
+  auth:
+    fileRealm:
+      - secretName: elasticsearch-user-admin    # Secret с учетной записью администратора
+      - secretName: elasticsearch-user-viewer   # Secret с учетной записью только для чтения
   http:
     tls:
       selfSignedCertificate:
-        disabled: true  # Отключаем SSL
+        disabled: false        # Включаем SSL (самоподписанный сертификат) для HTTPS
   nodeSets:
     - name: default
       count: 1
       config:
-        xpack.security.enabled: true
-        xpack.security.transport.ssl.enabled: false
-        xpack.security.http.ssl.enabled: false
+        xpack.security.enabled: true           # Включаем X-Pack Security (бесплатно в Basic-лицензии&#8203;:contentReference[oaicite:0]{index=0})
+        # Примечание: Настройки SSL транспорта на уровне кластера управляются оператором ECK&#8203;:contentReference[oaicite:1]{index=1},
+        # поэтому отдельные параметры xpack.security.transport.ssl можно не указывать.
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
