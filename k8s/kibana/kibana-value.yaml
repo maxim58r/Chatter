@@ -9,12 +9,10 @@ spec:
   config:
     elasticsearch.hosts:
       - "https://elastic-es-http.logging.svc:9200"
-    elasticsearch.username: "kibana_system"
+    elasticsearch.serviceAccountToken: "AAEAAWVsYXN0aWMva2liYW5hL2tpYmFuYS10b2tlbjpKWnVzT2E1LVJPdVpLMFRuQTZwTDN3"
     elasticsearch.ssl.verificationMode: "full"
     elasticsearch.ssl.certificateAuthorities:
       - "/usr/share/kibana/config/certs/tls.crt"
-  secureSettings:
-    - secretName: kibana-elasticsearch-credentials
   podTemplate:
     spec:
       containers:
