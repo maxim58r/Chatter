@@ -24,4 +24,4 @@ spec:
       volumes:
         - name: elasticsearch-ca
           secret:
-            secretName: elasticsearch-es-http-certs-public  # секрет с CA Elasticsearch (сгенерирован ECK)
+            secretName: elastic-es-http-certs-public  # Правильное имя секрета
