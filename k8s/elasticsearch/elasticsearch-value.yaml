@@ -5,36 +5,15 @@ metadata:
   namespace: logging
 spec:
   version: 8.5.1
-
-  # Здесь мы говорим ECK, что нужно создать пользователей из этих Secret
-  auth:
-    fileRealm:
-      - secretName: elasticsearch-user-admin
-      - secretName: elasticsearch-user-viewer
-    roleMappings:
-      - name: "adminuser_superuser_mapping"
-        roles:
-          - "superuser"     # встроенная роль с доступом к restricted indices
-        users:
-          - "adminuser"
-        enabled: true
-      - name: "vieweruser_viewer_mapping"
-        roles:
-          - "viewer"        # встроенная роль только для чтения
-        users:
-          - "vieweruser"
-        enabled: true
-
   http:
     tls:
       selfSignedCertificate:
-        disabled: false  # Генерировать самоподписанный сертификат для HTTPS
+        disabled: false  # Включаем HTTPS с самоподписанным сертификатом
   nodeSets:
     - name: default
       count: 1
       config:
         xpack.security.enabled: true
-        # Транспортный SSL ECK включает сам, здесь достаточно включить Security
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
