@@ -6,14 +6,26 @@ metadata:
 spec:
   version: 8.5.1
   count: 1
+
+  # 1) Указываем сервисный аккаунт
+  serviceAccountName: kibana-sa
+
+  # 2) Ссылка на Elasticsearch, раз Kibana операторная (ECK)
+  elasticsearchRef:
+    name: elastic  # имя Elasticsearch CR, совпадает с "metadata.name: elastic"
+
+  # 3) Дополнительная конфигурация
   config:
     elasticsearch.hosts:
       - "https://elastic-es-http.logging.svc:9200"
     elasticsearch.ssl.verificationMode: "full"
     elasticsearch.ssl.certificateAuthorities:
       - "/usr/share/kibana/config/certs/tls.crt"
+
   podTemplate:
     spec:
+      # Для надёжности продублируйте serviceAccountName (хотя достаточно и на верхнем уровне)
+      serviceAccountName: kibana-sa
       containers:
         - name: kibana
           volumeMounts:
