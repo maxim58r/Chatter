@@ -9,19 +9,13 @@ spec:
   config:
     elasticsearch.hosts:
       - "https://elastic-es-http.logging.svc:9200"
-    elasticsearch.ssl.certificateAuthorities:
-      - "/usr/share/kibana/config/certs/ca.crt"
-#    elasticsearch.ssl.verificationMode: none
+    elasticsearch.username: "elastic"
+    elasticsearch.password: "A5a6ZM5Kh34C0o8Z26oZOK1g"
+    elasticsearch.ssl.verificationMode: "none"  # Отключаем проверку SSL
   podTemplate:
     spec:
       containers:
         - name: kibana
-          env:
-            - name: ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: kibana-service-token
-                  key: token
           volumeMounts:
             - name: elasticsearch-ca
               mountPath: /usr/share/kibana/config/certs
