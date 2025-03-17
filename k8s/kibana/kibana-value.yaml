@@ -8,9 +8,10 @@ spec:
   count: 1
   config:
     elasticsearch.hosts:
-      - "https://elastic-es-http:9200"
+      - "https://elastic-es-http.logging.svc:9200"
     elasticsearch.ssl.certificateAuthorities:
       - "/usr/share/kibana/config/certs/ca.crt"
+#    elasticsearch.ssl.verificationMode: none
   podTemplate:
     spec:
       containers:
