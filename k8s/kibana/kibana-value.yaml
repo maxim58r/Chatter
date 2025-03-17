@@ -6,34 +6,28 @@ metadata:
 spec:
   version: 8.5.1
   count: 1
-  elasticsearchRef:
-    name: elastic  # Ссылка на кластер Elasticsearch
   config:
     elasticsearch.hosts:
-      - "https://elasticsearch-es-http:9200"  # URL сервиса Elasticsearch
+      - "https://elasticsearch-es-http:9200"   # URL сервиса Elasticsearch (кластер "elasticsearch")
     elasticsearch.ssl.certificateAuthorities:
-      - "/usr/share/kibana/config/certs/ca.crt"  # Путь до CA
-    xpack.security.authc.providers:
-      basic.basic1:
-        order: 0  # Включаем basic-авторизацию
+      - "/usr/share/kibana/config/certs/ca.crt"  # путь до CA
+  secureSettings:
+    - secretName: kibana-service-token           # секрет с токеном сервис-аккаунта
   podTemplate:
     spec:
-      serviceAccountName: kibana-sa  # Привязываем сервис-аккаунт
       containers:
         - name: kibana
           env:
             - name: ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: kibana-service-token
+                  name: kibana-service-token  # Берём токен из секрета
                   key: token
           volumeMounts:
             - name: elasticsearch-ca
-              mountPath: /usr/share/kibana/config/certs  # Монтируем папку с сертификатом CA
+              mountPath: /usr/share/kibana/config/certs   # Монтируем папку с CA
               readOnly: true
       volumes:
         - name: elasticsearch-ca
           secret:
-            secretName: elastic-es-http-certs-public  # Секрет с CA Elasticsearch (должен существовать)
-  secureSettings:
-    - secretName: kibana-service-token  # Подключаем секрет с сервисным токеном Kibana
+            secretName: elastic-es-http-certs-public  # Используем правильное имя секрета
