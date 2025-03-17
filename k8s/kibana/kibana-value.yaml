@@ -8,11 +8,9 @@ spec:
   count: 1
   config:
     elasticsearch.hosts:
-      - "https://elasticsearch-es-http:9200"   # URL сервиса Elasticsearch (кластер "elasticsearch")
+      - "https://elasticsearch-es-http:9200"
     elasticsearch.ssl.certificateAuthorities:
-      - "/usr/share/kibana/config/certs/ca.crt"  # путь до CA
-  secureSettings:
-    - secretName: kibana-service-token           # секрет с токеном сервис-аккаунта
+      - "/usr/share/kibana/config/certs/ca.crt"
   podTemplate:
     spec:
       containers:
@@ -21,13 +19,13 @@ spec:
             - name: ELASTICSEARCH_SERVICE_ACCOUNT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: kibana-service-token  # Берём токен из секрета
+                  name: kibana-service-token
                   key: token
           volumeMounts:
             - name: elasticsearch-ca
-              mountPath: /usr/share/kibana/config/certs   # Монтируем папку с CA
+              mountPath: /usr/share/kibana/config/certs
               readOnly: true
       volumes:
         - name: elasticsearch-ca
           secret:
-            secretName: elastic-es-http-certs-public  # Используем правильное имя секрета
+            secretName: elastic-es-http-certs-public
