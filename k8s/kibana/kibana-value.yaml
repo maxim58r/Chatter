@@ -9,7 +9,7 @@ spec:
   config:
     elasticsearch.hosts:
       - "https://elastic-es-http.logging.svc:9200"
-    elasticsearch.username: "elastic"
+    elasticsearch.username: "kibana_system"
     elasticsearch.ssl.verificationMode: "full"
     elasticsearch.ssl.certificateAuthorities:
       - "/usr/share/kibana/config/certs/tls.crt"
