@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: authservice-db
+  namespace: default
+spec:
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    parameters:
+      shared_buffers: "256MB"
+      max_connections: "100"
+  bootstrap:
+    initdb:
+      database: postgres_auth
+      owner: authuser
+      secret:
+        name: authservice-db-secret
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    retentionPolicy: "30d"

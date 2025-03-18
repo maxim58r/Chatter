@@ -51,6 +51,18 @@ pipeline {
             }
         }
 
+        stage('Deploy PostgreSQL') {
+            steps {
+                script {
+                    echo "Deploying PostgreSQL cluster..."
+                    sh '''
+                      kubectl apply -f k8s/postgres/postgres-secret.yaml
+                      kubectl apply -f k8s/postgres/postgres-cluster.yaml
+                    '''
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes with Helm') {
 			when {
 				expression { params.DEPLOY_TO_KUBERNETES }
