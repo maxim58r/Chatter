@@ -51,6 +51,21 @@ pipeline {
             }
         }
 
+        stage('Setup PostgreSQL CRD') {
+            steps {
+                script {
+                    def crdExists = sh(script: "kubectl get crds | grep postgresql.cnpg.io || true", returnStdout: true).trim()
+                    if (!crdExists) {
+                        echo "Installing CloudNativePG operator..."
+                        sh 'kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.22.1.yaml'
+                        sh 'kubectl rollout status deployment/cnpg-controller-manager -n cnpg-system --timeout=120s'
+                    } else {
+                        echo "CloudNativePG CRD already installed."
+                    }
+                }
+            }
+        }
+
         stage('Deploy PostgreSQL') {
             steps {
                 script {
