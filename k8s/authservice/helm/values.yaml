@@ -85,8 +85,8 @@ liveness:
 readiness:
   path: /actuator/health/readiness
   port: 8080
-  initialDelaySeconds: 120
-  periodSeconds: 5
+  initialDelaySeconds: 240
+  periodSeconds: 30
   failureThreshold: 5
 
 globalConfigMap: global-configmap
