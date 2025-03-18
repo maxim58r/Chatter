@@ -2,7 +2,7 @@ apiVersion: beat.k8s.elastic.co/v1beta1
 kind: Beat
 metadata:
   name: filebeat
-  namespace: logging   # ваш namespace
+  namespace: logging
 spec:
   type: filebeat
   version: 8.5.1
@@ -12,12 +12,26 @@ spec:
 
   config:
     filebeat.yml: |-
+      # Включаем перезагрузку конфигурации
+      config.reload.enabled: true
+      config.reload.period: 10s
+
+      # Явно указываем входные данные для контейнеров
+      filebeat.inputs:
+        - type: container
+          paths:
+            - /var/log/containers/*.log
+          processors:
+            - add_kubernetes_metadata:
+                host: ${NODE_NAME}
+                namespace: default
+
+      # Автодискаверинг Kubernetes (дополнительно)
       filebeat.autodiscover:
         providers:
           - type: kubernetes
             node: ${NODE_NAME}
             hints.enabled: true
-            namespaces: ["default"]
             hints.default_config:
               type: container
               paths:
@@ -38,6 +52,10 @@ spec:
         volumes:
           - name: filebeat-data
             emptyDir: {}
+          # Монтируем директорию с логами контейнеров
+          - name: varlogcontainers
+            hostPath:
+              path: /var/log/containers
         containers:
           - name: filebeat
             securityContext:
@@ -51,3 +69,6 @@ spec:
             volumeMounts:
               - name: filebeat-data
                 mountPath: /usr/share/filebeat/data
+              - name: varlogcontainers
+                mountPath: /var/log/containers
+                readOnly: true
