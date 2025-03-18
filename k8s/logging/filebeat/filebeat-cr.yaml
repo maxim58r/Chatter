@@ -49,15 +49,20 @@ spec:
       spec:
         serviceAccountName: filebeat-sa
         securityContext:
-          runAsUser: 0    # Запускаем под root
-          runAsGroup: 0
+          runAsUser: 1000  # предположим, внутри образа Filebeat = UID 1000
+          runAsGroup: 1000
+        volumes:
+          - name: filebeat-data
+            emptyDir: {}
         containers:
           - name: filebeat
-            # При желании задаем ресурсы и/или переменную NODE_NAME
+            volumeMounts:
+              - name: filebeat-data
+                mountPath: /usr/share/filebeat/data
             securityContext:
-              # Можно указать отдельно для контейнера
-              runAsUser: 0
-              runAsGroup: 0
+              runAsUser: 1000
+              runAsGroup: 1000
+            # При желании задаем ресурсы и/или переменную NODE_NAME
             env:
               - name: NODE_NAME
                 valueFrom:
