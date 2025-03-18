@@ -2,12 +2,11 @@ apiVersion: beat.k8s.elastic.co/v1beta1
 kind: Beat
 metadata:
   name: filebeat
-  namespace: logging
+  namespace: logging   # ваш namespace
 spec:
   type: filebeat
   version: 8.5.1
 
-  # Ссылка на Elasticsearch CR, развернутый ECK
   elasticsearchRef:
     name: elastic
 
@@ -19,8 +18,6 @@ spec:
             node: ${NODE_NAME}
             hints.enabled: true
             namespaces: ["default"]
-            # ВАЖНО: благодаря этому блоку Filebeat будет собирать логи
-            # подов без аннотаций "co.elastic.logs/*" — он применится по умолчанию.
             hints.default_config:
               type: container
               paths:
@@ -29,16 +26,6 @@ spec:
       processors:
         - add_host_metadata: {}
         - add_cloud_metadata: {}
-
-      # Если хотите явно прописать output (логин, пароль) — раскомментируйте ниже.
-      # Иначе ECK сам подставит сервисный аккаунт/секрет.
-      #
-      # output.elasticsearch:
-      #   hosts: ["https://elastic-es-http.logging.svc:9200"]
-      #   username: "elastic"
-      #   password: "SUPER-SECRET"
-      #   ssl.verification_mode: "certificate"
-      #   certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
 
   daemonSet:
     podTemplate:
