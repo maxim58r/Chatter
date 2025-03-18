@@ -7,71 +7,60 @@ spec:
   type: filebeat
   version: 8.5.1
 
-  # Ссылка на Elasticsearch, который развернут CR'ом "Elasticsearch"
-  # Допустим, ваш Elasticsearch называется "elastic" (metadata.name: elastic)
-  # в том же namespace "logging".
+  # Ссылка на Elasticsearch CR, развернутый ECK
   elasticsearchRef:
     name: elastic
 
-  # Основная конфигурация, почти как в filebeat.yml
   config:
-    # Обратите внимание, что здесь ключ "filebeat.yml", а внутри — обычный YAML
     filebeat.yml: |-
       filebeat.autodiscover:
         providers:
           - type: kubernetes
             node: ${NODE_NAME}
-            # Включаем hint-based autodiscover
             hints.enabled: true
-            include_annotations: ["co.elastic.logs/enabled"]
-            # Фильтр: собирать только namespace = "prod" (пример)
             namespaces: ["default"]
+            # ВАЖНО: благодаря этому блоку Filebeat будет собирать логи
+            # подов без аннотаций "co.elastic.logs/*" — он применится по умолчанию.
+            hints.default_config:
+              type: container
+              paths:
+                - /var/log/containers/*${data.kubernetes.container.id}.log
 
       processors:
         - add_host_metadata: {}
         - add_cloud_metadata: {}
 
-      # Опционально: если нужно явное указание output
-      # ECK обычно сам генерирует output.elasticsearch с учётными данными, 
-      # опираясь на elasticsearchRef. Но можно и вручную:
+      # Если хотите явно прописать output (логин, пароль) — раскомментируйте ниже.
+      # Иначе ECK сам подставит сервисный аккаунт/секрет.
       #
       # output.elasticsearch:
       #   hosts: ["https://elastic-es-http.logging.svc:9200"]
       #   username: "elastic"
       #   password: "SUPER-SECRET"
       #   ssl.verification_mode: "certificate"
-      #   # Если нужен CA-файл, укажите его путь 
-      #   # certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
+      #   certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
 
-  # Настройки DaemonSet'а, который создаст оператор
   daemonSet:
     podTemplate:
       spec:
         serviceAccountName: filebeat-sa
         securityContext:
-          runAsUser: 1000  # предположим, внутри образа Filebeat = UID 1000
+          runAsUser: 1000
           runAsGroup: 1000
+          fsGroup: 1000
         volumes:
           - name: filebeat-data
             emptyDir: {}
         containers:
           - name: filebeat
-            volumeMounts:
-              - name: filebeat-data
-                mountPath: /usr/share/filebeat/data
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
-            # При желании задаем ресурсы и/или переменную NODE_NAME
             env:
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
-            resources:
-              requests:
-                cpu: "100m"
-                memory: "200Mi"
-              limits:
-                cpu: "500m"
-                memory: "500Mi"
+            volumeMounts:
+              - name: filebeat-data
+                mountPath: /usr/share/filebeat/data
