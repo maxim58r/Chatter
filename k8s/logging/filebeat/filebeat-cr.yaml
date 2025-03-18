@@ -7,68 +7,54 @@ spec:
   type: filebeat
   version: 8.5.1
 
+  # Ссылка на развернутый Elasticsearch (ECK) CR
   elasticsearchRef:
     name: elastic
 
+  # Основная конфигурация Filebeat
   config:
-    filebeat.yml: |-
-      # Включаем перезагрузку конфигурации
-      config.reload.enabled: true
-      config.reload.period: 10s
-
-      # Явно указываем входные данные для контейнеров
-      filebeat.inputs:
-        - type: container
-          paths:
-            - /var/log/containers/*.log
-          processors:
-            - add_kubernetes_metadata:
-                host: ${NODE_NAME}
-                namespace: default
-
-      # Автодискаверинг Kubernetes (дополнительно)
-      filebeat.autodiscover:
+    filebeat:
+      autodiscover:
         providers:
           - type: kubernetes
             node: ${NODE_NAME}
             hints.enabled: true
+            # при необходимости можно указать namespaces: ["default"]
             hints.default_config:
               type: container
               paths:
                 - /var/log/containers/*${data.kubernetes.container.id}.log
+    processors:
+      - add_host_metadata: {}
+      - add_cloud_metadata: {}
 
-      processors:
-        - add_host_metadata: {}
-        - add_cloud_metadata: {}
-
+  # Описываем DaemonSet, чтобы Filebeat запускался на каждом узле
   daemonSet:
     podTemplate:
       spec:
         serviceAccountName: filebeat-sa
         securityContext:
+          # Параметры можно менять в зависимости от того,
+          # какая нужна UID/GID для доступа к /var/log/... на хосте
           runAsUser: 1000
           runAsGroup: 1000
           fsGroup: 1000
+
+        # Монтируем нужные хостовые каталоги
         volumes:
-          - name: filebeat-data
-            emptyDir: {}
-          # Монтируем директорию с логами контейнеров
           - name: varlogcontainers
             hostPath:
               path: /var/log/containers
+
         containers:
           - name: filebeat
             securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
+              runAsUser: 0
             env:
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
             volumeMounts:
-              - name: filebeat-data
-                mountPath: /usr/share/filebeat/data
               - name: varlogcontainers
                 mountPath: /var/log/containers
-                readOnly: true
