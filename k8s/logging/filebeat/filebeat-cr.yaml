@@ -23,6 +23,9 @@ spec:
             node: ${NODE_NAME}
             # Включаем hint-based autodiscover
             hints.enabled: true
+            include_annotations: ["co.elastic.logs/enabled"]
+            # Фильтр: собирать только namespace = "prod" (пример)
+            namespaces: ["default"]
 
       processors:
         - add_host_metadata: {}
@@ -45,9 +48,16 @@ spec:
     podTemplate:
       spec:
         serviceAccountName: filebeat-sa
+        securityContext:
+          runAsUser: 0    # Запускаем под root
+          runAsGroup: 0
         containers:
           - name: filebeat
             # При желании задаем ресурсы и/или переменную NODE_NAME
+            securityContext:
+              # Можно указать отдельно для контейнера
+              runAsUser: 0
+              runAsGroup: 0
             env:
               - name: NODE_NAME
                 valueFrom:
