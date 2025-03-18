@@ -1,0 +1,62 @@
+apiVersion: beat.k8s.elastic.co/v1beta1
+kind: Beat
+metadata:
+  name: filebeat
+  namespace: logging
+spec:
+  type: filebeat
+  version: 8.5.1
+
+  # Ссылка на Elasticsearch, который развернут CR'ом "Elasticsearch"
+  # Допустим, ваш Elasticsearch называется "elastic" (metadata.name: elastic)
+  # в том же namespace "logging".
+  elasticsearchRef:
+    name: elastic
+
+  # Основная конфигурация, почти как в filebeat.yml
+  config:
+    # Обратите внимание, что здесь ключ "filebeat.yml", а внутри — обычный YAML
+    filebeat.yml: |-
+      filebeat.autodiscover:
+        providers:
+          - type: kubernetes
+            node: ${NODE_NAME}
+            # Включаем hint-based autodiscover
+            hints.enabled: true
+
+      processors:
+        - add_host_metadata: {}
+        - add_cloud_metadata: {}
+
+      # Опционально: если нужно явное указание output
+      # ECK обычно сам генерирует output.elasticsearch с учётными данными, 
+      # опираясь на elasticsearchRef. Но можно и вручную:
+      #
+      # output.elasticsearch:
+      #   hosts: ["https://elastic-es-http.logging.svc:9200"]
+      #   username: "elastic"
+      #   password: "SUPER-SECRET"
+      #   ssl.verification_mode: "certificate"
+      #   # Если нужен CA-файл, укажите его путь 
+      #   # certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
+
+  # Настройки DaemonSet'а, который создаст оператор
+  daemonSet:
+    podTemplate:
+      spec:
+        serviceAccountName: filebeat-sa
+        containers:
+          - name: filebeat
+            # При желании задаем ресурсы и/или переменную NODE_NAME
+            env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "200Mi"
+              limits:
+                cpu: "500m"
+                memory: "500Mi"
