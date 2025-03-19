@@ -24,6 +24,12 @@ spec:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
 
+    output.elasticsearch:
+      hosts: [ "https://10.42.0.236:9200" ]
+      username: "elastic"
+      password: "IVc703t2Tm083t7QEQ6D5axV"
+      ssl.verification_mode: none
+
   daemonSet:
     podTemplate:
       spec:
