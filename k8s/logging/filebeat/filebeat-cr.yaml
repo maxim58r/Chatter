@@ -25,7 +25,7 @@ spec:
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
-      - decode_json_fields:  # Процессор для парсинга JSON
+      - decode_json_fields:
           fields: ["message"]
           target: ""
           overwrite_keys: true

@@ -30,8 +30,6 @@ spec:
         config-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         secret-checksum: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         co.elastic.logs/enabled: "true"
-        co.elastic.logs/module: "json"
-        co.elastic.logs/json.keys_under_root: "true"
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
@@ -93,7 +91,7 @@ spec:
               mountPath: /config
               readOnly: true
             - name: app-logs
-              mountPath: /var/log/app  # Логи приложения
+              mountPath: /var/log/containers
 
           livenessProbe:
             httpGet:
