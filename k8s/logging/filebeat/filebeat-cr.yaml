@@ -5,7 +5,7 @@ metadata:
   namespace: logging
 spec:
   type: filebeat
-  version: 8.5.1
+  version: 8.14.0  # Обновленная версия
   elasticsearchRef:
     name: elastic
   config:
@@ -14,18 +14,24 @@ spec:
         - type: kubernetes
           node: ${NODE_NAME}
           hints.enabled: true
-          # при необходимости можно указать namespaces: ["default"]
           hints.default_config:
             type: container
             paths:
               - /var/log/containers/*${data.kubernetes.container.id}.log
+            # Добавлены настройки для JSON-логов
+            json.keys_under_root: true
+            json.add_error_key: true
 
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
+      - decode_json_fields:  # Процессор для парсинга JSON
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
 
     output.elasticsearch:
-      hosts: [ "https://10.42.0.236:9200" ]
+      hosts: ["https://10.42.0.236:9200"]
       username: "elastic"
       password: "IVc703t2Tm083t7QEQ6D5axV"
       ssl.verification_mode: none
@@ -64,6 +70,7 @@ spec:
           - name: filebeat
             securityContext:
               runAsUser: 0
+              privileged: true  # Для доступа к логам
             env:
               - name: NODE_NAME
                 valueFrom:
@@ -76,6 +83,7 @@ spec:
             volumeMounts:
               - name: varlogcontainers
                 mountPath: /var/log/containers
+                readOnly: true
               - name: kube-api-access
                 mountPath: /var/run/secrets/kubernetes.io/serviceaccount
                 readOnly: true
