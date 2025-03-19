@@ -9,7 +9,7 @@ spec:
   elasticsearchRef:
     name: elastic
   config:
-    filebeat.yaml: |-
+    filebeat.yml: |-
       filebeat.autodiscover:
         providers:
           - type: kubernetes
@@ -20,21 +20,25 @@ spec:
               type: container
               paths:
                 - /var/log/containers/*${data.kubernetes.container.id}.log
+
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
+
   daemonSet:
     podTemplate:
       spec:
         serviceAccountName: filebeat-sa
         securityContext:
-          runAsUser: 1000
+          runAsUser: 0
           runAsGroup: 1000
           fsGroup: 1000
+
         volumes:
           - name: varlogcontainers
             hostPath:
               path: /var/log/containers
+
         containers:
           - name: filebeat
             securityContext:
