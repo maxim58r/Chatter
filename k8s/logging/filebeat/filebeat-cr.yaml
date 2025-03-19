@@ -5,7 +5,7 @@ metadata:
   namespace: logging
 spec:
   type: filebeat
-  version: 8.5.1
+  version: 8.14.0  # Обновленная версия
   elasticsearchRef:
     name: elastic
   config:
