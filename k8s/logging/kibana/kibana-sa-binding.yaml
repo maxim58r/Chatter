@@ -5,7 +5,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: elastic-admin  # Или другая роль с правами на чтение данных
+  name: elastic-agent
 subjects:
   - kind: ServiceAccount
     name: kibana-sa
