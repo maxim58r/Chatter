@@ -6,12 +6,8 @@ metadata:
 spec:
   type: filebeat
   version: 8.5.1
-
-  # Ссылка на развернутый Elasticsearch (ECK) CR
   elasticsearchRef:
     name: elastic
-
-  # Основная конфигурация Filebeat
   config:
     filebeat.yaml: |-
       filebeat.autodiscover:
@@ -27,25 +23,18 @@ spec:
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
-
-  # Описываем DaemonSet, чтобы Filebeat запускался на каждом узле
   daemonSet:
     podTemplate:
       spec:
         serviceAccountName: filebeat-sa
         securityContext:
-          # Параметры можно менять в зависимости от того,
-          # какая нужна UID/GID для доступа к /var/log/... на хосте
           runAsUser: 1000
           runAsGroup: 1000
           fsGroup: 1000
-
-        # Монтируем нужные хостовые каталоги
         volumes:
           - name: varlogcontainers
             hostPath:
               path: /var/log/containers
-
         containers:
           - name: filebeat
             securityContext:
