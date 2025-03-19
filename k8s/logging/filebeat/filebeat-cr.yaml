@@ -3,14 +3,9 @@ kind: Beat
 metadata:
   name: filebeat
   namespace: logging
-  labels:
-    app: filebeat
-    component: logging
-  annotations:
-    description: "Filebeat DaemonSet for collecting logs in the Kubernetes cluster"
 spec:
   type: filebeat
-  version: 8.14.0
+  version: 8.14.0  # Обновленная версия
   elasticsearchRef:
     name: elastic
   config:
@@ -22,7 +17,8 @@ spec:
           hints.default_config:
             type: container
             paths:
-              - /var/log/containers/*${data.kubernetes.pod.name}_${data.kubernetes.namespace}*.log
+              - /var/log/containers/*${data.kubernetes.container.id}.log
+            # Добавлены настройки для JSON-логов
             json.keys_under_root: true
             json.add_error_key: true
 
@@ -33,7 +29,12 @@ spec:
           fields: ["message"]
           target: ""
           overwrite_keys: true
-          ignore_missing: true
+
+    output.elasticsearch:
+      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
+      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
+      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
+      ssl.verification_mode: none
 
   daemonSet:
     podTemplate:
@@ -47,3 +48,49 @@ spec:
         volumes:
           - name: varlogcontainers
             hostPath:
+              path: /var/log/containers
+          - name: kube-api-access
+            projected:
+              sources:
+                - serviceAccountToken:
+                    path: token
+                    expirationSeconds: 3607
+                - configMap:
+                    name: kube-root-ca.crt
+                    items:
+                      - key: ca.crt
+                        path: ca.crt
+                - downwardAPI:
+                    items:
+                      - path: namespace
+                        fieldRef:
+                          fieldPath: metadata.namespace
+
+        containers:
+          - name: filebeat
+            securityContext:
+              runAsUser: 0
+              privileged: true  # Для доступа к логам
+            env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              - name: KUBERNETES_SERVICE_HOST
+                value: "kubernetes.default.svc"
+              - name: KUBERNETES_SERVICE_PORT
+                value: "443"
+              # Добавляем переменные окружения для Elasticsearch
+              - name: ELASTICSEARCH_HOSTS
+                value: "https://elastic-es-http.logging.svc.cluster.local:9200"
+              - name: ELASTICSEARCH_USERNAME
+                value: "elastic"
+              - name: ELASTICSEARCH_PASSWORD
+                value: "IVc703t2Tm083t7QEQ6D5axV"
+            volumeMounts:
+              - name: varlogcontainers
+                mountPath: /var/log/containers
+                readOnly: true
+              - name: kube-api-access
+                mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+                readOnly: true
