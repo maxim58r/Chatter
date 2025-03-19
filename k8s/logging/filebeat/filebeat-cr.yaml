@@ -9,17 +9,16 @@ spec:
   elasticsearchRef:
     name: elastic
   config:
-    filebeat:
-      autodiscover:
-        providers:
-          - type: kubernetes
-            node: ${NODE_NAME}
-            hints.enabled: true
-            # при необходимости можно указать namespaces: ["default"]
-            hints.default_config:
-              type: container
-              paths:
-                - /var/log/containers/*${data.kubernetes.container.id}.log
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+          hints.enabled: true
+          # при необходимости можно указать namespaces: ["default"]
+          hints.default_config:
+            type: container
+            paths:
+              - /var/log/containers/*${data.kubernetes.container.id}.log
 
     processors:
       - add_host_metadata: {}
@@ -38,6 +37,22 @@ spec:
           - name: varlogcontainers
             hostPath:
               path: /var/log/containers
+          - name: kube-api-access
+            projected:
+              sources:
+                - serviceAccountToken:
+                    path: token
+                    expirationSeconds: 3607
+                - configMap:
+                    name: kube-root-ca.crt
+                    items:
+                      - key: ca.crt
+                        path: ca.crt
+                - downwardAPI:
+                    items:
+                      - path: namespace
+                        fieldRef:
+                          fieldPath: metadata.namespace
 
         containers:
           - name: filebeat
@@ -48,6 +63,13 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
+              - name: KUBERNETES_SERVICE_HOST
+                value: "kubernetes.default.svc"
+              - name: KUBERNETES_SERVICE_PORT
+                value: "443"
             volumeMounts:
               - name: varlogcontainers
                 mountPath: /var/log/containers
+              - name: kube-api-access
+                mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+                readOnly: true
