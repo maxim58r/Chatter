@@ -13,7 +13,6 @@ spec:
     - name: default
       count: 1
       config:
-        xpack.security.enabled: true
         action.auto_create_index: ".*"  # Разрешаем создание всех индексов, включая системные
       volumeClaimTemplates:
         - metadata:
