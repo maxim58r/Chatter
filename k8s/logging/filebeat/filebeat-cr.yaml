@@ -13,8 +13,8 @@ spec:
 
   # Основная конфигурация Filebeat
   config:
-    filebeat:
-      autodiscover:
+    filebeat.yaml: |-
+      filebeat.autodiscover:
         providers:
           - type: kubernetes
             node: ${NODE_NAME}
