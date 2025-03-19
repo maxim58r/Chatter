@@ -4,7 +4,7 @@ metadata:
   name: elastic
   namespace: logging
 spec:
-  version: 8.5.1
+  version: 8.14.0
   http:
     tls:
       selfSignedCertificate:
