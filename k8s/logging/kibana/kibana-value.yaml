@@ -17,9 +17,6 @@ spec:
     elasticsearch.ssl.certificateAuthorities:
       - "/usr/share/kibana/config/certs/tls.crt"
 
-    # Отключаем Fleet/EPR (не нужен для базового сбора логов)
-    xpack.fleet.enabled: false
-
   podTemplate:
     spec:
       serviceAccountName: kibana-sa
