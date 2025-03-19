@@ -4,7 +4,7 @@ metadata:
   name: kibana
   namespace: logging
 spec:
-  version: 8.17.3
+  version: 8.5.1
   count: 1
   serviceAccountName: kibana-sa
   elasticsearchRef:
