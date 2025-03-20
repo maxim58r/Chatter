@@ -18,7 +18,8 @@ spec:
           hints.default_config:
             type: container
             paths:
-              - /var/log/containers/*${data.kubernetes.container.id}.log
+              - /var/log/containers/*${kubernetes.container.id}.log
+#              - /var/log/containers/*${data.kubernetes.container.id}.log
             # Добавлены настройки для JSON-логов
 #            json.keys_under_root: true
 #            json.add_error_key: true
@@ -29,6 +30,7 @@ spec:
       - add_cloud_metadata: {}
       - add_kubernetes_metadata:
           in_cluster: true
+#          target: data.kubernetes
 #      - decode_json_fields:
 #          fields: ["message"]
 #          target: ""
