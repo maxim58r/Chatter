@@ -15,29 +15,32 @@ spec:
       providers:
         - type: kubernetes
           node: ${NODE_NAME}
-          include_namespaces: ["default"]
-          hints.enabled: true
-          hints.default_config:
-            type: container
-            paths:
-#              - /var/log/containers/*${kubernetes.container.id}.log
-              - /var/log/containers/*.log
-#              - /var/log/containers/*${data.kubernetes.container.id}.log
-            # Добавлены настройки для JSON-логов
-#            json.keys_under_root: true
-#            json.add_error_key: true
-            start_position: beginning
+          scope: cluster # Для мониторинга всех нод
+          templates:
+            - condition:
+                equals:
+                  kubernetes.namespace: "default"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*.log
+                  # Раскомментируйте, если логи в формате JSON
+                  # json.keys_under_root: true
+                  # json.add_error_key: true
+                  start_position: beginning
 
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
       - add_kubernetes_metadata:
           in_cluster: true
+          # Добавьте namespace для метаданных
+          namespace: ${POD_NAMESPACE}
 
     output.elasticsearch:
-      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
-      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
-      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
+      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
+      username: "${ELASTICSEARCH_USERNAME}"
+      password: "${ELASTICSEARCH_PASSWORD}"
       ssl.verification_mode: none
 
   daemonSet:
@@ -46,13 +49,14 @@ spec:
         serviceAccountName: filebeat-sa
         securityContext:
           runAsUser: 0
-          runAsGroup: 1000
-          fsGroup: 1000
+          # Уберите fsGroup, если не требуется
+          # fsGroup: 1000
 
         volumes:
           - name: varlogcontainers
             hostPath:
               path: /var/log/containers
+              type: Directory # Явное указание типа
           - name: kube-api-access
             projected:
               sources:
@@ -74,17 +78,21 @@ spec:
           - name: filebeat
             securityContext:
               runAsUser: 0
-              privileged: true  # Для доступа к логам
+              privileged: true
+              allowPrivilegeEscalation: false # Улучшение безопасности
             env:
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
+              - name: POD_NAMESPACE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
               - name: KUBERNETES_SERVICE_HOST
                 value: "kubernetes.default.svc"
               - name: KUBERNETES_SERVICE_PORT
                 value: "443"
-              # Добавляем переменные окружения для Elasticsearch
               - name: ELASTICSEARCH_HOSTS
                 value: "https://elastic-es-http.logging.svc.cluster.local:9200"
               - name: ELASTICSEARCH_USERNAME
