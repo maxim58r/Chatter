@@ -86,7 +86,7 @@ spec:
               - name: ELASTICSEARCH_USERNAME
                 value: "elastic"
               - name: ELASTICSEARCH_PASSWORD
-                value: "IVc703t2Tm083t7QEQ6D5axV"
+                value: "5LtfVTJc002wyaI499n4oj45"
             volumeMounts:
               - name: varlogcontainers
                 mountPath: /var/log/containers
