@@ -30,6 +30,7 @@ spec:
         config-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         secret-checksum: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         co.elastic.logs/enabled: "true"
+        co.elastic.logs/container.name: {{ .Values.name }}
     spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
