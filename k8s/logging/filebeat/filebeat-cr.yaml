@@ -79,7 +79,6 @@ spec:
             securityContext:
               runAsUser: 0
               privileged: true
-              allowPrivilegeEscalation: false # Улучшение безопасности
             env:
               - name: NODE_NAME
                 valueFrom:
