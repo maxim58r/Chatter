@@ -9,6 +9,7 @@ spec:
   elasticsearchRef:
     name: elastic
   config:
+    logging.level: debug
     filebeat.autodiscover:
       providers:
         - type: kubernetes
@@ -19,16 +20,17 @@ spec:
             paths:
               - /var/log/containers/*${data.kubernetes.container.id}.log
             # Добавлены настройки для JSON-логов
-            json.keys_under_root: true
-            json.add_error_key: true
+#            json.keys_under_root: true
+#            json.add_error_key: true
+            start_position: beginning
 
     processors:
       - add_host_metadata: {}
       - add_cloud_metadata: {}
-      - decode_json_fields:
-          fields: ["message"]
-          target: ""
-          overwrite_keys: true
+#      - decode_json_fields:
+#          fields: ["message"]
+#          target: ""
+#          overwrite_keys: true
 
     output.elasticsearch:
       hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
