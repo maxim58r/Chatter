@@ -36,11 +36,15 @@ spec:
 #          target: ""
 #          overwrite_keys: true
 
-    output.elasticsearch:
-      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
-      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
-      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
-      ssl.verification_mode: none
+#    output.elasticsearch:
+#      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
+#      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
+#      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
+#      ssl.verification_mode: none
+    output.console:
+      pretty: true
+
+
 
   daemonSet:
     podTemplate:
