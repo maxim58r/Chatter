@@ -14,6 +14,7 @@ spec:
       providers:
         - type: kubernetes
           node: ${NODE_NAME}
+          include_namespaces: ["default"]
           hints.enabled: true
           hints.default_config:
             type: container
