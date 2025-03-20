@@ -19,8 +19,8 @@ spec:
           hints.default_config:
             type: container
             paths:
-#              - /var/log/containers/*${kubernetes.container.id}.log
-              - /var/log/containers/*${data.kubernetes.container.id}.log
+              - /var/log/containers/*${kubernetes.container.id}.log
+#              - /var/log/containers/*${data.kubernetes.container.id}.log
             # Добавлены настройки для JSON-логов
 #            json.keys_under_root: true
 #            json.add_error_key: true
@@ -31,21 +31,19 @@ spec:
       - add_cloud_metadata: {}
       - add_kubernetes_metadata:
           in_cluster: true
-          target: data.kubernetes
+#          target: data.kubernetes
 #      - decode_json_fields:
 #          fields: ["message"]
 #          target: ""
 #          overwrite_keys: true
 
-#    output.elasticsearch:
-#      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
-#      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
-#      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
-#      ssl.verification_mode: none
-    output.console:
-      pretty: true
-
-
+    output.elasticsearch:
+      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]  # Используем DNS-имя сервиса
+      username: "${ELASTICSEARCH_USERNAME}"  # Используем переменную окружения
+      password: "${ELASTICSEARCH_PASSWORD}"  # Используем переменную окружения
+      ssl.verification_mode: none
+#    output.console:
+#      pretty: true
 
   daemonSet:
     podTemplate:
