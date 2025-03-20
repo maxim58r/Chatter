@@ -10,6 +10,7 @@ spec:
     name: elastic
   config:
     logging.level: debug
+    logging.selectors: ["*"]
     filebeat.autodiscover:
       providers:
         - type: kubernetes
@@ -19,7 +20,8 @@ spec:
           hints.default_config:
             type: container
             paths:
-              - /var/log/containers/*${kubernetes.container.id}.log
+#              - /var/log/containers/*${kubernetes.container.id}.log
+              - /var/log/containers/*{{`{{.kubernetes.container.id}}`}}*.log
 #              - /var/log/containers/*${data.kubernetes.container.id}.log
             # Добавлены настройки для JSON-логов
 #            json.keys_under_root: true
