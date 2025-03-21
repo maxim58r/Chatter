@@ -53,10 +53,10 @@ spec:
           # fsGroup: 1000
 
         volumes:
-          - name: varlogcontainers
+          - name: varlog
             hostPath:
-              path: /var/log/containers
-              type: Directory # Явное указание типа
+              path: /var/log
+              type: Directory
           - name: kube-api-access
             projected:
               sources:
@@ -99,8 +99,8 @@ spec:
               - name: ELASTICSEARCH_PASSWORD
                 value: "5LtfVTJc002wyaI499n4oj45"
             volumeMounts:
-              - name: varlogcontainers
-                mountPath: /var/log/containers
+              - name: varlog
+                mountPath: /var/log
                 readOnly: true
               - name: kube-api-access
                 mountPath: /var/run/secrets/kubernetes.io/serviceaccount
