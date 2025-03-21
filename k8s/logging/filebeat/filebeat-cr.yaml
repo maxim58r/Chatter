@@ -11,6 +11,13 @@ spec:
   config:
     logging.level: debug
     logging.selectors: ["*"]
+
+    setup.dashboards.enabled: true
+    setup.kibana.host: "https://kibana.logging.svc.cluster.local:5601"
+    setup.kibana.username: "elastic"
+    setup.kibana.password: "5LtfVTJc002wyaI499n4oj45"
+    setup.kibana.ssl.verification_mode: none
+
     filebeat.autodiscover:
       providers:
         - type: kubernetes
@@ -49,9 +56,6 @@ spec:
         serviceAccountName: filebeat-sa
         securityContext:
           runAsUser: 0
-          # Уберите fsGroup, если не требуется
-          # fsGroup: 1000
-
         volumes:
           - name: varlog
             hostPath:
@@ -73,7 +77,6 @@ spec:
                       - path: namespace
                         fieldRef:
                           fieldPath: metadata.namespace
-
         containers:
           - name: filebeat
             securityContext:
