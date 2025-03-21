@@ -13,7 +13,7 @@ spec:
     logging.selectors: ["*"]
 
     setup.dashboards.enabled: true
-    setup.kibana.host: "https://kibana.logging.svc.cluster.local:5601"
+    setup.kibana.host: "https://kibana-kb-http.logging.svc.cluster.local:5601"
     setup.kibana.username: "elastic"
     setup.kibana.password: "5LtfVTJc002wyaI499n4oj45"
     setup.kibana.ssl.verification_mode: none
