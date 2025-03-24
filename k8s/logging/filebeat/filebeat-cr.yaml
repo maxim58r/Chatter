@@ -61,6 +61,8 @@ spec:
             hostPath:
               path: /var/log
               type: Directory
+          - name: beat-data
+            emptyDir: {}
           - name: kube-api-access
             projected:
               sources:
@@ -108,3 +110,5 @@ spec:
               - name: kube-api-access
                 mountPath: /var/run/secrets/kubernetes.io/serviceaccount
                 readOnly: true
+              - name: beat-data
+                mountPath: /usr/share/filebeat/data
