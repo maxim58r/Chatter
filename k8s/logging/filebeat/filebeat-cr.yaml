@@ -9,7 +9,7 @@ spec:
   elasticsearchRef:
     name: elastic
   config:
-    logging.level: debug
+    logging.level: info
     logging.selectors: ["*"]
 
     setup.dashboards.enabled: true
