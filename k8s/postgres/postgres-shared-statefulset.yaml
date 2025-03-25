@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shared-hl
+  namespace: postgres
+  labels:
+    app: postgres-shared
+spec:
+  clusterIP: None
+  selector:
+    app: postgres-shared
+  ports:
+    - port: 5432
+      name: postgresql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shared-nodeport
+  namespace: postgres
+spec:
+  type: NodePort
+  selector:
+    app: postgres-shared
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 32172
+      protocol: TCP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-shared-secret
+  namespace: postgres
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "postgres"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-shared
+  namespace: postgres
+spec:
+  serviceName: "postgres-shared-hl"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-shared
+  template:
+    metadata:
+      labels:
+        app: postgres-shared
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          env:
+            - name: POSTGRES_DB
+              value: postgres_shared
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-shared-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+        storageClassName: local-path
