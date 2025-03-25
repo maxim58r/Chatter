@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shared-nodeport
+  namespace: postgres
+spec:
+  type: NodePort
+  selector:
+    application: spilo
+    cluster-name: postgres-shared
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 32172
