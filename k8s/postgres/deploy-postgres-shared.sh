@@ -28,3 +28,8 @@ echo ""
 echo "🔗 JDBC: jdbc:postgresql://$NODE_IP:$NODE_PORT/$DB_NAME"
 echo "👤 Пользователь: postgres"
 echo "🔑 Пароль: $PASSWORD"
+
+# Сделай скрипт исполняемым:
+# chmod +x deploy-postgres-shared.sh
+# запуск
+# ./deploy-postgres-shared.sh
