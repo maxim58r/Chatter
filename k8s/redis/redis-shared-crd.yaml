@@ -1,0 +1,24 @@
+apiVersion: redis.redis.opstreelabs.in/v1beta1
+kind: Redis
+metadata:
+  name: redis-shared
+  namespace: redis
+spec:
+  kubernetesConfig:
+    image: quay.io/opstree/redis:v7.0.11
+    imagePullPolicy: IfNotPresent
+  redisExporter:
+    enabled: false
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: local-path
+  redisConfig:
+    maxmemory: "256mb"
+    maxmemory-policy: "allkeys-lru"
+  clusterSize: 1
+  password: "CfAb11y5gLQ3quvc"
