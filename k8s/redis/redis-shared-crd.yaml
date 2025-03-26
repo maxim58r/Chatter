@@ -9,6 +9,7 @@ spec:
     imagePullPolicy: IfNotPresent
   redisExporter:
     enabled: false
+    image: quay.io/opstree/redis-exporter:v1.0.4  # обязательное поле даже если disabled
   storage:
     volumeClaimTemplate:
       spec:
