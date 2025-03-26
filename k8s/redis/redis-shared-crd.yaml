@@ -24,4 +24,4 @@ spec:
     imagePullPolicy: IfNotPresent
   auth:
     enabled: true
-    password: redispass123
+    password: "CfAb11y5gLQ3quvc"
