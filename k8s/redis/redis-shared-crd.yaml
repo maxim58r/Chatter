@@ -4,20 +4,20 @@ metadata:
   name: redis-shared
   namespace: redis
 spec:
-  auth:
-    enabled: true
-    existingSecret: redis-shared-auth
   kubernetesConfig:
     image: quay.io/opstree/redis:v7.0.11
     imagePullPolicy: IfNotPresent
   redisExporter:
     enabled: false
-    image: quay.io/opstree/redis-exporter:v1.0.4  # обязательное поле даже если disabled
+    image: quay.io/opstree/redis-exporter:v1.0.4
   storage:
     volumeClaimTemplate:
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes:
+          - ReadWriteOnce
         resources:
           requests:
             storage: 1Gi
         storageClassName: local-path
+  userConfig:
+    aclSecret: redis-shared-acl.yaml
