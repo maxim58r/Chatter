@@ -1,51 +1,26 @@
 #!/bin/bash
+NAMESPACE=redis
+RELEASE=redis-shared
+PASSWORD="MySecurePassword"
 
-set -euo pipefail
+echo "🔐 Создаём namespace и секрет с паролем..."
+kubectl create ns $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic redis-password --from-literal=redis-password=$PASSWORD -n $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
-NAMESPACE="redis"
-CLUSTER_NAME="redis-shared"
-NODE_PORT="32179"
-PORT="6379"
+echo "📦 Установка Redis через Helm..."
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
 
-echo "📦 Применяем Redis CRD..."
-kubectl apply -f redis-shared-crd.yaml
+helm upgrade --install $RELEASE bitnami/redis \
+  --namespace $NAMESPACE \
+  --set auth.enabled=true \
+  --set auth.existingSecret=redis-password \
+  --set auth.existingSecretPasswordKey=redis-password \
+  --set replica.replicaCount=0 \
+  --set persistence.enabled=true \
+  --set persistence.storageClass=local-path \
+  --set service.type=LoadBalancer
 
-echo "🌐 Применяем NodePort сервис..."
-kubectl apply -f redis-shared-nodeport.yaml
-
-echo "⏳ Ожидаем, пока Redis Pod будет готов..."
-while true; do
-  READY=$(kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$CLUSTER_NAME" \
-    -o jsonpath='{.items[0].status.containerStatuses[0].ready}' 2>/dev/null || echo "")
-  if [[ "$READY" == "true" ]]; then
-    echo -e "\n✅ Redis Pod готов!"
-    break
-  fi
-  echo -n "."
-  sleep 2
-done
-
-echo "🔐 Ищем Secret с автосгенерированным паролем..."
-SECRET_NAME=$(kubectl get secrets -n "$NAMESPACE" -o name | grep "$CLUSTER_NAME" | grep -E 'auth|secret' | head -n1 || true)
-
-if [[ -z "$SECRET_NAME" ]]; then
-  echo "❌ Не найден Secret с паролем."
-  exit 1
-fi
-
-PASSWORD=$(kubectl get "$SECRET_NAME" -n "$NAMESPACE" -o jsonpath="{.data.password}" | base64 -d)
-
-NODE_IP=$(kubectl get node -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
-
-echo ""
-echo "✅ Redis готов к подключению:"
-echo ""
-echo "🔗 redis://:$PASSWORD@$NODE_IP:$NODE_PORT"
-echo "📦 Host: $NODE_IP"
-echo "🔑 Пароль: $PASSWORD"
-
-
-# Сделай скрипт исполняемым:
-# chmod +x deploy-redis-shared.sh
-# Запусти:
-# ./deploy-redis-shared.sh
+echo -e "\n✅ Готово! Проверь командой:"
+echo "kubectl get svc -n $NAMESPACE"
+echo "redis-cli -h <EXTERNAL-IP> -a $PASSWORD ping"
