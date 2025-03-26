@@ -6,7 +6,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app.kubernetes.io/instance: redis-shared
+    app: redis-shared   # ← соответствует Pod
   ports:
     - port: 6379
       targetPort: 6379
