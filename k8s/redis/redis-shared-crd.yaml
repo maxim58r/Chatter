@@ -4,24 +4,16 @@ metadata:
   name: redis-shared
   namespace: redis
 spec:
-  mode: standalone
-  size: 1
-  redisConfig:
-    databases: "16"
-    maxmemory-policy: "allkeys-lru"
-  persistence:
-    enabled: true
-    storageClass: local-path
-    accessModes:
-      - ReadWriteOnce
-    storage: 1Gi
-  podSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
   kubernetesConfig:
     image: quay.io/opstree/redis:v7.0.11
     imagePullPolicy: IfNotPresent
-  auth:
-    enabled: true
-    password: "CfAb11y5gLQ3quvc"
+  redisExporter:
+    enabled: false
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: local-path
