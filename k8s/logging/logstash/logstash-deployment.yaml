@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: docker.io/library/logstash:8.5.1
+          # или 8.7.0, лишь бы подходило под вашу версию ES
+          ports:
+            - containerPort: 5044
+          # чуть уменьшим ресурсы, логстеш довольно прожорлив
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "300m"
+          env:
+            # Уменьшаем Java heap, чтобы не съел всё
+            - name: LS_JAVA_OPTS
+              value: "-Xms256m -Xmx256m"
+          volumeMounts:
+            - name: pipeline-config
+              mountPath: /usr/share/logstash/pipeline
+      volumes:
+        - name: pipeline-config
+          configMap:
+            name: logstash-pipeline
+            items:
+              - key: logstash.conf
+                path: logstash.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash-svc
+  namespace: logging
+spec:
+  type: NodePort
+  selector:
+    app: logstash
+  ports:
+    - port: 5044           # Service внутри кластера
+      targetPort: 5044     # Контейнерный порт
+      nodePort: 30429      # Внешний порт
+      protocol: TCP

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipeline
+  namespace: logging
+data:
+  logstash.conf: |-
+    input {
+      tcp {
+        port => 5044
+        codec => json
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => ["https://elastic-es-http.logging.svc.cluster.local:9200"]
+        index => "spring-logs-%{+YYYY.MM.dd}"
+        user => "elastic"
+        password => "5LtfVTJc002wyaI499n4oj45"
+        ssl_certificate_verification => "none"
+      }
+    }
