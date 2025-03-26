@@ -1,14 +1,14 @@
 #!/bin/bash
 NAMESPACE=redis
 RELEASE=redis-shared
-PASSWORD="MySecurePassword"
+PASSWORD="CfAb11y5gLQ3quvc"
 
 echo "🔐 Создаём namespace и секрет с паролем..."
 kubectl create ns $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 kubectl create secret generic redis-password --from-literal=redis-password=$PASSWORD -n $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
-echo "📦 Установка Redis через Helm..."
-helm repo add bitnami https://charts.bitnami.com/bitnami
+echo "📦 Установка Redis через Helm с LoadBalancer на мастере..."
+helm repo add bitnami https://charts.bitnami.com/bitnami || true
 helm repo update
 
 helm upgrade --install $RELEASE bitnami/redis \
@@ -19,8 +19,9 @@ helm upgrade --install $RELEASE bitnami/redis \
   --set replica.replicaCount=0 \
   --set persistence.enabled=true \
   --set persistence.storageClass=local-path \
-  --set service.type=LoadBalancer
+  --set master.service.type=LoadBalancer
 
-echo -e "\n✅ Готово! Проверь командой:"
+echo -e "\n✅ Redis установлен с LoadBalancer."
+echo "Проверь IP командой:"
 echo "kubectl get svc -n $NAMESPACE"
 echo "redis-cli -h <EXTERNAL-IP> -a $PASSWORD ping"
