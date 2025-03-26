@@ -1,0 +1,15 @@
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisACL
+metadata:
+  name: redis-shared-acl
+  namespace: redis
+spec:
+  users:
+    - name: default
+      secret:
+        name: redis-shared-auth
+        key: password
+      commands:
+        - allcommands
+      keys:
+        - allkeys
