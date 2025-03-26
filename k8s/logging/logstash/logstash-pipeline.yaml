@@ -17,6 +17,6 @@ data:
         index => "spring-logs-%{+YYYY.MM.dd}"
         user => "elastic"
         password => "5LtfVTJc002wyaI499n4oj45"
-        ssl_certificate_verification => "none"
+        ssl_certificate_verification => "false"
       }
     }
