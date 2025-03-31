@@ -22,7 +22,7 @@ spec:
       providers:
         - type: kubernetes
           node: ${NODE_NAME}
-          scope: cluster # Для мониторинга всех нод
+          scope: cluster
           templates:
             - condition:
                 equals:
@@ -31,10 +31,15 @@ spec:
                 - type: container
                   paths:
                     - /var/log/containers/*.log
-                  # Раскомментируйте, если логи в формате JSON
-                  # json.keys_under_root: true
-                  # json.add_error_key: true
                   start_position: beginning
+            - condition:
+                equals:
+                  kubernetes.namespace: "logging"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*.log
+              start_position: beginning
 
     processors:
       - add_host_metadata: {}
