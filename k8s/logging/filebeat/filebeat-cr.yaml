@@ -49,15 +49,9 @@ spec:
           # Добавьте namespace для метаданных
           namespace: ${POD_NAMESPACE}
 
-#    output.elasticsearch:
-#      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
-#      username: "${ELASTICSEARCH_USERNAME}"
-#      password: "${ELASTICSEARCH_PASSWORD}"
-#      ssl.verification_mode: none
-
     output.logstash:
       hosts: [ "logstash-svc.logging.svc.cluster.local:5044" ]
-      ssl.enabled: false
+      ssl.verification_mode: none
 
   daemonSet:
     podTemplate:
