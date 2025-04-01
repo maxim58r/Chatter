@@ -15,7 +15,7 @@ data:
         # ssl_key         => "/usr/share/logstash/config/certs/tls.key"
       }
       tcp {
-        port => 30429
+        port => 32029
         codec => json_lines  # или другой codec, соответствующий формату логов
       }
     }
