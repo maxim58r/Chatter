@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,10 +17,9 @@ spec:
       containers:
         - name: logstash
           image: docker.io/library/logstash:8.5.1
-          # или 8.7.0, лишь бы подходило под вашу версию ES
           ports:
-            - containerPort: 5044
-          # чуть уменьшим ресурсы, логстеш довольно прожорлив
+            - containerPort: 5044    # Beats input
+            - containerPort: 30429   # TCP input
           resources:
             requests:
               memory: "256Mi"
@@ -28,7 +28,6 @@ spec:
               memory: "512Mi"
               cpu: "300m"
           env:
-            # Уменьшаем Java heap, чтобы не съел всё
             - name: LS_JAVA_OPTS
               value: "-Xms256m -Xmx256m"
           volumeMounts:
@@ -41,6 +40,7 @@ spec:
             items:
               - key: logstash.conf
                 path: logstash.conf
+
 ---
 apiVersion: v1
 kind: Service
@@ -52,7 +52,16 @@ spec:
   selector:
     app: logstash
   ports:
-    - port: 5044           # Service внутри кластера
-      targetPort: 5044     # Контейнерный порт
-      nodePort: 30429      # Внешний порт
+    # Публикуем порт 5044 (Beats) наружу
+    - name: beats
+      port: 5044
+      targetPort: 5044
+      nodePort: 31044      # Любое свободное значение от 30000 до 32767
+      protocol: TCP
+
+    # Публикуем порт 30429 (TCP) наружу
+    - name: tcp
+      port: 30429
+      targetPort: 30429
+      nodePort: 32029      # Аналогично, свободный диапазон 30000-32767
       protocol: TCP
