@@ -49,11 +49,15 @@ spec:
           # Добавьте namespace для метаданных
           namespace: ${POD_NAMESPACE}
 
-    output.elasticsearch:
-      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
-      username: "${ELASTICSEARCH_USERNAME}"
-      password: "${ELASTICSEARCH_PASSWORD}"
-      ssl.verification_mode: none
+#    output.elasticsearch:
+#      hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
+#      username: "${ELASTICSEARCH_USERNAME}"
+#      password: "${ELASTICSEARCH_PASSWORD}"
+#      ssl.verification_mode: none
+
+    output.logstash:
+      hosts: [ "logstash-svc.logging.svc.cluster.local:5044" ]
+      ssl.enabled: false
 
   daemonSet:
     podTemplate:
@@ -102,12 +106,12 @@ spec:
                 value: "kubernetes.default.svc"
               - name: KUBERNETES_SERVICE_PORT
                 value: "443"
-              - name: ELASTICSEARCH_HOSTS
-                value: "https://elastic-es-http.logging.svc.cluster.local:9200"
-              - name: ELASTICSEARCH_USERNAME
-                value: "elastic"
-              - name: ELASTICSEARCH_PASSWORD
-                value: "5LtfVTJc002wyaI499n4oj45"
+#              - name: ELASTICSEARCH_HOSTS
+#                value: "https://elastic-es-http.logging.svc.cluster.local:9200"
+#              - name: ELASTICSEARCH_USERNAME
+#                value: "elastic"
+#              - name: ELASTICSEARCH_PASSWORD
+#                value: "5LtfVTJc002wyaI499n4oj45"
             volumeMounts:
               - name: varlog
                 mountPath: /var/log

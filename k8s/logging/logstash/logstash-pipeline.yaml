@@ -6,17 +6,27 @@ metadata:
 data:
   logstash.conf: |-
     input {
-      tcp {
+      # Принимаем поток от Filebeat по протоколу Beats
+      beats {
         port => 5044
-        codec => json
+        # Если нужно TLS, добавляем:
+        # ssl => true
+        # ssl_certificate => "/usr/share/logstash/config/certs/tls.crt"
+        # ssl_key         => "/usr/share/logstash/config/certs/tls.key"
       }
     }
+
+    filter {
+      # Можно добавить фильтры для парсинга, обогащения, grok и т.д.
+    }
+
     output {
       elasticsearch {
         hosts => ["https://elastic-es-http.logging.svc.cluster.local:9200"]
         index => "spring-logs-%{+YYYY.MM.dd}"
         user => "elastic"
         password => "5LtfVTJc002wyaI499n4oj45"
+
         ssl => true
         ssl_certificate_verification => false
       }
