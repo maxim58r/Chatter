@@ -2,38 +2,30 @@ apiVersion: beat.k8s.elastic.co/v1beta1
 kind: Beat
 metadata:
   name: metricbeat
-  namespace: logging       # Или где у вас хранится вся логика
+  namespace: logging
 spec:
   type: metricbeat
-  version: 8.5.1           # Тот же, что у Elasticsearch
+  version: 8.5.1
   elasticsearchRef:
-    name: elastic          # Имя Elasticsearch, задеплоенного ECK
+    name: elastic
   kibanaRef:
-    name: kibana           # Если хотите дашборды автоматически
+    name: kibana
   config:
-    # Основная конфигурация metricbeat:
     metricbeat.autodiscover:
       providers:
         - type: kubernetes
           node: ${NODE_NAME}
-          # Охват всего кластера:
           scope: cluster
           templates:
             - condition:
                 equals:
-                  # Фильтруем по namespace / labels, если нужно
                   kubernetes.namespace: "default"
               config:
                 - module: prometheus
                   period: 15s
                   hosts: ["${data.host}:8080"]
                   metrics_path: "/actuator/prometheus"
-                  # Можно указать разный scheme (http/https), если нужно
-                  # scheme: https
-                  # Если нужно базовая аутентификация,
-                  # добавьте username / password или etc.
 
-    # Пример: если нужно дополнительно собирать метрики узлов k8s
     metricbeat.modules:
       - module: kubernetes
         metricsets:
@@ -43,28 +35,25 @@ spec:
           - container
           - volume
         period: 10s
-        host: "${NODE_NAME}"
-        hosts: ["https://${NODE_NAME}:10250"]  # при использовании secure kubelet
-        ssl.verification_mode: none            # если самоподписанные сертификаты
+        hosts: ["https://${NODE_NAME}:10250"]
+        ssl.verification_mode: none
 
-    # если хотите отладки
-    # logging.level: debug
-    setup.ilm.enabled: false  # Зависит от того, как вы управляете индексами
+    setup.ilm.enabled: false
 
   daemonSet:
     podTemplate:
       spec:
-        serviceAccountName: metricbeat-sa  # Создайте ServiceAccount при необходимости
+        serviceAccountName: metricbeat-sa
         containers:
           - name: metricbeat
+            env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
             resources:
               limits:
                 memory: 200Mi
               requests:
                 cpu: 100m
                 memory: 100Mi
-            env:
-              - name: NODE_NAME
-                valueFrom:
-                  fieldRef:
-                    fieldPath: spec.nodeName
