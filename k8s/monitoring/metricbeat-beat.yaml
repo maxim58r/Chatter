@@ -11,32 +11,15 @@ spec:
   kibanaRef:
     name: kibana
   config:
-    metricbeat.autodiscover:
-      providers:
-        - type: kubernetes
-          node: ${NODE_NAME}
-          scope: cluster
-          templates:
-            - condition:
-                equals:
-                  kubernetes.namespace: "default"
-              config:
-                - module: prometheus
-                  period: 15s
-                  hosts: ["${data.host}:8080"]
-                  metrics_path: "/actuator/prometheus"
-
     metricbeat.modules:
-      - module: kubernetes
-        metricsets:
-          - node
-          - system
-          - pod
-          - container
-          - volume
-        period: 10s
-        hosts: ["https://${NODE_NAME}:10250"]
-        ssl.verification_mode: none
+      - module: prometheus
+        period: 15s
+        hosts: ["http://kube-state-metrics.kube-system.svc.cluster.local:8080"]
+        metrics_path: /metrics
+        query:
+          - help: "kube_.*"
+        fields:
+          service: kube-state-metrics
 
     setup.ilm.enabled: false
 
@@ -51,11 +34,15 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
-            securityContext:
-              runAsUser: 0
             resources:
               limits:
                 memory: 200Mi
               requests:
                 cpu: 100m
                 memory: 100Mi
+  template:
+    spec:
+      containers:
+        - name: metricbeat
+          securityContext:
+            runAsUser: 0
