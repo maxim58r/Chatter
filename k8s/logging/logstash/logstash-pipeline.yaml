@@ -7,13 +7,13 @@ data:
   logstash.conf: |-
     input {
       # Принимаем поток от Filebeat по протоколу Beats
-      beats {
-        port => 5044
-        # Если нужно TLS, добавляем:
-        # ssl => true
-        # ssl_certificate => "/usr/share/logstash/config/certs/tls.crt"
-        # ssl_key         => "/usr/share/logstash/config/certs/tls.key"
-      }
+      #      beats {
+      #        port => 5044
+      #        # Если нужно TLS, добавляем:
+      #        # ssl => true
+      #        # ssl_certificate => "/usr/share/logstash/config/certs/tls.crt"
+      #        # ssl_key         => "/usr/share/logstash/config/certs/tls.key"
+      #      }
       tcp {
         port => 30429
         codec => json_lines  # или другой codec, соответствующий формату логов
