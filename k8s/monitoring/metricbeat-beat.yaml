@@ -15,17 +15,13 @@ spec:
       - module: elasticsearch
         xpack.enabled: true
         period: 10s
-        hosts: [ "https://elastic-es-http.logging.svc:9200" ]
-        username: "elastic"
-        password: "5LtfVTJc002wyaI499n4oj45"
+        hosts: ["https://elastic-es-http.logging.svc:9200"]
         ssl.verification_mode: none
 
       - module: kibana
         xpack.enabled: true
         period: 10s
-        hosts: [ "https://kibana-kb-http.logging.svc:5601" ]
-        username: "elastic"
-        password: "5LtfVTJc002wyaI499n4oj45"
+        hosts: ["https://kibana-kb-http.logging.svc:5601"]
         ssl.verification_mode: none
 
       - module: prometheus
@@ -46,8 +42,8 @@ spec:
           - process
           - process_summary
         period: 10s
-        processes: [ '.*' ]
-        cpu.metrics: [ "percentages", "normalized_percentages" ]
+        processes: [".*"]
+        cpu.metrics: ["percentages", "normalized_percentages"]
 
       - module: kubernetes
         metricsets:
@@ -56,17 +52,21 @@ spec:
           - container
           - volume
         period: 10s
-        hosts: [ "https://${NODE_NAME}:10250" ]
+        hosts: ["https://${NODE_NAME}:10250"]
         ssl.verification_mode: none
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         kubernetes.ssl.certificate_authorities:
           - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
     setup.ilm.enabled: false
+
   daemonSet:
     podTemplate:
       spec:
         serviceAccountName: metricbeat-sa
         automountServiceAccountToken: true
+        hostNetwork: true
+        dnsPolicy: ClusterFirstWithHostNet
         containers:
           - name: metricbeat
             image: docker.elastic.co/beats/metricbeat:8.5.1
@@ -110,3 +110,4 @@ spec:
             hostPath:
               path: /var/lib/logging/metricbeat/metricbeat-data
               type: DirectoryOrCreate
+
