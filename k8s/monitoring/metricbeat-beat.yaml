@@ -17,7 +17,7 @@ spec:
         period: 10s
         hosts: [ "https://elastic-es-http.logging.svc:9200" ]
         username: "elastic"
-        password: "your-password"   # Или используй секрет
+        password: "5LtfVTJc002wyaI499n4oj45"
         ssl.verification_mode: none
 
       - module: kibana
@@ -25,7 +25,7 @@ spec:
         period: 10s
         hosts: [ "https://kibana-kb-http.logging.svc:5601" ]
         username: "elastic"
-        password: "your-password"
+        password: "5LtfVTJc002wyaI499n4oj45"
         ssl.verification_mode: none
 
       - module: prometheus
