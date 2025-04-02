@@ -20,6 +20,29 @@ spec:
           help: kube_.*
         fields:
           service: kube-state-metrics
+      - module: system
+        metricsets:
+          - cpu
+          - memory
+          - network
+          - filesystem
+          - process
+          - process_summary
+        period: 10s
+        processes: [ '.*' ]
+        cpu.metrics: [ "percentages", "normalized_percentages" ]
+      - module: kubernetes
+        metricsets:
+          - node
+          - pod
+          - container
+          - volume
+        period: 10s
+        hosts: [ "https://${NODE_NAME}:10250" ]
+        ssl.verification_mode: none
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes.ssl.certificate_authorities:
+          - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     setup.ilm.enabled: false
   daemonSet:
     podTemplate:
