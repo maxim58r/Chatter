@@ -16,12 +16,28 @@ spec:
         - type: kubernetes
           node: ${NODE_NAME}
           templates:
-            - config:
+            - condition:
+                contains:
+                  kubernetes.pod.name: "authservice"
+              config:
                 - module: prometheus
                   period: 15s
                   hosts: ["localhost:8080"]
                   metrics_path: "/actuator/prometheus"
+
     metricbeat.modules:
+      - module: system
+        metricsets:
+          - cpu
+          - memory
+          - network
+          - filesystem
+          - process
+          - process_summary
+        period: 10s
+        processes: [".*"]
+        cpu.metrics: ["percentages", "normalized_percentages"]
+
       - module: kubernetes
         metricsets:
           - node
@@ -39,6 +55,7 @@ spec:
         ssl.verification_mode: none
         kubernetes.ssl.certificate_authorities:
           - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
     setup.ilm.enabled: false
 
   daemonSet:
