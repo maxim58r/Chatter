@@ -15,13 +15,12 @@ spec:
       - module: prometheus
         period: 15s
         hosts: ["http://kube-state-metrics.kube-system.svc.cluster.local:8080"]
-        metrics_path: /metrics
-        fields:
-          service: kube-state-metrics
+        metrics_path: "/metrics"
         query:
           - help: kube_.*
+        fields:
+          service: kube-state-metrics
     setup.ilm.enabled: false
-
   daemonSet:
     podTemplate:
       spec:
