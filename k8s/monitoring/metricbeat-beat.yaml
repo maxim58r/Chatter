@@ -17,7 +17,7 @@ spec:
         hosts: ["http://kube-state-metrics.kube-system.svc.cluster.local:8080"]
         metrics_path: "/metrics"
         query:
-          - help: kube_.*
+          help: kube_.*
         fields:
           service: kube-state-metrics
     setup.ilm.enabled: false
