@@ -28,6 +28,11 @@ spec:
           - pod
           - container
           - volume
+          - state_pod
+          - state_node
+          - state_deployment
+          - state_replicaset
+          - state_container
         period: 10s
         hosts: ["https://${NODE_NAME}:10250"]
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
