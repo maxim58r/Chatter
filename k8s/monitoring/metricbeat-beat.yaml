@@ -19,6 +19,8 @@ spec:
             - condition:
                 contains:
                   kubernetes.pod.name: "authservice"
+                equals:
+                  kubernetes.namespace: "default"
               config:
                 - module: prometheus
                   period: 15s
