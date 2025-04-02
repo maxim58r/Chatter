@@ -19,7 +19,7 @@ spec:
             - config:
                 - module: prometheus
                   period: 15s
-                  hosts: ["${data.host}:8080"]
+                  hosts: ["localhost:8080"]
                   metrics_path: "/actuator/prometheus"
     metricbeat.modules:
       - module: kubernetes
@@ -34,7 +34,6 @@ spec:
         ssl.verification_mode: none
         kubernetes.ssl.certificate_authorities:
           - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
     setup.ilm.enabled: false
 
   daemonSet:
@@ -47,7 +46,7 @@ spec:
         containers:
           - name: metricbeat
             image: docker.elastic.co/beats/metricbeat:8.5.1
-            args: ["-e"]
+            args: ["-e", "-c", "/etc/beat.yml"]
             env:
               - name: NODE_NAME
                 valueFrom:
@@ -61,3 +60,17 @@ spec:
                 memory: 100Mi
             securityContext:
               runAsUser: 0
+            volumeMounts:
+              - name: config
+                mountPath: /etc/beat.yml
+                subPath: beat.yml
+              - name: beat-data
+                mountPath: /usr/share/metricbeat/data
+        volumes:
+          - name: config
+            secret:
+              secretName: metricbeat-beat-metricbeat-config
+          - name: beat-data
+            hostPath:
+              path: /var/lib/logging/metricbeat/metricbeat-data
+              type: DirectoryOrCreate
