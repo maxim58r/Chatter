@@ -12,6 +12,22 @@ spec:
     name: kibana
   config:
     metricbeat.modules:
+      - module: elasticsearch
+        xpack.enabled: true
+        period: 10s
+        hosts: [ "https://elastic-es-http.logging.svc:9200" ]
+        username: "elastic"
+        password: "your-password"   # Или используй секрет
+        ssl.verification_mode: none
+
+      - module: kibana
+        xpack.enabled: true
+        period: 10s
+        hosts: [ "https://kibana-kb-http.logging.svc:5601" ]
+        username: "elastic"
+        password: "your-password"
+        ssl.verification_mode: none
+
       - module: prometheus
         period: 15s
         hosts: ["http://kube-state-metrics.kube-system.svc.cluster.local:8080"]
@@ -20,6 +36,7 @@ spec:
           help: kube_.*
         fields:
           service: kube-state-metrics
+
       - module: system
         metricsets:
           - cpu
@@ -31,6 +48,7 @@ spec:
         period: 10s
         processes: [ '.*' ]
         cpu.metrics: [ "percentages", "normalized_percentages" ]
+
       - module: kubernetes
         metricsets:
           - node
