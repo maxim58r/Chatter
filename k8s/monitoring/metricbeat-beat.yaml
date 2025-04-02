@@ -11,40 +11,17 @@ spec:
   kibanaRef:
     name: kibana
   config:
+    metricbeat.autodiscover:
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+          templates:
+            - config:
+                - module: prometheus
+                  period: 15s
+                  hosts: ["${data.host}:8080"]
+                  metrics_path: "/actuator/prometheus"
     metricbeat.modules:
-      - module: elasticsearch
-        xpack.enabled: true
-        period: 10s
-        hosts: ["https://elastic-es-http.logging.svc:9200"]
-        ssl.verification_mode: none
-
-      - module: kibana
-        xpack.enabled: true
-        period: 10s
-        hosts: ["https://kibana-kb-http.logging.svc:5601"]
-        ssl.verification_mode: none
-
-      - module: prometheus
-        period: 15s
-        hosts: ["http://kube-state-metrics.kube-system.svc.cluster.local:8080"]
-        metrics_path: "/metrics"
-        query:
-          help: kube_.*
-        fields:
-          service: kube-state-metrics
-
-      - module: system
-        metricsets:
-          - cpu
-          - memory
-          - network
-          - filesystem
-          - process
-          - process_summary
-        period: 10s
-        processes: [".*"]
-        cpu.metrics: ["percentages", "normalized_percentages"]
-
       - module: kubernetes
         metricsets:
           - node
@@ -53,8 +30,8 @@ spec:
           - volume
         period: 10s
         hosts: ["https://${NODE_NAME}:10250"]
-        ssl.verification_mode: none
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        ssl.verification_mode: none
         kubernetes.ssl.certificate_authorities:
           - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
@@ -70,7 +47,7 @@ spec:
         containers:
           - name: metricbeat
             image: docker.elastic.co/beats/metricbeat:8.5.1
-            args: ["-e", "-c", "/etc/beat.yml"]
+            args: ["-e"]
             env:
               - name: NODE_NAME
                 valueFrom:
@@ -84,30 +61,3 @@ spec:
                 memory: 100Mi
             securityContext:
               runAsUser: 0
-            volumeMounts:
-              - name: config
-                mountPath: /etc/beat.yml
-                subPath: beat.yml
-              - name: elasticsearch-certs
-                mountPath: /mnt/elastic-internal/elasticsearch-certs
-                readOnly: true
-              - name: kibana-certs
-                mountPath: /mnt/elastic-internal/kibana-certs
-                readOnly: true
-              - name: beat-data
-                mountPath: /usr/share/metricbeat/data
-        volumes:
-          - name: config
-            secret:
-              secretName: metricbeat-beat-metricbeat-config
-          - name: elasticsearch-certs
-            secret:
-              secretName: metricbeat-beat-es-ca
-          - name: kibana-certs
-            secret:
-              secretName: metricbeat-beat-kibana-ca
-          - name: beat-data
-            hostPath:
-              path: /var/lib/logging/metricbeat/metricbeat-data
-              type: DirectoryOrCreate
-
