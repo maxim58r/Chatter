@@ -12,7 +12,6 @@ spec:
 
   config:
     elasticsearch.hosts:
-#      - "https://elastic-es-http.logging.svc:9200"
       - "https://elastic-es-http.logging.svc.cluster.local:9200"
     elasticsearch.ssl.verificationMode: "full"
     elasticsearch.ssl.certificateAuthorities:
@@ -20,9 +19,15 @@ spec:
 
   podTemplate:
     spec:
-      serviceAccountName: kibana-sa
       containers:
         - name: kibana
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 500m
+            limits:
+              memory: 3Gi
+              cpu: 1
           volumeMounts:
             - name: elasticsearch-ca
               mountPath: /usr/share/kibana/config/certs
