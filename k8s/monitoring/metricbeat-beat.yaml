@@ -48,6 +48,7 @@ spec:
     podTemplate:
       spec:
         serviceAccountName: metricbeat-sa
+        automountServiceAccountToken: true
         containers:
           - name: metricbeat
             image: docker.elastic.co/beats/metricbeat:8.5.1
