@@ -1,60 +1,42 @@
-# metricbeat-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: metricbeat
+  name: metricbeat-cluster-role
 rules:
   - apiGroups: [""]
     resources:
       - nodes
       - namespaces
       - pods
-    verbs: ["get", "list", "watch"]
+      - services
+      - endpoints
+      - secrets
+    verbs: ["get", "watch", "list"]
   - apiGroups: ["extensions"]
     resources:
       - replicasets
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "watch", "list"]
   - apiGroups: ["apps"]
     resources:
-      - statefulsets
       - deployments
-      - replicasets
+      - statefulsets
       - daemonsets
-    verbs: ["get", "list", "watch"]
+      - replicasets
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+    verbs: ["get", "watch", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: metricbeat
-subjects:
-  - kind: ServiceAccount
-    name: metricbeat-sa
-    namespace: logging
+  name: metricbeat-cluster-role-binding
 roleRef:
   kind: ClusterRole
-  name: metricbeat
+  name: metricbeat-cluster-role
   apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: metricbeat-role
-  namespace: logging
-rules:
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: metricbeat-rolebinding
-  namespace: logging
 subjects:
   - kind: ServiceAccount
     name: metricbeat-sa
     namespace: logging
-roleRef:
-  kind: Role
-  name: metricbeat-role
-  apiGroup: rbac.authorization.k8s.io
