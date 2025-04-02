@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,6 +32,10 @@ spec:
           volumeMounts:
             - name: pipeline-config
               mountPath: /usr/share/logstash/pipeline
+            # NEW! Примонтируем logstash.yml
+            - name: logstash-config-vol
+              mountPath: /usr/share/logstash/config/logstash.yml
+              subPath: logstash.yml
       volumes:
         - name: pipeline-config
           configMap:
@@ -40,7 +43,13 @@ spec:
             items:
               - key: logstash.conf
                 path: logstash.conf
-
+        # NEW! Добавляем volume для logstash.yml
+        - name: logstash-config-vol
+          configMap:
+            name: logstash-config  # <-- тот ConfigMap, что вы создали
+            items:
+              - key: logstash.yml
+                path: logstash.yml
 ---
 apiVersion: v1
 kind: Service

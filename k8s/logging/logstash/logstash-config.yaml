@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: logging
+data:
+  logstash.yml: |-
+    # -- Базовые настройки -- #
+    # чтобы Logstash слушал конвейер в /usr/share/logstash/pipeline
+    path.config: "/usr/share/logstash/pipeline"
+    # если нужно слушать API-интерфейс и т.д.
+    http.host: "0.0.0.0"
+
+    # -- Отключаем (или настраиваем) X-Pack Monitoring -- #
+    xpack.monitoring.enabled: false
+    # Либо, если хотите включить и направить на нужный адрес ES:
+    # xpack.monitoring.enabled: true
+    # xpack.monitoring.elasticsearch.hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
+
+    # Можно указать logging.level, pipeline.workers, queue.type и т.д. при необходимости.
