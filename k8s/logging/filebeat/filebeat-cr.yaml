@@ -48,7 +48,7 @@ spec:
           namespace: ${POD_NAMESPACE}
 
     output.logstash:
-      hosts: [ "logstash-svc.logging.svc.cluster.local:5044" ]
+      hosts: [ "logstash-svc.logging.svc.cluster.local:30429" ]
       ssl.verification_mode: none
 
   daemonSet:
