@@ -34,15 +34,11 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
+            securityContext:
+              runAsUser: 0
             resources:
               limits:
                 memory: 200Mi
               requests:
                 cpu: 100m
                 memory: 100Mi
-  template:
-    spec:
-      containers:
-        - name: metricbeat
-          securityContext:
-            runAsUser: 0
