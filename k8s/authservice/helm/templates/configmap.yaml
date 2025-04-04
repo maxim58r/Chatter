@@ -12,9 +12,6 @@ data:
       application:
         name: {{ .Values.spring.application.name | quote }}
 
-      profiles:
-        active: {{ .Values.springProfilesActive | quote }}
-
       datasource:
         url: ${IFT_DATASOURCE_URL}
         username: ${IFT_DATASOURCE_USERNAME}
