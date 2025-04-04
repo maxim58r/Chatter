@@ -26,14 +26,12 @@ spring:
   liquibase:
     enabled: true
     changeLog: classpath:db/changelog/db.changelog-master.xml
-    defaultSchema: authservice
   jpa:
     hibernate:
       ddlAuto: update
     showSql: true
     properties:
       hibernateDialect: org.hibernate.dialect.PostgreSQLDialect
-      hibernateDefaultSchema: authservice
 
   elasticsearch:
     uris: http://192.168.1.35:30429
