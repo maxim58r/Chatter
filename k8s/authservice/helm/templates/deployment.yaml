@@ -79,6 +79,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: elasticsearchPassword
+            - name: ELASTIC_HOST
+              value: {{ .Values.spring.elasticsearch.logstashHost | quote }}
 
           envFrom:
             - configMapRef:
