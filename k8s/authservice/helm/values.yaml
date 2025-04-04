@@ -28,7 +28,7 @@ spring:
     changeLog: classpath:db/changelog/db.changelog-master.xml
   jpa:
     hibernate:
-      ddlAuto: create
+      ddlAuto: update
     showSql: true
     properties:
       hibernateDialect: org.hibernate.dialect.PostgreSQLDialect

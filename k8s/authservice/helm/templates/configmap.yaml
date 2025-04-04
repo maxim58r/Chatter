@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-configmap
   namespace: {{ .Release.Namespace }}
 data:
-  application.yaml: |
+  application-ift.yaml: |
     server:
       port: {{ .Values.server.port | quote }}
 
@@ -12,10 +12,14 @@ data:
       application:
         name: {{ .Values.spring.application.name | quote }}
 
+      profiles:
+        active: {{ .Values.springProfilesActive | quote }}
+
       datasource:
         url: ${IFT_DATASOURCE_URL}
         username: ${IFT_DATASOURCE_USERNAME}
         password: ${IFT_DATASOURCE_PASSWORD}
+        driver-class-name: org.postgresql.Driver
 
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
@@ -27,6 +31,7 @@ data:
         show-sql: {{ .Values.spring.jpa.showSql | quote }}
         properties:
           hibernate.dialect: {{ .Values.spring.jpa.properties.hibernateDialect | quote }}
+          hibernate.default_schema: public
 
       elasticsearch:
         uris: ${ELASTICSEARCH_URI}
