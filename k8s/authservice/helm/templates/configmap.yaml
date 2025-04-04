@@ -20,6 +20,7 @@ data:
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
         change-log: {{ .Values.spring.liquibase.changeLog | quote }}
+        default-schema: {{ .Values.spring.liquibase.defaultSchema | quote }}
 
       jpa:
         hibernate:
@@ -27,6 +28,7 @@ data:
         show-sql: {{ .Values.spring.jpa.showSql | quote }}
         properties:
           hibernate.dialect: {{ .Values.spring.jpa.properties.hibernateDialect | quote }}
+          hibernate.default_schema: {{ .Values.spring.jpa.properties.hibernateDefaultSchema | quote }}
 
       elasticsearch:
         uris: ${ELASTICSEARCH_URI}
