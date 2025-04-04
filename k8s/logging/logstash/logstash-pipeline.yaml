@@ -13,8 +13,10 @@ data:
     }
 
     filter {
-      # Можно добавить фильтры для парсинга, обогащения, grok и т.д.
-    }
+      if "_jsonparsefailure" in [tags] {
+        drop { }
+      }
+    }    
 
     output {
       elasticsearch {
