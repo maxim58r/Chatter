@@ -16,17 +16,17 @@ data:
       if "_jsonparsefailure" in [tags] {
         drop { }
       }
-    }    
+    }
 
     output {
       elasticsearch {
         hosts => ["https://elastic-es-http.logging.svc.cluster.local:9200"]
         index => "spring-logs-%{+YYYY.MM.dd}"
-        
+
         user => "${ES_USERNAME}"
         password => "${ES_PASSWORD}"
-        
+
         ssl => true
         ssl_certificate_verification => false
       }
-   }
+    }
