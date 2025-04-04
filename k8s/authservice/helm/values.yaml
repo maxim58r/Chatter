@@ -57,20 +57,6 @@ jwt:
   secret: secret_key
   expiration: 3600000
 
-logging:
-  level:
-    org:
-      springframework:
-        boot:
-          context:
-            properties: INFO
-      hibernate:
-        SQL: OFF
-        type:
-          descriptor:
-            sql:
-              BasicBinder: OFF
-
 deployment:
   annotations:
     redeploy: ""

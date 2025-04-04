@@ -47,13 +47,6 @@ data:
       secret: {{ .Values.jwt.secret | quote }}
       expiration: {{ .Values.jwt.expiration | int }}
 
-    logging:
-      level:
-        root: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}
-        org.springframework: {{ .Values.logging.level.org.springframework.boot.context.properties | quote }}
-      pattern:
-        console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){blue} %clr(%-5level) %clr(%logger{36}){cyan} - %msg%n"
-
     management:
       endpoint:
         health:
