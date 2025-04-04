@@ -22,10 +22,11 @@ data:
       elasticsearch {
         hosts => ["https://elastic-es-http.logging.svc.cluster.local:9200"]
         index => "spring-logs-%{+YYYY.MM.dd}"
-        user => "elastic"
-        password => "5LtfVTJc002wyaI499n4oj45"
-
+        
+        user => "${ES_USERNAME}"
+        password => "${ES_PASSWORD}"
+        
         ssl => true
         ssl_certificate_verification => false
       }
-    }
+   }
