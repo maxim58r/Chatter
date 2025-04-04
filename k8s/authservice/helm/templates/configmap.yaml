@@ -24,6 +24,7 @@ data:
       liquibase:
         enabled: {{ .Values.spring.liquibase.enabled | quote }}
         change-log: {{ .Values.spring.liquibase.changeLog | quote }}
+        default-schema: public
 
       jpa:
         hibernate:
