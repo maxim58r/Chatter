@@ -98,12 +98,6 @@ spec:
                 value: "kubernetes.default.svc"
               - name: KUBERNETES_SERVICE_PORT
                 value: "443"
-#              - name: ELASTICSEARCH_HOSTS
-#                value: "https://elastic-es-http.logging.svc.cluster.local:9200"
-#              - name: ELASTICSEARCH_USERNAME
-#                value: "elastic"
-#              - name: ELASTICSEARCH_PASSWORD
-#                value: "5LtfVTJc002wyaI499n4oj45"
             volumeMounts:
               - name: varlog
                 mountPath: /var/log

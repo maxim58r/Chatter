@@ -63,7 +63,7 @@ logging:
       springframework:
         boot:
           context:
-            properties: DEBUG
+            properties: INFO
       hibernate:
         SQL: OFF
         type:

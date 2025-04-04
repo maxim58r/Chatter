@@ -91,6 +91,8 @@ spec:
             - name: config-volume
               mountPath: /config
               readOnly: true
+            - name: logs
+              mountPath: /logs
 
           livenessProbe:
             httpGet:
@@ -117,3 +119,6 @@ spec:
             items:
               - key: application.yaml
                 path: application.yaml
+        - name: logs
+          emptyDir: {}
+
