@@ -36,7 +36,7 @@ spring:
   elasticsearch:
     uris: http://192.168.1.35:30429
     username: elastic
-    logstashHost: logstash-svc.default.svc.cluster.local:5044
+    logstashHost: logstash-svc.logging.svc.cluster.local:5044
 
 
   security:
