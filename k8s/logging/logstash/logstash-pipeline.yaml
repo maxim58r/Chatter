@@ -6,9 +6,16 @@ metadata:
 data:
   logstash.conf: |-
     input {
+      # Внешний порт для доступа извне кластера
       tcp {
         port => 30429
-        codec => json_lines  # или другой codec, соответствующий формату логов
+        codec => json_lines
+      }
+
+      # Внутренний порт для подключения внутри кластера
+      tcp {
+        port => 5044
+        codec => json_lines
       }
     }
 

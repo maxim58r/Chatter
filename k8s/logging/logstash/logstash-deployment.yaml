@@ -71,16 +71,11 @@ spec:
   selector:
     app: logstash
   ports:
-    # Публикуем порт 5044 (Beats) наружу
-    - name: beats
+    - name: internal-tcp
       port: 5044
       targetPort: 5044
-      nodePort: 31044      # Любое свободное значение от 30000 до 32767
       protocol: TCP
-
-    # Публикуем порт 30429 (TCP) наружу
-    - name: tcp
+    - name: external-tcp
       port: 30429
       targetPort: 30429
-      nodePort: 32029      # Аналогично, свободный диапазон 30000-32767
       protocol: TCP
