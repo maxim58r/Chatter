@@ -49,15 +49,15 @@ spring:
           enabled: true
   classpath: classpath:/,file:/config/
 
-#redis:
-#  host: redis-shared-master.redis.svc.cluster.local
-#  port: 6379
-#  connectTimeout: 60000
-
 redis:
-  host: redis-shared-headless.redis.svc.cluster.local
+  host: redis-shared-master.redis.svc.cluster.local
   port: 6379
   connectTimeout: 60000
+
+#redis:
+#  host: redis-shared-headless.redis.svc.cluster.local
+#  port: 6379
+#  connectTimeout: 60000
 
 jwt:
   secret: secret_key
