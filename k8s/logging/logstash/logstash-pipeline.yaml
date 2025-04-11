@@ -4,7 +4,7 @@ metadata:
   name: logstash-pipeline
   namespace: logging
 data:
-  logstash.conf: |-
+  logstash.conf: |
     input {
       tcp {
         port => 30429
@@ -12,6 +12,7 @@ data:
           charset => "UTF-8"
           target => "log"
         }
+        type => "external"
       }
 
       tcp {
@@ -20,18 +21,25 @@ data:
           charset => "UTF-8"
           target => "log"
         }
+        type => "internal"
       }
     }
 
     filter {
-      if [message] {
-        if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
-          drop { }
-        }
+      if ![log] or ![log][message] {
+        drop {}
+      }
+
+      if [log][message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001|\\u0003/ {
+        drop {}
+      }
+
+      if (strlen([log][message]) < 5 or strlen([log][message]) > 10000) {
+        drop {}
       }
 
       if "_jsonparsefailure" in [tags] {
-        drop { }
+        drop {}
       }
     }
 
