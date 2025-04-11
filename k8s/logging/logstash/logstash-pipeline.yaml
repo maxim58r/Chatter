@@ -24,16 +24,20 @@ data:
     }
 
     filter {
-      if ![message].nil? {
+      # Проверка наличия поля message
+      if [message] {
+        # Отбрасываем бинарные данные
         if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
           drop { }
         }
 
+        # Отбрасываем слишком короткие или длинные сообщения
         if (strlen([message]) < 3 or strlen([message]) > 10000) {
           drop { }
         }
       }
 
+      # Удаляем записи с ошибками парсинга JSON
       if "_jsonparsefailure" in [tags] {
         drop { }
       }
