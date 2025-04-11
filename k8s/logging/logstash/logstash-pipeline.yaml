@@ -24,7 +24,7 @@ data:
     }
 
     filter {
-      if [message] != nil {
+      if ![message].nil? {
         if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
           drop { }
         }
