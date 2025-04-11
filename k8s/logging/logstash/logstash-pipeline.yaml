@@ -25,15 +25,16 @@ data:
     }
 
     filter {
-      # Удаляем бинарные и слишком короткие/длинные сообщения
-      if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
-        drop { }
+      if [message] != nil {
+        if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
+          drop { }
+        }
+        
+        if (strlen([message]) < 3 or strlen([message]) > 10000) {
+          drop { }
+        }
       }
-
-      if [message] and (strlen([message]) < 3 or strlen([message]) > 10000) {
-        drop { }
-      }
-
+      
       if "_jsonparsefailure" in [tags] {
         drop { }
       }
