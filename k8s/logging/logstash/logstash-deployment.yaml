@@ -21,14 +21,14 @@ spec:
             - containerPort: 30429   # TCP input
           resources:
             requests:
-              memory: "256Mi"
+              memory: "1Gi"
               cpu: "100m"
             limits:
-              memory: "512Mi"
+              memory: "2Gi"
               cpu: "300m"
           env:
             - name: LS_JAVA_OPTS
-              value: "-Xms256m -Xmx256m"
+              value: "-Xms256m -Xmx512m"
             - name: ES_USERNAME
               valueFrom:
                 secretKeyRef:
