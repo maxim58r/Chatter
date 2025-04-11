@@ -1,3 +1,4 @@
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -24,8 +25,12 @@ data:
     }
 
     filter {
-      # Удаляем мусорные бинарные сообщения
-      if [message] =~ /\\x|\\u0000/ {
+      # Удаляем бинарные и слишком короткие/длинные сообщения
+      if [message] =~ /\\x[0-9A-Fa-f]{2}|\\u0000|\\u0016|\\u0001/ {
+        drop { }
+      }
+
+      if [message] and (strlen([message]) < 3 or strlen([message]) > 10000) {
         drop { }
       }
 
