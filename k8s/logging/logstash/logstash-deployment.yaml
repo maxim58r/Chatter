@@ -28,7 +28,7 @@ spec:
               cpu: "300m"
           env:
             - name: LS_JAVA_OPTS
-              value: "-Xms256m -Xmx512m"
+              value: "-Xms1g -Xmx1g"
             - name: ES_USERNAME
               valueFrom:
                 secretKeyRef:

@@ -6,20 +6,29 @@ metadata:
 data:
   logstash.conf: |-
     input {
-      # Внешний порт для доступа извне кластера
       tcp {
         port => 30429
-        codec => json_lines
+        codec => json_lines {
+          charset => "UTF-8"
+          target => "log"
+        }
       }
 
-      # Внутренний порт для подключения внутри кластера
       tcp {
         port => 5044
-        codec => json_lines
+        codec => json_lines {
+          charset => "UTF-8"
+          target => "log"
+        }
       }
     }
 
     filter {
+      # Удаляем мусорные бинарные сообщения
+      if [message] =~ /\\x|\\u0000/ {
+        drop { }
+      }
+
       if "_jsonparsefailure" in [tags] {
         drop { }
       }
@@ -29,10 +38,8 @@ data:
       elasticsearch {
         hosts => ["https://elastic-es-http.logging.svc.cluster.local:9200"]
         index => "spring-logs-%{+YYYY.MM.dd}"
-
         user => "${ES_USERNAME}"
         password => "${ES_PASSWORD}"
-
         ssl => true
         ssl_certificate_verification => false
       }

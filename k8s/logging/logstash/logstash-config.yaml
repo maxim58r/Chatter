@@ -18,3 +18,5 @@ data:
     # xpack.monitoring.elasticsearch.hosts: ["https://elastic-es-http.logging.svc.cluster.local:9200"]
 
     # Можно указать logging.level, pipeline.workers, queue.type и т.д. при необходимости.
+    pipeline.workers: 2
+    queue.type: persisted
