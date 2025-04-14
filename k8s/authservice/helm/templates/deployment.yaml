@@ -48,8 +48,8 @@ spec:
               cpu: {{ .Values.container.resources.requests.cpu }}
 
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "{{ .Values.springProfilesActive }}"
+{{/*            - name: SPRING_PROFILES_ACTIVE*/}}
+{{/*              value: "{{ .Values.springProfilesActive }}"*/}}
             - name: SPRING_CONFIG_LOCATION
               value: {{ .Values.spring.classpath | quote }}
             - name: IFT_DATASOURCE_URL

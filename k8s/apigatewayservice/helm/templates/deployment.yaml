@@ -53,8 +53,8 @@ spec:
           # Переменные окружения
           env:
             # профиль (если нужен), берем из values:
-{{/*            - name: SPRING_PROFILES_ACTIVE*/}}
-{{/*              value: {{ .Values.springProfilesActive }}*/}}
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springProfilesActive }}
 
             # Указываем Spring, что нужно читать файл application.yaml из /config
             - name: SPRING_CONFIG_LOCATION
