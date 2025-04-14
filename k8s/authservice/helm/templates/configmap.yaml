@@ -36,15 +36,15 @@ data:
         username: ${ELASTICSEARCH_USERNAME}
         password: ${ELASTICSEARCH_PASSWORD}
 
-      redis:
-        host: ${IFT_REDIS_HOST}
-        port: ${IFT_REDIS_PORT}
-        connect-timeout: {{ .Values.redis.connectTimeout | quote }}
-        password: ${IFT_REDIS_PASSWORD}
-
       security:
         user:
           name: {{ .Values.spring.security.user.name | quote }}
+
+    redis:
+      host: ${IFT_REDIS_HOST}
+      port: ${IFT_REDIS_PORT}
+      connect-timeout: {{ .Values.redis.connectTimeout | quote }}
+      password: ${IFT_REDIS_PASSWORD}
 
     jwt:
       secret: {{ .Values.jwt.secret | quote }}
