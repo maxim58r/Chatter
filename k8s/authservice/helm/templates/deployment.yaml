@@ -82,11 +82,6 @@ spec:
             - name: ELASTIC_HOST
               value: {{ .Values.spring.elasticsearch.logstashHost | quote }}
 
-          envFrom:
-            - configMapRef:
-                name: {{ .Values.globalConfigMap }}
-
-
           volumeMounts:
             - name: app-storage
               mountPath: /data

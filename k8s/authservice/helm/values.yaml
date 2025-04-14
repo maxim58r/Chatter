@@ -81,7 +81,6 @@ readiness:
   periodSeconds: 30
   failureThreshold: 5
 
-globalConfigMap: global-configmap
 serviceAccountName: authservice-sa
 
 storage:
