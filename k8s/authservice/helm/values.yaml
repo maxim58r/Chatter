@@ -9,7 +9,7 @@ image:
 containerPort: 8080
 nodePort: 31000
 
-springProfilesActive: "ift"
+#springProfilesActive: "ift"
 release: prom-stack
 server:
   port: 8080

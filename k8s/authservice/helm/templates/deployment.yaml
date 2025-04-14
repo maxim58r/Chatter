@@ -114,8 +114,8 @@ spec:
           configMap:
             name: {{ .Release.Name }}-configmap
             items:
-              - key: application-ift.yaml
-                path: application-ift.yaml
+              - key: application.yaml
+                path: application.yaml
         - name: logs
           emptyDir: {}
 

@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-configmap
   namespace: {{ .Release.Namespace }}
 data:
-  application-ift.yaml: |
+  application.yaml: |
     server:
       port: {{ .Values.server.port | quote }}
 
