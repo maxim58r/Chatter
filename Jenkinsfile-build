@@ -111,7 +111,7 @@ pipeline {
                            echo "=== Building Docker image for ${srv} ==="
                            sh """
                              docker buildx build \
-                               --platform linux/amd64,linux/arm64 \
+                               --platform linux/amd64 \
                                --build-arg BUILDKIT_STEP_LOG_MAX_SIZE=104857600 \
                                --build-arg BUILDKIT_STEP_LOG_MAX_RETRIES=10 \
                                -t ${DOCKER_HUB_CREDS_USR}/${srv}:${env.BUILD_NUMBER} \
