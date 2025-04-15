@@ -103,7 +103,6 @@ pipeline {
             }
         }
 
-
         stage('Build & Push Docker Images') {
             steps {
                 script {
@@ -112,7 +111,6 @@ pipeline {
                            echo "=== Building Docker image for ${srv} ==="
                            sh """
                              docker buildx build \
-                               --builder mybuilder \
                                --platform linux/amd64,linux/arm64 \
                                --build-arg BUILDKIT_STEP_LOG_MAX_SIZE=104857600 \
                                --build-arg BUILDKIT_STEP_LOG_MAX_RETRIES=10 \
