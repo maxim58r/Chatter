@@ -96,13 +96,13 @@ pipeline {
         stage('Prepare Buildx') {
             steps {
                 sh """
-                  echo "=== Creating buildx builder using host driver ==="
-                  docker buildx rm mybuilder || true
-                  docker buildx create --name mybuilder --driver docker --use
-                  docker buildx inspect mybuilder --bootstrap || exit 1
+                    echo "=== Using default buildx builder ==="
+                    docker buildx use default
+                    docker buildx inspect default --bootstrap
                 """
             }
         }
+
 
         stage('Build & Push Docker Images') {
             steps {
