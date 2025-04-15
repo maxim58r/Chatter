@@ -96,7 +96,9 @@ pipeline {
         stage('Prepare Buildx') {
 			steps {
 				sh """
-                  docker buildx create --name mybuilder --driver docker-container --use || true
+                  echo "=== Creating buildx builder using host driver ==="
+                  docker buildx rm mybuilder || true
+                  docker buildx create --name mybuilder --driver docker --use
                   docker buildx inspect mybuilder --bootstrap || exit 1
                 """
             }
