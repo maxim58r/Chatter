@@ -1,19 +1,19 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: postgres-shared
+  name: postgres-new
   namespace: postgres
 spec:
-  teamId: "chatter"
+  teamId: chatter
   volume:
-    size: 2Gi
+    size: 5Gi
   numberOfInstances: 1
   users:
     postgres:
       - superuser
       - createdb
   databases:
-    postgres_shared: postgres
+    mydatabase: postgres
   postgresql:
     version: "15"
   resources:
