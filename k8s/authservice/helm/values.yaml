@@ -18,10 +18,10 @@ spring:
   application:
     name: authservice
   datasource:
-    host: authservice-db-rw.default.svc.cluster.local
+    host: postgres-new.postgres.svc.cluster.local
     port: 5432
-    dbName: postgres_auth
-    username: authuser
+    dbName: authservice
+    username: postgres
     password: ""
   liquibase:
     enabled: true
